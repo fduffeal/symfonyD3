@@ -1,0 +1,3 @@
+acme_es_battle_homepage:
+    path:     /hello/{name}
+    defaults: { _controller: AcmeEsBattleBundle:Default:index }
