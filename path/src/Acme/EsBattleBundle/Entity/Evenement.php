@@ -151,4 +151,49 @@ class Evenement
     {
         return $this->end;
     }
+
+    /**
+     * @ORM\OneToMany(targetEntity="Paris", mappedBy="evenement")
+     */
+    protected $paris;
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->paris = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add paris
+     *
+     * @param \Acme\EsBattleBundle\Entity\Paris $paris
+     * @return Evenement
+     */
+    public function addPari(\Acme\EsBattleBundle\Entity\Paris $paris)
+    {
+        $this->paris[] = $paris;
+
+        return $this;
+    }
+
+    /**
+     * Remove paris
+     *
+     * @param \Acme\EsBattleBundle\Entity\Paris $paris
+     */
+    public function removePari(\Acme\EsBattleBundle\Entity\Paris $paris)
+    {
+        $this->paris->removeElement($paris);
+    }
+
+    /**
+     * Get paris
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getParis()
+    {
+        return $this->paris;
+    }
 }

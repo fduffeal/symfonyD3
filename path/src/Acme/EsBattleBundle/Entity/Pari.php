@@ -150,4 +150,33 @@ class Pari
     {
         return $this->game;
     }
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Evenement", inversedBy="paris")
+     * @ORM\JoinColumn(name="evenement_id", referencedColumnName="id")
+     */
+    protected $evenement;
+
+    /**
+     * Set evenement
+     *
+     * @param \Acme\EsBattleBundle\Entity\Evenement $evenement
+     * @return Pari
+     */
+    public function setEvenement(\Acme\EsBattleBundle\Entity\Evenement $evenement = null)
+    {
+        $this->evenement = $evenement;
+
+        return $this;
+    }
+
+    /**
+     * Get evenement
+     *
+     * @return \Acme\EsBattleBundle\Entity\Evenement 
+     */
+    public function getEvenement()
+    {
+        return $this->evenement;
+    }
 }
