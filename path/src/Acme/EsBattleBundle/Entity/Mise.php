@@ -91,4 +91,33 @@ class Mise
     {
         return $this->date;
     }
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Pari", inversedBy="mises")
+     * @ORM\JoinColumn(name="pari_id", referencedColumnName="id")
+     */
+    protected $pari;
+
+    /**
+     * Set pari
+     *
+     * @param \Acme\EsBattleBundle\Entity\Pari $pari
+     * @return Mise
+     */
+    public function setPari(\Acme\EsBattleBundle\Entity\Pari $pari = null)
+    {
+        $this->pari = $pari;
+
+        return $this;
+    }
+
+    /**
+     * Get pari
+     *
+     * @return \Acme\EsBattleBundle\Entity\Pari 
+     */
+    public function getPari()
+    {
+        return $this->pari;
+    }
 }

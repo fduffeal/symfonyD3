@@ -153,7 +153,7 @@ class Evenement
     }
 
     /**
-     * @ORM\OneToMany(targetEntity="Paris", mappedBy="evenement")
+     * @ORM\OneToMany(targetEntity="Pari", mappedBy="evenement")
      */
     protected $paris;
     /**
@@ -170,7 +170,7 @@ class Evenement
      * @param \Acme\EsBattleBundle\Entity\Paris $paris
      * @return Evenement
      */
-    public function addPari(\Acme\EsBattleBundle\Entity\Paris $paris)
+    public function addPari(\Acme\EsBattleBundle\Entity\Pari $paris)
     {
         $this->paris[] = $paris;
 
@@ -182,7 +182,7 @@ class Evenement
      *
      * @param \Acme\EsBattleBundle\Entity\Paris $paris
      */
-    public function removePari(\Acme\EsBattleBundle\Entity\Paris $paris)
+    public function removePari(\Acme\EsBattleBundle\Entity\Pari $paris)
     {
         $this->paris->removeElement($paris);
     }

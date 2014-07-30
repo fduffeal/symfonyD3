@@ -179,4 +179,49 @@ class Pari
     {
         return $this->evenement;
     }
+
+    /**
+     * @ORM\OneToMany(targetEntity="Mise", mappedBy="pari")
+     */
+    protected $mises;
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->mises = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add mises
+     *
+     * @param \Acme\EsBattleBundle\Entity\Mise $mises
+     * @return Pari
+     */
+    public function addMise(\Acme\EsBattleBundle\Entity\Mise $mises)
+    {
+        $this->mises[] = $mises;
+
+        return $this;
+    }
+
+    /**
+     * Remove mises
+     *
+     * @param \Acme\EsBattleBundle\Entity\Mise $mises
+     */
+    public function removeMise(\Acme\EsBattleBundle\Entity\Mise $mises)
+    {
+        $this->mises->removeElement($mises);
+    }
+
+    /**
+     * Get mises
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getMises()
+    {
+        return $this->mises;
+    }
 }
