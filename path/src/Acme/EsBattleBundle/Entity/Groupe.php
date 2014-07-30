@@ -91,4 +91,49 @@ class Groupe
     {
         return $this->description;
     }
+
+    /**
+     * @ORM\OneToMany(targetEntity="User", mappedBy="groupe")
+     */
+    protected $users;
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->users = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add users
+     *
+     * @param \Acme\EsBattleBundle\Entity\User $users
+     * @return Groupe
+     */
+    public function addUser(\Acme\EsBattleBundle\Entity\User $users)
+    {
+        $this->users[] = $users;
+
+        return $this;
+    }
+
+    /**
+     * Remove users
+     *
+     * @param \Acme\EsBattleBundle\Entity\User $users
+     */
+    public function removeUser(\Acme\EsBattleBundle\Entity\User $users)
+    {
+        $this->users->removeElement($users);
+    }
+
+    /**
+     * Get users
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getUsers()
+    {
+        return $this->users;
+    }
 }

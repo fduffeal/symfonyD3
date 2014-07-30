@@ -169,4 +169,34 @@ class User
     {
         return $this->clans;
     }
+
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Groupe", inversedBy="users")
+     * @ORM\JoinColumn(name="groupe_id", referencedColumnName="id")
+     */
+    protected $groupe;
+
+    /**
+     * Set groupe
+     *
+     * @param \Acme\EsBattleBundle\Entity\Groupe $groupe
+     * @return User
+     */
+    public function setGroupe(\Acme\EsBattleBundle\Entity\Groupe $groupe = null)
+    {
+        $this->groupe = $groupe;
+
+        return $this;
+    }
+
+    /**
+     * Get groupe
+     *
+     * @return \Acme\EsBattleBundle\Entity\Groupe 
+     */
+    public function getGroupe()
+    {
+        return $this->groupe;
+    }
 }
