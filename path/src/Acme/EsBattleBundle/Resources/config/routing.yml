@@ -1,3 +1,7 @@
 acme_es_battle_homepage:
     path:     /hello/{name}
     defaults: { _controller: AcmeEsBattleBundle:Default:index }
+
+acme_es_battle_login:
+    path:     /login/{login}/{password}
+    defaults: { _controller: AcmeEsBattleBundle:Login:index }

@@ -55,7 +55,11 @@ doctrine:
 
     orm:
         auto_generate_proxy_classes: "%kernel.debug%"
-        auto_mapping: true
+        entity_managers:
+                default:
+                    connection:       default
+                    mappings:
+                        AcmeEsBattleBundle: ~
 
 # Swiftmailer Configuration
 swiftmailer:
