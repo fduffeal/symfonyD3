@@ -60,6 +60,7 @@ doctrine:
                     connection:       default
                     mappings:
                         AcmeEsBattleBundle: ~
+                        FOSOAuthServerBundle: ~
 
 # Swiftmailer Configuration
 swiftmailer:
@@ -68,3 +69,15 @@ swiftmailer:
     username:  "%mailer_user%"
     password:  "%mailer_password%"
     spool:     { type: memory }
+
+# app/config/config.yml
+fos_oauth_server:
+    db_driver: orm
+    client_class:        Acme\EsBattleBundle\Entity\Client
+    access_token_class:  Acme\EsBattleBundle\Entity\AccessToken
+    refresh_token_class: Acme\EsBattleBundle\Entity\RefreshToken
+    auth_code_class:     Acme\EsBattleBundle\Entity\AuthCode
+    service:
+        user_provider: platform.user.provider
+        options:
+            supported_scopes: user

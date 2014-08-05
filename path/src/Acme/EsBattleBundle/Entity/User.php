@@ -1,202 +1,139 @@
 <?php
 
+// src/Acme/DemoBundle/Entity/User.php
+
 namespace Acme\EsBattleBundle\Entity;
 
+use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping as ORM;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 /**
- * User
+ * Acme\UserBundle\Entity\User
  *
- * @ORM\Table()
- * @ORM\Entity
+ * @ORM\Table(name="acme_users")
+ * @ORM\Entity(repositoryClass="Acme\DemoBundle\Repository\UserRepository")
  */
-class User
+class User implements UserInterface, \Serializable
 {
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
+     * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="login", type="string", length=255)
+     * @ORM\Column(type="string", length=25, unique=true)
      */
-    private $login;
+    private $username;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="password", type="string", length=255)
+     * @ORM\Column(type="string", length=25, unique=true)
+     */
+    private $email;
+
+    /**
+     * @ORM\Column(type="string", length=32)
+     */
+    private $salt;
+
+    /**
+     * @ORM\Column(type="string", length=40)
      */
     private $password;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="avatar", type="string", length=255)
+     * @ORM\Column(name="is_active", type="boolean")
      */
-    private $avatar;
+    private $isActive;
 
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId()
+    public function __construct()
     {
+        $this->isActive = true;
+        $this->salt = md5(uniqid(null, true));
+    }
+
+    public function getId(){
         return $this->id;
     }
 
     /**
-     * Set login
-     *
-     * @param string $login
-     * @return User
+     * @inheritDoc
      */
-    public function setLogin($login)
+    public function getUsername()
     {
-        $this->login = $login;
-
-        return $this;
+        return $this->username;
     }
 
     /**
-     * Get login
-     *
-     * @return string 
+     * @inheritDoc
      */
-    public function getLogin()
+    public function setUsername($username)
     {
-        return $this->login;
+        $this->username = $username;
+        $this->email = $username;
     }
 
     /**
-     * Set password
-     *
-     * @param string $password
-     * @return User
+     * @inheritDoc
      */
-    public function setPassword($password)
+    public function getSalt()
     {
-        $this->password = $password;
+        return $this->salt;
+    }
 
-        return $this;
+    public function setSalt($salt)
+    {
+        $this->salt = $salt;
     }
 
     /**
-     * Get password
-     *
-     * @return string 
+     * @inheritDoc
      */
     public function getPassword()
     {
         return $this->password;
     }
 
-    /**
-     * Set avatar
-     *
-     * @param string $avatar
-     * @return User
-     */
-    public function setAvatar($avatar)
+    public function setPassword($password)
     {
-        $this->avatar = $avatar;
-
-        return $this;
+        $this->password = $password;
     }
 
     /**
-     * Get avatar
-     *
-     * @return string 
+     * @inheritDoc
      */
-    public function getAvatar()
+    public function getRoles()
     {
-        return $this->avatar;
+        return array('ROLE_USER');
     }
 
     /**
-     * @ORM\ManyToMany(targetEntity="Clan")
-     * @ORM\JoinTable(name="users_clans",
-     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="clan_id", referencedColumnName="id")}
-     *      )
-     **/
-    private $clans;
-
-    public function __construct() {
-        $this->clans = new ArrayCollection();
+     * @inheritDoc
+     */
+    public function eraseCredentials()
+    {
     }
 
     /**
-     * Add clans
-     *
-     * @param \Acme\EsBattleBundle\Entity\Clan $clans
-     * @return User
+     * @see \Serializable::serialize()
      */
-    public function addClan(\Acme\EsBattleBundle\Entity\Clan $clans)
+    public function serialize()
     {
-        $this->clans[] = $clans;
-
-        return $this;
+        return serialize(
+            array(
+                $this->id,
+            )
+        );
     }
 
     /**
-     * Remove clans
-     *
-     * @param \Acme\EsBattleBundle\Entity\Clan $clans
+     * @see \Serializable::unserialize()
      */
-    public function removeClan(\Acme\EsBattleBundle\Entity\Clan $clans)
+    public function unserialize($serialized)
     {
-        $this->clans->removeElement($clans);
-    }
-
-    /**
-     * Get clans
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getClans()
-    {
-        return $this->clans;
-    }
-
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Groupe", inversedBy="users")
-     * @ORM\JoinColumn(name="groupe_id", referencedColumnName="id")
-     */
-    protected $groupe;
-
-    /**
-     * Set groupe
-     *
-     * @param \Acme\EsBattleBundle\Entity\Groupe $groupe
-     * @return User
-     */
-    public function setGroupe(\Acme\EsBattleBundle\Entity\Groupe $groupe = null)
-    {
-        $this->groupe = $groupe;
-
-        return $this;
-    }
-
-    /**
-     * Get groupe
-     *
-     * @return \Acme\EsBattleBundle\Entity\Groupe 
-     */
-    public function getGroupe()
-    {
-        return $this->groupe;
+        list (
+            $this->id,
+            ) = unserialize($serialized);
     }
 }
