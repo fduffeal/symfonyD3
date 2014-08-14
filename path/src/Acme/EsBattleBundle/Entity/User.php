@@ -1,6 +1,6 @@
 <?php
 
-// src/Acme/DemoBundle/Entity/User.php
+// src/Acme/EsBattleBundle/Entity/User.php
 
 namespace Acme\EsBattleBundle\Entity;
 
@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Acme\UserBundle\Entity\User
  *
  * @ORM\Table(name="acme_users")
- * @ORM\Entity(repositoryClass="Acme\DemoBundle\Repository\UserRepository")
+ * @ORM\Entity(repositoryClass="Acme\EsBattleBundle\Repository\UserRepository")
  */
 class User implements UserInterface, \Serializable
 {

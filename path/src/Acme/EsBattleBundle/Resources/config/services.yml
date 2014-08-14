@@ -13,15 +13,16 @@ services:
     class: Doctrine\ORM\EntityManager
     factory-service : doctrine
     factory-method: getManagerForClass
-    arguments : [platform.entity.user.class]
+    arguments : [%platform.entity.user.class%]
 
   platform.user.repository:
     class : Acme\EsBattleBundle\Repository\UserRepository
-    factory-service : latform.user.manager
+    factory-service : doctrine.orm.entity_manager
     factory-method : getRepository
-    arguments : [platform.entity.user.class]
+    arguments : [%platform.entity.user.class%]
 
   platform.user.provider:
-    class : Acme\EsBattleBundle\Provider\UserProvider
+    class : %platform.user.provider.class%
+    factory_service: doctrine.orm.entity_manager
     arguments : ["@platform.user.repository"]
 

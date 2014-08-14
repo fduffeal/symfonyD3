@@ -1,4 +1,5 @@
 <?php
+// src/Acme/EsBattleBundle/Entity/AccessToken.php
 
 namespace Acme\EsBattleBundle\Entity;
 

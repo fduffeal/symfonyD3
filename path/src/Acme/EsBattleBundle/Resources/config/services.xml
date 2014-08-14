@@ -1,4 +1,4 @@
-<!-- src/Acme/DemoBundle/Resources/config/services.xml -->
+<!-- src/Acme/EsBattleBundle/Resources/config/services.xml -->
 <parameters>
     <parameter key="platform.entity.user.class">Acme\EsBattleBundle\Entity\User</parameter>
     <parameter key="platform.user.provider.class">Acme\EsBattleBundle\Provider\UserProvider</parameter>

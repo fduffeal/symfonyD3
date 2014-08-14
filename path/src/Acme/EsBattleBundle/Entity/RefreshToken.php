@@ -1,4 +1,5 @@
 <?php
+// src/Acme/EsBattleBundle/Entity/RefreshToken.php
 
 namespace Acme\EsBattleBundle\Entity;
 

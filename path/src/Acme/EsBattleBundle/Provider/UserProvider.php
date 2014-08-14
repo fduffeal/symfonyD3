@@ -1,5 +1,5 @@
 <?php
-// src/Acme/DemoBundle/Provider/UserProvider.php
+// src/Acme/EsBattleBundle/Provider/UserProvider.php
 
 namespace Acme\EsBattleBundle\Provider;
 
@@ -31,7 +31,7 @@ class UserProvider implements UserProviderInterface
             $user = $q->getSingleResult();
         } catch (NoResultException $e) {
             $message = sprintf(
-                'Unable to find an active admin AcmeDemoBundle:User object identified by "%s".',
+                'Unable to find an active admin AcmeEsBattleBundle:User object identified by "%s".',
                 $username
             );
             throw new UsernameNotFoundException($message, 0, $e);
