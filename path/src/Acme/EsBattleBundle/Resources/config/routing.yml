@@ -3,5 +3,6 @@ acme_es_battle_homepage:
     defaults: { _controller: AcmeEsBattleBundle:Default:index }
 
 acme_es_battle_login:
-    path:     /login/{login}/{password}
+    path:     /loginold/{login}/{password}
     defaults: { _controller: AcmeEsBattleBundle:Login:index }
+

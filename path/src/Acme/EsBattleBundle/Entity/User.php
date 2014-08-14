@@ -3,6 +3,7 @@
 namespace Acme\EsBattleBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use FOS\UserBundle\Model\User as BaseUser;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -12,7 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @ORM\Table()
  * @ORM\Entity
  */
-class User
+class User extends  BaseUser
 {
     /**
      * @var integer
@@ -21,7 +22,7 @@ class User
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
@@ -35,7 +36,7 @@ class User
      *
      * @ORM\Column(name="password", type="string", length=255)
      */
-    private $password;
+    protected $password;
 
     /**
      * @var string
@@ -134,6 +135,10 @@ class User
     private $clans;
 
     public function __construct() {
+
+        parent::__construct();
+        // your own logic
+
         $this->clans = new ArrayCollection();
     }
 
