@@ -72,4 +72,4 @@ swiftmailer:
 fos_user:
     db_driver: orm # other valid values are 'mongodb', 'couchdb' and 'propel'
     firewall_name: main
-    user_class: Acme\EsbattleBundle\Entity\User
+    user_class: Acme\EsBattleBundle\Entity\User
