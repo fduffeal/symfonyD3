@@ -1,9 +1,0 @@
-# src/Acme/UserBundle/Resources/config/doctrine/Mise.orm.yml
-Acme\EsBattleBundle\Entity\Mise:
-    type:  entity
-    table: mise
-    id:
-        id:
-            type: integer
-            generator:
-                strategy: AUTO

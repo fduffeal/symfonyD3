@@ -1,9 +1,0 @@
-# src/Acme/UserBundle/Resources/config/doctrine/Pari.orm.yml
-Acme\EsBattleBundle\Entity\Pari:
-    type:  entity
-    table: pari
-    id:
-        id:
-            type: integer
-            generator:
-                strategy: AUTO

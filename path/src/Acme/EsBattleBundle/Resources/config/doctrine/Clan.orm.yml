@@ -1,9 +1,0 @@
-# src/Acme/UserBundle/Resources/config/doctrine/Clan.orm.yml
-Acme\EsBattleBundle\Entity\Clan:
-    type:  entity
-    table: clan
-    id:
-        id:
-            type: integer
-            generator:
-                strategy: AUTO

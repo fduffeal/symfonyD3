@@ -1,9 +1,0 @@
-# src/Acme/UserBundle/Resources/config/doctrine/Game.orm.yml
-Acme\EsBattleBundle\Entity\Game:
-    type:  entity
-    table: game
-    id:
-        id:
-            type: integer
-            generator:
-                strategy: AUTO

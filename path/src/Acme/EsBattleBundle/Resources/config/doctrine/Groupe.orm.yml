@@ -1,9 +1,0 @@
-# src/Acme/UserBundle/Resources/config/doctrine/Groupe.orm.yml
-Acme\EsBattleBundle\Entity\Groupe:
-    type:  entity
-    table: groupe
-    id:
-        id:
-            type: integer
-            generator:
-                strategy: AUTO
