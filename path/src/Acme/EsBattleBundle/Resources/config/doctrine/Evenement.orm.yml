@@ -1,0 +1,9 @@
+# src/Acme/UserBundle/Resources/config/doctrine/Evenement.orm.yml
+Acme\EsBattleBundle\Entity\Evenement:
+    type:  entity
+    table: evenement
+    id:
+        id:
+            type: integer
+            generator:
+                strategy: AUTO

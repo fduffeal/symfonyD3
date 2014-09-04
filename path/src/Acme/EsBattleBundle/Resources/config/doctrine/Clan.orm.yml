@@ -1,7 +1,7 @@
-# src/Acme/UserBundle/Resources/config/doctrine/User.orm.yml
-Acme\EsBattleBundle\Entity\User:
+# src/Acme/UserBundle/Resources/config/doctrine/Clan.orm.yml
+Acme\EsBattleBundle\Entity\Clan:
     type:  entity
-    table: user
+    table: clan
     id:
         id:
             type: integer

@@ -13,7 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @ORM\Table()
  * @ORM\Entity
  */
-class User extends  BaseUser
+class User extends BaseUser
 {
     /**
      * @var integer
@@ -43,7 +43,7 @@ class User extends  BaseUser
      *
      * @ORM\Column(name="avatar", type="string", length=255)
      */
-    private $avatar;
+    protected $avatar;
 
 
     /**

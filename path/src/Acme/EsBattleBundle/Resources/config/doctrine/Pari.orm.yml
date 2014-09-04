@@ -1,7 +1,7 @@
-# src/Acme/UserBundle/Resources/config/doctrine/User.orm.yml
-Acme\EsBattleBundle\Entity\User:
+# src/Acme/UserBundle/Resources/config/doctrine/Pari.orm.yml
+Acme\EsBattleBundle\Entity\Pari:
     type:  entity
-    table: user
+    table: pari
     id:
         id:
             type: integer

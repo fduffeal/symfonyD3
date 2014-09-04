@@ -1,7 +1,7 @@
-# src/Acme/UserBundle/Resources/config/doctrine/User.orm.yml
-Acme\EsBattleBundle\Entity\User:
+# src/Acme/UserBundle/Resources/config/doctrine/Game.orm.yml
+Acme\EsBattleBundle\Entity\Game:
     type:  entity
-    table: user
+    table: game
     id:
         id:
             type: integer

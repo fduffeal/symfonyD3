@@ -1,7 +1,7 @@
-# src/Acme/UserBundle/Resources/config/doctrine/User.orm.yml
-Acme\EsBattleBundle\Entity\User:
+# src/Acme/UserBundle/Resources/config/doctrine/Groupe.orm.yml
+Acme\EsBattleBundle\Entity\Groupe:
     type:  entity
-    table: user
+    table: groupe
     id:
         id:
             type: integer
