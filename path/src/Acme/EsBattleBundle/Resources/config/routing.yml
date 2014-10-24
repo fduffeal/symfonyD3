@@ -6,3 +6,10 @@ acme_es_battle_login:
     path:     /loginold/{login}/{password}
     defaults: { _controller: AcmeEsBattleBundle:Login:index }
 
+acme_es_battle_rdv:
+    path:     /rdv/
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:index }
+
+acme_es_battle_rdv_create:
+    path:     /rdv/add/{name}/{description}/{start}/{end}/{nbParticipant}
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:create }
