@@ -7,7 +7,6 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use FOS\UserBundle\Model\UserInterface;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse ;
 
 
 use Symfony\Component\Serializer\Serializer;
@@ -94,6 +93,15 @@ class RdvController extends Controller
 		$em->persist($appointment);
 		$em->flush();
 
-		return $this->render('AcmeEsBattleBundle:Default:json.html.twig', array('json' => json_encode($appointment)));
+
+        $encoders = array(new XmlEncoder(), new JsonEncoder());
+        $normalizers = array(new GetSetMethodNormalizer());
+
+        $serializer = new Serializer($normalizers, $encoders);
+
+        $json = $serializer->serialize($appointment, 'json');
+
+        return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+
 	}
 }
