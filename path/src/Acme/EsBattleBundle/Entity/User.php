@@ -62,6 +62,14 @@ class User
 	private  $salt;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="apikey", type="string", length=255)
+     */
+    private  $apikey;
+
+
+    /**
      * @ORM\ManyToMany(targetEntity="Clan")
      * @ORM\JoinTable(name="users_clans",
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
@@ -179,13 +187,12 @@ class User
 	 *
 	 * @return string
 	 */
-	public function serialize()
+	public function _toArray()
 	{
-		return serialize(array(
-			'id' => $this->id,
-			'username' => $this->username
-
-		));
+		return array(
+			'username' => $this->username,
+            'token' => $this->apikey
+		);
 	}
 
     /**
@@ -284,7 +291,34 @@ class User
 		return base_convert(sha1($password.$this->salt), 16, 36);
 	}
 
+    public function createApiKey(){
+        return base_convert(sha1(uniqid(mt_rand(), true)), 16, 36).base_convert(sha1(uniqid(mt_rand(), true).$this->username.$this->id), 16, 36);
+    }
+
 	public function isPasswordOk($password){
 		return $this->password === $this->makePassword($password);
 	}
+
+    /**
+     * Set apikey
+     *
+     * @param string $apikey
+     * @return User
+     */
+    public function setApikey($apikey)
+    {
+        $this->apikey = $apikey;
+
+        return $this;
+    }
+
+    /**
+     * Get apikey
+     *
+     * @return string 
+     */
+    public function getApikey()
+    {
+        return $this->apikey;
+    }
 }
