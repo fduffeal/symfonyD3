@@ -8,27 +8,10 @@ use Acme\EsBattleBundle\Entity\User as User;
 
 use Symfony\Component\HttpFoundation\Response;
 
-
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Encoder\XmlEncoder;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
-
-use Symfony\Component\HttpFoundation\Request;
-
 class LoginController extends Controller
 {
-    public function indexAction(Request $request)
+    public function indexAction($email,$password)
     {
-
-        $email = $request->query->get('email');
-        $password = $request->query->get('password');
-
-        var_dump($_REQUEST);die();
-
-        /*$user = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:User')
-            ->findByLogin($login);*/
 
         $user = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:User')
@@ -44,14 +27,7 @@ class LoginController extends Controller
             $em->persist($user);
             $em->flush();
 
-            $aUser = $user->_toArray();
-
-            $encoders = array(new XmlEncoder(), new JsonEncoder());
-            $normalizers = array(new GetSetMethodNormalizer());
-
-            $serializer = new Serializer($normalizers, $encoders);
-
-            $json = $serializer->serialize($aUser, 'json');
+            $json = $user->_toJson();
 
 		    return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
 	    } else {
@@ -74,15 +50,7 @@ class LoginController extends Controller
 		$em->persist($user);
 		$em->flush();
 
-        $aUser = $user->_toArray();
-
-        $encoders = array(new XmlEncoder(), new JsonEncoder());
-        $normalizers = array(new GetSetMethodNormalizer());
-
-        $serializer = new Serializer($normalizers, $encoders);
-
-        $json = $serializer->serialize($aUser, 'json');
-
+        $json = $user->_toJson();
 
         return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
 	}
