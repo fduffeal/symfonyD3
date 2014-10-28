@@ -1,7 +1,28 @@
 parameters:
 #    acme_es_battle.example.class: Acme\EsBattleBundle\Example
 
+  platform.entity.user.class : Acme\EsBattleBundle\Entity\User
+  platform.user.provider.class : Acme\EsBattleBundle\Provider\UserProvider
+
 services:
 #    acme_es_battle.example:
 #        class: %acme_es_battle.example.class%
 #        arguments: [@service_id, "plain_value", %parameter%]
+
+  platform.user.manager:
+    class: Doctrine\ORM\EntityManager
+    factory-service : doctrine
+    factory-method: getManagerForClass
+    arguments : [%platform.entity.user.class%]
+
+  platform.user.repository:
+    class : Acme\EsBattleBundle\Repository\UserRepository
+    factory-service : doctrine.orm.entity_manager
+    factory-method : getRepository
+    arguments : [%platform.entity.user.class%]
+
+  platform.user.provider:
+    class : %platform.user.provider.class%
+    factory_service: doctrine.orm.entity_manager
+    arguments : ["@platform.user.repository"]
+
