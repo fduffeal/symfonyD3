@@ -36,6 +36,14 @@ class LoginController extends Controller
 
     }
 
+	/**
+	 * @param $email
+	 * @param $password
+	 * @param $username
+	 * @return Response
+	 *
+	 * @todo checker email et username
+	 */
 	public function registerAction($email,$password,$username)
 	{
 
@@ -45,6 +53,7 @@ class LoginController extends Controller
 		$user->setUsername($username);
 		$user->setPassword($user->makePassword($password));
 
+		$user->setApikey($user->createApiKey());
 
 		$em = $this->getDoctrine()->getManager();
 		$em->persist($user);
