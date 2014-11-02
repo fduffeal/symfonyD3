@@ -84,27 +84,36 @@ class RdvController extends Controller
 //	    return $this->render('AcmeEsBattleBundle:Default:json.html.twig', array('json' => $result));
     }
 
-	public function createAction($name,$description,$start,$duree,$nbParticipant,$username,$token)
+	public function createAction($plateform,$game,$tags,$description,$start,$duree,$nbParticipant,$username,$token)
 	{
 
         $user = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:User')
             ->findOneBy(
-                array('username' => $username,'token' => $token)
+                array('username' => $username,'apikey' => $token)
             );
 
 		$start = new \DateTime($start);
-		$duree = new \Time($duree);
 		$nbParticipant = intval($nbParticipant);
 
 		$appointment = new Appointment();
-		$appointment->setName($name);
 		$appointment->setDescription($description);
 		$appointment->setStart($start);
 		$appointment->setDuree($duree);
 		$appointment->setNbParticipant($nbParticipant);
         $appointment->setLeader($user);
         $appointment->addUser($user);
+
+
+        $aTags = preg_split("/[\s,]+/",$tags);
+
+        foreach($aTags as $key){
+            $selectedTag = $this->getDoctrine()
+                ->getRepository('AcmeEsBattleBundle:Tag')
+                ->findOneBy(array('nom' => $key));
+
+            $appointment->addTag($selectedTag);
+        }
 
 		$em = $this->getDoctrine()->getManager();
 		$em->persist($appointment);
@@ -116,9 +125,28 @@ class RdvController extends Controller
 
         $serializer = new Serializer($normalizers, $encoders);
 
-        $json = $serializer->serialize($appointment, 'json');
+        $json = $appointment->_toJson();
+
 
         return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
 
 	}
+
+    public function getFormInfoAction(){
+        $tags = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Tag')
+            ->findAll();
+
+        $aTags = array();
+        foreach($tags as $tag){
+            $aTags[] = $tag->_toArray();
+        }
+
+        $response = array(
+            'tags' => $aTags
+        );
+        $json = json_encode($response);
+        return new Response($json, 200, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+
+    }
 }

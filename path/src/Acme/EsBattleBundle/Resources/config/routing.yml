@@ -15,5 +15,9 @@ acme_es_battle_rdv:
     defaults: { _controller: AcmeEsBattleBundle:Rdv:index }
 
 acme_es_battle_rdv_create:
-    path:     /rdv/add/{name}/{description}/{start}/{duree}/{nbParticipant}/{username}/{token}
+    path:     /rdv/add/{plateform}/{game}/{tags}/{description}/{start}/{duree}/{nbParticipant}/{username}/{token}
     defaults: { _controller: AcmeEsBattleBundle:Rdv:create }
+
+acme_es_battle_rdv_form_info:
+    path:     /rdv/form_info
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:getFormInfo }
