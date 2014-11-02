@@ -195,8 +195,8 @@ class User
 	public function _toArray()
 	{
 		return array(
-			'username' => $this->username,
-            'token' => $this->apikey
+            'id' => $this->getId(),
+			'username' => $this->getUsername()
 		);
 	}
 

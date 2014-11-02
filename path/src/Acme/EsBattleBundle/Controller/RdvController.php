@@ -29,17 +29,30 @@ class RdvController extends Controller
 //		    throw new AccessDeniedException('This user does not have access to this section.');
 //	    }
 
-	    $result = $this->getDoctrine()
+
+        $collection = $this->getDoctrine()
 		    ->getRepository('AcmeEsBattleBundle:Appointment')
 		    ->findAll();
 
 
-	    $encoders = array(new XmlEncoder(), new JsonEncoder());
+        /*$serializer = new Serializer(array(new GetSetMethodNormalizer()), array('json' => new
+        JsonEncoder()));
+        $collection = $serializer->serialize($collection, 'json');*/
+
+        $aResult = [];
+        foreach($collection as $appointment){
+            $aResult[] = $appointment->_toArray();
+        }
+
+	    /*$encoders = array(new XmlEncoder(), new JsonEncoder());
 	    $normalizers = array(new GetSetMethodNormalizer());
 
 	    $serializer = new Serializer($normalizers, $encoders);
 
-	    $json = $serializer->serialize($result, 'json'); // Output: {"name":"foo","age":99}
+	    $json = $serializer->serialize($aResult, 'json'); // Output: {"name":"foo","age":99}*/
+
+        $json = json_encode($aResult);
+
 
 //	    $result = json_encode($result);
 //	    var_dump($result);
@@ -52,6 +65,7 @@ class RdvController extends Controller
 
 
 
+//        var_dump($json);die();
 // create a simple Response with a 200 status code (the default)
 
 // create a JSON-response with a 200 status code
@@ -70,24 +84,27 @@ class RdvController extends Controller
 //	    return $this->render('AcmeEsBattleBundle:Default:json.html.twig', array('json' => $result));
     }
 
-	public function createAction($name,$description,$start,$end,$nbParticipant)
+	public function createAction($name,$description,$start,$duree,$nbParticipant,$username,$token)
 	{
 
-		$user = $this->container->get('security.context')->getToken()->getUser();
-		if (!is_object($user) || !$user instanceof UserInterface) {
-			throw new AccessDeniedException('This user does not have access to this section.');
-		}
+        $user = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:User')
+            ->findOneBy(
+                array('username' => $username,'token' => $token)
+            );
 
 		$start = new \DateTime($start);
-		$end = new \DateTime($end);
+		$duree = new \Time($duree);
 		$nbParticipant = intval($nbParticipant);
 
 		$appointment = new Appointment();
 		$appointment->setName($name);
 		$appointment->setDescription($description);
 		$appointment->setStart($start);
-		$appointment->setEnd($end);
+		$appointment->setDuree($duree);
 		$appointment->setNbParticipant($nbParticipant);
+        $appointment->setLeader($user);
+        $appointment->addUser($user);
 
 		$em = $this->getDoctrine()->getManager();
 		$em->persist($appointment);

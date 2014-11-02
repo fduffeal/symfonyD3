@@ -27,7 +27,12 @@ class LoginController extends Controller
             $em->persist($user);
             $em->flush();
 
-            $json = $user->_toJson();
+            $aUser = array(
+                'username' => $user->getUsername(),
+                'token' => $user->getToken()
+            );
+
+            $json = json_encode($aUser);
 
 		    return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
 	    } else {
@@ -59,7 +64,12 @@ class LoginController extends Controller
 		$em->persist($user);
 		$em->flush();
 
-        $json = $user->_toJson();
+        $aUser = array(
+            'username' => $user->getUsername(),
+            'token' => $user->getToken()
+        );
+
+        $json = json_encode($aUser);
 
         return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
 	}

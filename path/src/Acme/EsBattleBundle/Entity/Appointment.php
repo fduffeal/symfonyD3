@@ -4,6 +4,11 @@ namespace Acme\EsBattleBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+
 /**
  * Appointment
  *
@@ -21,12 +26,6 @@ class Appointment
      */
     private $id;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
-     */
-    private $name;
 
     /**
      * @var string
@@ -43,11 +42,11 @@ class Appointment
     private $start;
 
     /**
-     * @var \DateTime
+     * @var integer
      *
-     * @ORM\Column(name="end", type="datetime")
+     * @ORM\Column(name="duree", type="integer")
      */
-    private $end;
+    private $duree;
 
 	/**
 	 *
@@ -57,6 +56,37 @@ class Appointment
 
 
     /**
+     * @ORM\ManyToMany(targetEntity="Tag")
+     * @ORM\JoinTable(name="appointment_tag",
+     *      joinColumns={@ORM\JoinColumn(name="appointment_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="tag_id", referencedColumnName="id")}
+     *      )
+     **/
+    private $tags;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="User")
+     * @ORM\JoinTable(name="appointment_user",
+     *      joinColumns={@ORM\JoinColumn(name="appointment_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
+     *      )
+     **/
+    private $users;
+
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="users")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     */
+    protected $leader;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Game", inversedBy="games")
+     * @ORM\JoinColumn(name="game_id", referencedColumnName="id")
+     */
+    protected $game;
+
+    /**
      * Get id
      *
      * @return integer 
@@ -64,29 +94,6 @@ class Appointment
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Set name
-     *
-     * @param string $name
-     * @return Evenement
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * Get name
-     *
-     * @return string 
-     */
-    public function getName()
-    {
-        return $this->name;
     }
 
     /**
@@ -136,30 +143,6 @@ class Appointment
     }
 
     /**
-     * Set end
-     *
-     * @param \DateTime $end
-     * @return Evenement
-     */
-    public function setEnd($end)
-    {
-        $this->end = $end;
-
-        return $this;
-    }
-
-    /**
-     * Get end
-     *
-     * @return \DateTime 
-     */
-    public function getEnd()
-    {
-        return $this->end;
-    }
-
-
-    /**
      * Set nbParticipant
      *
      * @param integer $nbParticipant
@@ -180,5 +163,186 @@ class Appointment
     public function getNbParticipant()
     {
         return $this->nbParticipant;
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->tags = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add tags
+     *
+     * @param \Acme\EsBattleBundle\Entity\Tag $tags
+     * @return Appointment
+     */
+    public function addTag(\Acme\EsBattleBundle\Entity\Tag $tags)
+    {
+        $this->tags[] = $tags;
+
+        return $this;
+    }
+
+    /**
+     * Remove tags
+     *
+     * @param \Acme\EsBattleBundle\Entity\Tag $tags
+     */
+    public function removeTag(\Acme\EsBattleBundle\Entity\Tag $tags)
+    {
+        $this->tags->removeElement($tags);
+    }
+
+    /**
+     * Get tags
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * Add users
+     *
+     * @param \Acme\EsBattleBundle\Entity\User $users
+     * @return Appointment
+     */
+    public function addUser(\Acme\EsBattleBundle\Entity\User $users)
+    {
+        $this->users[] = $users;
+
+        return $this;
+    }
+
+    /**
+     * Remove users
+     *
+     * @param \Acme\EsBattleBundle\Entity\User $users
+     */
+    public function removeUser(\Acme\EsBattleBundle\Entity\User $users)
+    {
+        $this->users->removeElement($users);
+    }
+
+    /**
+     * Get users
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getUsers()
+    {
+        return $this->users;
+    }
+
+    /**
+     * Set leader
+     *
+     * @param \Acme\EsBattleBundle\Entity\User $leader
+     * @return Appointment
+     */
+    public function setLeader(\Acme\EsBattleBundle\Entity\User $leader = null)
+    {
+        $this->leader = $leader;
+
+        return $this;
+    }
+
+    /**
+     * Get leader
+     *
+     * @return \Acme\EsBattleBundle\Entity\User 
+     */
+    public function getLeader()
+    {
+        return $this->leader;
+    }
+
+    /**
+     * Set game
+     *
+     * @param \Acme\EsBattleBundle\Entity\Game $game
+     * @return Appointment
+     */
+    public function setGame(\Acme\EsBattleBundle\Entity\Game $game = null)
+    {
+        $this->game = $game;
+
+        return $this;
+    }
+
+    /**
+     * Get game
+     *
+     * @return \Acme\EsBattleBundle\Entity\Game 
+     */
+    public function getGame()
+    {
+        return $this->game;
+    }
+
+
+    /*
+    * Serializes appointment.
+    *
+    * The serialized data have to contain the fields used by the equals method and the username.
+    *
+    * @return string
+    */
+    public function _toArray()
+    {
+
+        $tags = $this->getTags();
+        $aTags = array();
+        foreach($tags as $tag){
+            $aTags[] = $tag->_toArray();
+        }
+        return array(
+            'id' => $this->getId(),
+            'description' => $this->getDescription(),
+            'start' => $this->getStart()->getTimestamp(),
+            'duree' => $this->getDuree(),
+            'nbParticipant' => $this->getNbParticipant(),
+            'leader' => $this->getLeader()->_toArray(),
+            'tags' => $aTags
+
+        );
+    }
+
+    public function _toJson(){
+        $aAppointment = $this->_toArray();
+
+        $encoders = array(new XmlEncoder(), new JsonEncoder());
+        $normalizers = array(new GetSetMethodNormalizer());
+
+        $serializer = new Serializer($normalizers, $encoders);
+
+        return $serializer->serialize($aAppointment, 'json');
+    }
+
+    /**
+     * Set duree
+     *
+     * @param integer $duree
+     * @return Appointment
+     */
+    public function setDuree($duree)
+    {
+        $this->duree = $duree;
+
+        return $this;
+    }
+
+    /**
+     * Get duree
+     *
+     * @return integer 
+     */
+    public function getDuree()
+    {
+        return $this->duree;
     }
 }
