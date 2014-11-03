@@ -29,7 +29,7 @@ class LoginController extends Controller
 
             $aUser = array(
                 'username' => $user->getUsername(),
-                'token' => $user->getToken()
+                'token' => $user->getApikey()
             );
 
             $json = json_encode($aUser);
@@ -66,7 +66,7 @@ class LoginController extends Controller
 
         $aUser = array(
             'username' => $user->getUsername(),
-            'token' => $user->getToken()
+            'token' => $user->getApikey()
         );
 
         $json = json_encode($aUser);
