@@ -93,12 +93,13 @@ class RdvController extends Controller
                 array('username' => $username,'apikey' => $token)
             );
 
-		$start = new \DateTime($start);
+		$startDay = new \DateTime();
+		$startDay->setTimestamp($start);
 		$nbParticipant = intval($nbParticipant);
 
 		$appointment = new Appointment();
 		$appointment->setDescription($description);
-		$appointment->setStart($start);
+		$appointment->setStart($startDay);
 		$appointment->setDuree($duree);
 		$appointment->setNbParticipant($nbParticipant);
         $appointment->setLeader($user);
