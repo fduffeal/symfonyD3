@@ -93,6 +93,12 @@ class RdvController extends Controller
                 array('username' => $username,'apikey' => $token)
             );
 
+        $myPlateform = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Plateform')
+            ->findOneBy(
+                array('id' => $plateform)
+            );
+
 		$startDay = new \DateTime();
 		$startDay->setTimestamp($start);
 		$nbParticipant = intval($nbParticipant);
@@ -104,6 +110,7 @@ class RdvController extends Controller
 		$appointment->setNbParticipant($nbParticipant);
         $appointment->setLeader($user);
         $appointment->addUser($user);
+        $appointment->setPlateform($myPlateform);
 
 
         $aTags = preg_split("/[\s,]+/",$tags);
@@ -146,8 +153,18 @@ class RdvController extends Controller
             $aTags[] = $tag->_toArray();
         }
 
+        $plateforms = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Plateform')
+            ->findAll();
+
+        $aPlateforms = array();
+        foreach($plateforms as $plateform){
+            $aPlateforms[] = $plateform->_toArray();
+        }
+
         $response = array(
-            'tags' => $aTags
+            'tags' => $aTags,
+            'plateforms' => $aPlateforms
         );
         $json = json_encode($response);
         return new Response($json, 200, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));

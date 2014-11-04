@@ -87,6 +87,12 @@ class Appointment
     protected $game;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Plateform", inversedBy="plateform")
+     * @ORM\JoinColumn(name="plateform_id", referencedColumnName="id")
+     */
+    protected $plateform;
+
+    /**
      * Get id
      *
      * @return integer 
@@ -300,6 +306,8 @@ class Appointment
         foreach($tags as $tag){
             $aTags[] = $tag->_toArray();
         }
+
+        $plateform = $this->getPlateform();
         return array(
             'id' => $this->getId(),
             'description' => $this->getDescription(),
@@ -307,7 +315,8 @@ class Appointment
             'duree' => $this->getDuree(),
             'nbParticipant' => $this->getNbParticipant(),
             'leader' => $this->getLeader()->_toArray(),
-            'tags' => $aTags
+            'tags' => $aTags,
+            'plateform' => ($plateform)?$plateform->_toArray():null
 
         );
     }
@@ -344,5 +353,28 @@ class Appointment
     public function getDuree()
     {
         return $this->duree;
+    }
+
+    /**
+     * Set plateform
+     *
+     * @param \Acme\EsBattleBundle\Entity\Plateform $plateform
+     * @return Appointment
+     */
+    public function setPlateform(\Acme\EsBattleBundle\Entity\Plateform $plateform = null)
+    {
+        $this->plateform = $plateform;
+
+        return $this;
+    }
+
+    /**
+     * Get plateform
+     *
+     * @return \Acme\EsBattleBundle\Entity\Plateform 
+     */
+    public function getPlateform()
+    {
+        return $this->plateform;
     }
 }
