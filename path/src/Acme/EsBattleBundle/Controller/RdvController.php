@@ -120,17 +120,20 @@ class RdvController extends Controller
 		$em->persist($appointment);
 		$em->flush();
 
-
-        $encoders = array(new XmlEncoder(), new JsonEncoder());
-        $normalizers = array(new GetSetMethodNormalizer());
-
-        $serializer = new Serializer($normalizers, $encoders);
-
         $json = $appointment->_toJson();
 
 
         return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
 
+	}
+
+	public function getRdvByIdAction($rdvId){
+		$appointment = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Appointment')
+			->findOneBy(array('id'=>$rdvId));
+
+		$json = $appointment->_toJson();
+		return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
 	}
 
     public function getFormInfoAction(){
