@@ -99,6 +99,12 @@ class RdvController extends Controller
                 array('id' => $plateform)
             );
 
+        $myGame = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Game')
+            ->findOneBy(
+                array('id' => $game)
+            );
+
 		$startDay = new \DateTime();
 		$startDay->setTimestamp($start);
 		$nbParticipant = intval($nbParticipant);
@@ -111,6 +117,7 @@ class RdvController extends Controller
         $appointment->setLeader($user);
         $appointment->addUser($user);
         $appointment->setPlateform($myPlateform);
+        $appointment->setGame($myGame);
 
 
         $aTags = preg_split("/[\s,]+/",$tags);
@@ -162,9 +169,19 @@ class RdvController extends Controller
             $aPlateforms[] = $plateform->_toArray();
         }
 
+        $games = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Game')
+            ->findAll();
+
+        $aGame = array();
+        foreach($games as $game){
+            $aGame[] = $game->_toArray();
+        }
+
         $response = array(
             'tags' => $aTags,
-            'plateforms' => $aPlateforms
+            'plateforms' => $aPlateforms,
+            'games' => $aGame
         );
         $json = json_encode($response);
         return new Response($json, 200, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));

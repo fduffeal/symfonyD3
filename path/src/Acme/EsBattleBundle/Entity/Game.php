@@ -6,6 +6,11 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+
 /**
  * Game
  *
@@ -94,46 +99,22 @@ class Game
         return $this->site;
     }
 
-    /**
-     * @ORM\OneToMany(targetEntity="Pari", mappedBy="game")
-     */
-    protected $paris;
-
-    public function __construct()
-    {
-        $this->paris = new ArrayCollection();
+    public function _toArray(){
+        return array(
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'site' => $this->getSite()
+        );
     }
 
-    /**
-     * Add paris
-     *
-     * @param \Acme\EsBattleBundle\Entity\Pari $paris
-     * @return Game
-     */
-    public function addPari(\Acme\EsBattleBundle\Entity\Pari $paris)
-    {
-        $this->paris[] = $paris;
+    public function _toJson(){
+        $aAppointment = $this->_toArray();
 
-        return $this;
-    }
+        $encoders = array(new XmlEncoder(), new JsonEncoder());
+        $normalizers = array(new GetSetMethodNormalizer());
 
-    /**
-     * Remove paris
-     *
-     * @param \Acme\EsBattleBundle\Entity\Pari $paris
-     */
-    public function removePari(\Acme\EsBattleBundle\Entity\Pari $paris)
-    {
-        $this->paris->removeElement($paris);
-    }
+        $serializer = new Serializer($normalizers, $encoders);
 
-    /**
-     * Get paris
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getParis()
-    {
-        return $this->paris;
+        return $serializer->serialize($aAppointment, 'json');
     }
 }

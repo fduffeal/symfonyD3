@@ -308,6 +308,7 @@ class Appointment
         }
 
         $plateform = $this->getPlateform();
+        $game = $this->getGame();
         return array(
             'id' => $this->getId(),
             'description' => $this->getDescription(),
@@ -316,7 +317,8 @@ class Appointment
             'nbParticipant' => $this->getNbParticipant(),
             'leader' => $this->getLeader()->_toArray(),
             'tags' => $aTags,
-            'plateform' => ($plateform)?$plateform->_toArray():null
+            'plateform' => ($plateform)?$plateform->_toArray():null,
+            'game' => ($game)?$game->_toArray():null
 
         );
     }
