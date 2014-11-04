@@ -21,3 +21,7 @@ acme_es_battle_rdv_create:
 acme_es_battle_rdv_form_info:
     path:     /rdv/form_info
     defaults: { _controller: AcmeEsBattleBundle:Rdv:getFormInfo }
+
+acme_es_battle_forget_password:
+    path:     /forget_password/{email}
+    defaults: { _controller: AcmeEsBattleBundle:Login:forgetPassword }
