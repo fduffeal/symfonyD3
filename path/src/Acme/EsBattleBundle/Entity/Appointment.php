@@ -73,6 +73,15 @@ class Appointment
      **/
     private $users;
 
+	/**
+	 * @ORM\ManyToMany(targetEntity="User")
+	 * @ORM\JoinTable(name="appointment_user_in_queue",
+	 *      joinColumns={@ORM\JoinColumn(name="appointment_id", referencedColumnName="id")},
+	 *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
+	 *      )
+	 **/
+	private $usersInQueue;
+
 
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="users")
@@ -378,5 +387,38 @@ class Appointment
     public function getPlateform()
     {
         return $this->plateform;
+    }
+
+    /**
+     * Add usersInQueue
+     *
+     * @param \Acme\EsBattleBundle\Entity\User $usersInQueue
+     * @return Appointment
+     */
+    public function addUsersInQueue(\Acme\EsBattleBundle\Entity\User $usersInQueue)
+    {
+        $this->usersInQueue[] = $usersInQueue;
+
+        return $this;
+    }
+
+    /**
+     * Remove usersInQueue
+     *
+     * @param \Acme\EsBattleBundle\Entity\User $usersInQueue
+     */
+    public function removeUsersInQueue(\Acme\EsBattleBundle\Entity\User $usersInQueue)
+    {
+        $this->usersInQueue->removeElement($usersInQueue);
+    }
+
+    /**
+     * Get usersInQueue
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getUsersInQueue()
+    {
+        return $this->usersInQueue;
     }
 }

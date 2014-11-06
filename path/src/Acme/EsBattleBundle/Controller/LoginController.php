@@ -10,13 +10,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LoginController extends Controller
 {
-    public function indexAction($email,$password)
+    public function indexAction($username,$password)
     {
 
         $user = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:User')
             ->findOneBy(
-                array('email' => $email)
+                array('username' => $username)
             );
 
 	    if($user->isPasswordOk($password)){
@@ -85,7 +85,15 @@ class LoginController extends Controller
 	}
 
 	public function forgetPasswordAction($email){
-		$username = 'PoneyMCH';
+
+		$user = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:User')
+			->findOneBy(
+				array('email' => $email)
+			);
+
+		$username = $user->getUsername();
+
 		$message = \Swift_Message::newInstance()
 			->setContentType('text/html')
 			->setSubject('Welcome to Esbattle.com')
