@@ -34,6 +34,10 @@ acme_es_battle_rdv_kick_user:
     path:     /rdv/kick_user/{userId}/{rdvId}/{username}/{apikey}
     defaults: { _controller: AcmeEsBattleBundle:Rdv:kickUser }
 
+acme_es_battle_rdv_leave:
+    path:     /rdv/leave/{rdvId}/{username}/{apikey}
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:leaveRdv }
+
 acme_es_battle_rdv_form_info:
     path:     /rdv/form_info
     defaults: { _controller: AcmeEsBattleBundle:Rdv:getFormInfo }

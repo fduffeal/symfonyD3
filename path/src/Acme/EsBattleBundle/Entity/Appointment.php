@@ -321,15 +321,20 @@ class Appointment
 
         $users = $this->getUsers();
         $aUsers = array();
-        foreach($users as $user){
-            $aUsers[] = $user->_toArray();
-        }
+	    if($users !== null){
+		    foreach($users as $user){
+			    $aUsers[] = $user->_toArray();
+		    }
+	    }
 
         $usersInQueue = $this->getUsersInQueue();
         $aUsersInQueue = array();
-        foreach($usersInQueue as $userInQueue){
-            $aUsersInQueue[] = $userInQueue->_toArray();
-        }
+
+	    if($usersInQueue !== null){
+		    foreach($usersInQueue as $userInQueue){
+			    $aUsersInQueue[] = $userInQueue->_toArray();
+		    }
+	    }
 
         return array(
             'id' => $this->getId(),
