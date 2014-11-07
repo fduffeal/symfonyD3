@@ -318,6 +318,19 @@ class Appointment
 
         $plateform = $this->getPlateform();
         $game = $this->getGame();
+
+        $users = $this->getUsers();
+        $aUsers = array();
+        foreach($users as $user){
+            $aUsers[] = $user->_toArray();
+        }
+
+        $usersInQueue = $this->getUsersInQueue();
+        $aUsersInQueue = array();
+        foreach($usersInQueue as $userInQueue){
+            $aUsersInQueue[] = $userInQueue->_toArray();
+        }
+
         return array(
             'id' => $this->getId(),
             'description' => $this->getDescription(),
@@ -327,7 +340,9 @@ class Appointment
             'leader' => $this->getLeader()->_toArray(),
             'tags' => $aTags,
             'plateform' => ($plateform)?$plateform->_toArray():null,
-            'game' => ($game)?$game->_toArray():null
+            'game' => ($game)?$game->_toArray():null,
+            'users' => $aUsers,
+            'usersInQueue' => $aUsersInQueue
 
         );
     }

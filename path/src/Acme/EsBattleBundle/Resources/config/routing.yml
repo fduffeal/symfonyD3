@@ -22,6 +22,18 @@ acme_es_battle_rdv_get:
     path:     /rdv/get/{rdvId}
     defaults: { _controller: AcmeEsBattleBundle:Rdv:getRdvById }
 
+acme_es_battle_rdv_join:
+    path:     /rdv/join/{rdvId}/{username}/{apikey}
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:joinRdv }
+
+acme_es_battle_rdv_accept_user:
+    path:     /rdv/accept_user/{userId}/{rdvId}/{username}/{apikey}
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:acceptUser }
+
+acme_es_battle_rdv_kick_user:
+    path:     /rdv/kick_user/{userId}/{rdvId}/{username}/{apikey}
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:kickUser }
+
 acme_es_battle_rdv_form_info:
     path:     /rdv/form_info
     defaults: { _controller: AcmeEsBattleBundle:Rdv:getFormInfo }

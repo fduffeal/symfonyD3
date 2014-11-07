@@ -150,6 +150,107 @@ class RdvController extends Controller
 		return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
 	}
 
+    public function joinRdvAction($rdvId,$username,$apikey){
+        $user = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:User')
+            ->findOneBy(array('username'=>$username,'apikey'=>$apikey));
+
+
+        $appointment = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Appointment')
+            ->findOneBy(array('id'=>$rdvId));
+
+        $appointment->addUsersInQueue($user);
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($appointment);
+        $em->flush();
+
+        $json = $appointment->_toJson();
+        return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+
+    }
+
+    public function acceptUserAction($userId,$rdvId,$username,$apikey){
+
+        $appointment = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Appointment')
+            ->findOneBy(array('id'=>$rdvId));
+
+        $leader = $appointment->getLeader();
+
+        if($leader->getUsername() == $username && $leader->getApikey() == $apikey){
+
+            $user = $this->getDoctrine()
+                ->getRepository('AcmeEsBattleBundle:User')
+                ->findOneBy(array('id'=>$userId));
+
+            $appointment->removeUsersInQueue($user);
+            $appointment->addUser($user);
+
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($appointment);
+            $em->flush();
+
+            $json = $appointment->_toJson();
+            return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+
+
+        }else{
+            return new Response(null, 501, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+        }
+    }
+
+    public function kickUserAction($userId,$rdvId,$username,$apikey){
+        $appointment = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Appointment')
+            ->findOneBy(array('id'=>$rdvId));
+
+        $leader = $appointment->getLeader();
+
+        if($leader->getUsername() == $username && $leader->getApikey() == $apikey){
+            $user = $this->getDoctrine()
+                ->getRepository('AcmeEsBattleBundle:User')
+                ->findOneBy(array('id'=>$userId));
+
+            $appointment->removeUser($user);
+
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($appointment);
+            $em->flush();
+
+            $json = $appointment->_toJson();
+            return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+
+        }else {
+            return new Response(null, 501, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+
+        }
+    }
+
+    public function leaveRdvAction($rdvId,$username,$apikey){
+        $appointment = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Appointment')
+            ->findOneBy(array('id'=>$rdvId));
+
+        $user = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:User')
+            ->findOneBy(array('username'=>$username,'apikey'=>$apikey));
+
+        $appointment->removeUser($user);
+        $appointment->removeUsersInQueue($user);
+
+        $json = $appointment->_toJson();
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($appointment);
+        $em->flush();
+
+        return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+
+
+    }
+
     public function getFormInfoAction(){
         $tags = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:Tag')
