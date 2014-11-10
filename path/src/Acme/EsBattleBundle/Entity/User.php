@@ -73,6 +73,20 @@ class User
      */
     private  $apikey;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="psn", type="string", length=255,nullable=true)
+     */
+    private  $psn;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="xbox", type="string", length=255,nullable=true)
+     */
+    private  $xbox;
+
 
     /**
      * @ORM\ManyToMany(targetEntity="Clan")
@@ -336,5 +350,51 @@ class User
     public function getApikey()
     {
         return $this->apikey;
+    }
+
+    /**
+     * Set psn
+     *
+     * @param string $psn
+     * @return User
+     */
+    public function setPsn($psn)
+    {
+        $this->psn = $psn;
+
+        return $this;
+    }
+
+    /**
+     * Get psn
+     *
+     * @return string 
+     */
+    public function getPsn()
+    {
+        return $this->psn;
+    }
+
+    /**
+     * Set xbox
+     *
+     * @param string $xbox
+     * @return User
+     */
+    public function setXbox($xbox)
+    {
+        $this->xbox = $xbox;
+
+        return $this;
+    }
+
+    /**
+     * Get xbox
+     *
+     * @return string 
+     */
+    public function getXbox()
+    {
+        return $this->xbox;
     }
 }
