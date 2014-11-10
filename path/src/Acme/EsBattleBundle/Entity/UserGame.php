@@ -26,20 +26,20 @@ class UserGame {
     protected $id;
 
     /**
-     * @ORM\OneToOne(targetEntity="User")
+     * @ORM\ManyToOne(targetEntity="User",inversedBy="users")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
     protected $user;
 
     /**
-     * @ORM\OneToOne(targetEntity="Game")
+     * @ORM\ManyToOne(targetEntity="Game",inversedBy="games")
      * @ORM\JoinColumn(name="game_id", referencedColumnName="id")
      */
     protected $game;
 
 
     /**
-     * @ORM\OneToOne(targetEntity="Plateform")
+     * @ORM\ManyToOne(targetEntity="Plateform",inversedBy="plateforms")
      * @ORM\JoinColumn(name="plateform_id", referencedColumnName="id")
      */
     protected $plateform;
@@ -291,6 +291,7 @@ class UserGame {
             'id' => $this->getId(),
             'gameProfilName' => $this->getGameProfilName(),
             'plateform' => $this->getPlateform()->_toArray(),
+            'game' => $this->getGame()->_toArray(),
             'data1' => $this->getData1(),
             'data2' => $this->getData2(),
             'data3' => $this->getData3(),
