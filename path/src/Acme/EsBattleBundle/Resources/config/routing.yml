@@ -45,3 +45,7 @@ acme_es_battle_rdv_form_info:
 acme_es_battle_forget_password:
     path:     /forget_password/{email}
     defaults: { _controller: AcmeEsBattleBundle:Login:forgetPassword }
+
+acme_es_battle_game_data_update:
+    path:     /game_data/update/{plateformId}/{gameId}/{profilName}/{data1}/{data2}/{data3}/{data4}/{username}/{apikey}
+    defaults: { _controller: AcmeEsBattleBundle:Login:updateUserGame }

@@ -2,6 +2,7 @@
 
 namespace Acme\EsBattleBundle\Controller;
 
+use Acme\EsBattleBundle\Entity\UserGame;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Acme\EsBattleBundle\Entity\User as User;
@@ -27,9 +28,22 @@ class LoginController extends Controller
             $em->persist($user);
             $em->flush();
 
+            $userGameCollection = $this->getDoctrine()
+                ->getRepository('AcmeEsBattleBundle:UserGame')
+                ->findBy(
+                    array('user' => $user)
+                );
+
+            foreach($userGameCollection as $key => $userGame){
+                $userGameCollection[$key] = $userGame->_toArray();
+            }
+
+
             $aUser = array(
                 'username' => $user->getUsername(),
-                'token' => $user->getApikey()
+                'email' => $user->getEmail(),
+                'token' => $user->getApikey(),
+                'userGame'=> $userGameCollection
             );
 
             $json = json_encode($aUser);
@@ -104,4 +118,76 @@ class LoginController extends Controller
 
 		return new Response(null, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
 	}
+
+    public function updateUserGameAction($plateformId,$gameId,$profilName,$data1,$data2,$data3,$data4,$username,$apikey){
+        $user = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:User')
+            ->findOneBy(
+                array('username' => $username)
+            );
+
+        if($user === null || $user->isPasswordOk($apikey)){
+            return new Response(null, 501, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+        }
+
+        $plateform = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Plateform')
+            ->findOneBy(
+                array('id' => $plateformId)
+            );
+
+        $game = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Game')
+            ->findOneBy(
+                array('id' => $gameId)
+            );
+
+
+        $userGame = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:UserGame')
+            ->findOneBy(
+                array('user' => $user,'plateform' => $plateform,'game' => $game)
+            );
+
+        if($userGame === null){
+            $userGame = new UserGame();
+            $userGame->setUser($user);
+            $userGame->setPlateform($plateform);
+            $userGame->setGame($game);
+        }
+
+        $userGame->setGameProfilName($profilName);
+        $userGame->setData1($data1);
+        $userGame->setData2($data2);
+        $userGame->setData3($data3);
+        $userGame->setData4($data4);
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($userGame);
+        $em->flush();
+
+
+        $userGameCollection = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:UserGame')
+            ->findBy(
+                array('user' => $user)
+            );
+
+        foreach($userGameCollection as $key => $userGame){
+            $userGameCollection[$key] = $userGame->_toArray();
+        }
+
+
+        $aUser = array(
+            'username' => $user->getUsername(),
+            'email' => $user->getEmail(),
+            'token' => $user->getApikey(),
+            'userGame'=> $userGameCollection
+        );
+
+        $json = json_encode($aUser);
+
+        return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+
+    }
 }
