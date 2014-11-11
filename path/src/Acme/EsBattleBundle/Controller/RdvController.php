@@ -44,7 +44,14 @@ class RdvController extends Controller
 
         $json = json_encode($aResult);
 
-	    return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+	    $response = new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+
+        $response->setPublic();
+        // définit l'âge max des caches privés ou des caches partagés
+        $response->setMaxAge(600);
+        $response->setSharedMaxAge(600);
+
+        return $response;
     }
 
 	public function createAction($plateform,$game,$tags,$description,$start,$duree,$nbParticipant,$userGameId,$username,$token)
@@ -278,7 +285,13 @@ class RdvController extends Controller
             'games' => $aGame
         );
         $json = json_encode($response);
-        return new Response($json, 200, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+        $response = new Response($json, 200, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
 
+        $response->setPublic();
+        // définit l'âge max des caches privés ou des caches partagés
+        $response->setMaxAge(600);
+        $response->setSharedMaxAge(600);
+
+        return $response;
     }
 }
