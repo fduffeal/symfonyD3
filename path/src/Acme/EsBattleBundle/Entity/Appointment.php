@@ -48,6 +48,13 @@ class Appointment
      */
     private $duree;
 
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="end", type="datetime")
+     */
+    private $end;
+
 	/**
 	 *
 	 * @ORM\Column(name="nbParticipant", type="integer")
@@ -65,22 +72,22 @@ class Appointment
     private $tags;
 
     /**
-     * @ORM\ManyToMany(targetEntity="User")
-     * @ORM\JoinTable(name="appointment_user",
+     * @ORM\ManyToMany(targetEntity="UserGame")
+     * @ORM\JoinTable(name="appointment_user_game",
      *      joinColumns={@ORM\JoinColumn(name="appointment_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
+     *      inverseJoinColumns={@ORM\JoinColumn(name="user_game_id", referencedColumnName="id")}
      *      )
      **/
-    private $users;
+    private $usersGame;
 
 	/**
-	 * @ORM\ManyToMany(targetEntity="User")
-	 * @ORM\JoinTable(name="appointment_user_in_queue",
+	 * @ORM\ManyToMany(targetEntity="UserGame")
+	 * @ORM\JoinTable(name="appointment_user_game_in_queue",
 	 *      joinColumns={@ORM\JoinColumn(name="appointment_id", referencedColumnName="id")},
-	 *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
+	 *      inverseJoinColumns={@ORM\JoinColumn(name="user_game_id", referencedColumnName="id")}
 	 *      )
 	 **/
-	private $usersInQueue;
+	private $usersGameInQueue;
 
 
     /**
@@ -221,39 +228,6 @@ class Appointment
     }
 
     /**
-     * Add users
-     *
-     * @param \Acme\EsBattleBundle\Entity\User $users
-     * @return Appointment
-     */
-    public function addUser(\Acme\EsBattleBundle\Entity\User $users)
-    {
-        $this->users[] = $users;
-
-        return $this;
-    }
-
-    /**
-     * Remove users
-     *
-     * @param \Acme\EsBattleBundle\Entity\User $users
-     */
-    public function removeUser(\Acme\EsBattleBundle\Entity\User $users)
-    {
-        $this->users->removeElement($users);
-    }
-
-    /**
-     * Get users
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getUsers()
-    {
-        return $this->users;
-    }
-
-    /**
      * Set leader
      *
      * @param \Acme\EsBattleBundle\Entity\User $leader
@@ -319,20 +293,28 @@ class Appointment
         $plateform = $this->getPlateform();
         $game = $this->getGame();
 
-        $users = $this->getUsers();
+        $users = $this->getUsersGame();
         $aUsers = array();
 	    if($users !== null){
 		    foreach($users as $user){
-			    $aUsers[] = $user->_toArray();
+                $userAccount = $user->getUser();
+                $user = $user->_toArray();
+                $user['user'] = $userAccount->_toArray();
+			    $aUsers[] = $user;
 		    }
 	    }
 
-        $usersInQueue = $this->getUsersInQueue();
+        $usersInQueue = $this->getUsersGameInQueue();
         $aUsersInQueue = array();
 
 	    if($usersInQueue !== null){
 		    foreach($usersInQueue as $userInQueue){
-			    $aUsersInQueue[] = $userInQueue->_toArray();
+                $userAccount = $userInQueue->getUser();
+
+                $userInQueue = $userInQueue->_toArray();
+                $userInQueue['user'] = $userAccount->_toArray();
+
+			    $aUsersInQueue[] = $userInQueue;
 		    }
 	    }
 
@@ -340,6 +322,7 @@ class Appointment
             'id' => $this->getId(),
             'description' => $this->getDescription(),
             'start' => $this->getStart()->getTimestamp(),
+            'end' => $this->getEnd()->getTimestamp(),
             'duree' => $this->getDuree(),
             'nbParticipant' => $this->getNbParticipant(),
             'leader' => $this->getLeader()->_toArray(),
@@ -440,5 +423,94 @@ class Appointment
     public function getUsersInQueue()
     {
         return $this->usersInQueue;
+    }
+
+    /**
+     * Add usersGame
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserGame $usersGame
+     * @return Appointment
+     */
+    public function addUsersGame(\Acme\EsBattleBundle\Entity\UserGame $usersGame)
+    {
+        $this->usersGame[] = $usersGame;
+
+        return $this;
+    }
+
+    /**
+     * Remove usersGame
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserGame $usersGame
+     */
+    public function removeUsersGame(\Acme\EsBattleBundle\Entity\UserGame $usersGame)
+    {
+        $this->usersGame->removeElement($usersGame);
+    }
+
+    /**
+     * Get usersGame
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getUsersGame()
+    {
+        return $this->usersGame;
+    }
+
+    /**
+     * Add usersGameInQueue
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserGame $usersGameInQueue
+     * @return Appointment
+     */
+    public function addUsersGameInQueue(\Acme\EsBattleBundle\Entity\UserGame $usersGameInQueue)
+    {
+        $this->usersGameInQueue[] = $usersGameInQueue;
+
+        return $this;
+    }
+
+    /**
+     * Remove usersGameInQueue
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserGame $usersGameInQueue
+     */
+    public function removeUsersGameInQueue(\Acme\EsBattleBundle\Entity\UserGame $usersGameInQueue)
+    {
+        $this->usersGameInQueue->removeElement($usersGameInQueue);
+    }
+
+    /**
+     * Get usersGameInQueue
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getUsersGameInQueue()
+    {
+        return $this->usersGameInQueue;
+    }
+
+    /**
+     * Set end
+     *
+     * @param \DateTime $end
+     * @return Appointment
+     */
+    public function setEnd($end)
+    {
+        $this->end = $end;
+
+        return $this;
+    }
+
+    /**
+     * Get end
+     *
+     * @return \DateTime 
+     */
+    public function getEnd()
+    {
+        return $this->end;
     }
 }

@@ -24,67 +24,30 @@ class RdvController extends Controller
     public function indexAction()
     {
 
-//	    $user = $this->container->get('security.context')->getToken()->getUser();
-//	    if (!is_object($user) || !$user instanceof UserInterface) {
-//		    throw new AccessDeniedException('This user does not have access to this section.');
-//	    }
+
+        $stop_date = date('Y-m-d H:i:s', strtotime('-1 day', time()));
 
 
-        $collection = $this->getDoctrine()
-		    ->getRepository('AcmeEsBattleBundle:Appointment')
-		    ->findAll();
+        $em = $this->getDoctrine()->getManager();
+        $query = $em->createQuery(
+            'SELECT rdv
+            FROM AcmeEsBattleBundle:Appointment rdv
+            WHERE rdv.start > :now'
+        )->setParameter('now', $stop_date);
 
-
-        /*$serializer = new Serializer(array(new GetSetMethodNormalizer()), array('json' => new
-        JsonEncoder()));
-        $collection = $serializer->serialize($collection, 'json');*/
+        $collection = $query->getResult();
 
         $aResult = [];
         foreach($collection as $appointment){
             $aResult[] = $appointment->_toArray();
         }
 
-	    /*$encoders = array(new XmlEncoder(), new JsonEncoder());
-	    $normalizers = array(new GetSetMethodNormalizer());
-
-	    $serializer = new Serializer($normalizers, $encoders);
-
-	    $json = $serializer->serialize($aResult, 'json'); // Output: {"name":"foo","age":99}*/
-
         $json = json_encode($aResult);
 
-
-//	    $result = json_encode($result);
-//	    var_dump($result);
-//	    $response = new \Response(json_encode($result));
-//	    $response->headers->set('Content-Type', 'application/json');
-//
-//	    return $response;
-
-//	    var_dump($result);
-
-
-
-//        var_dump($json);die();
-// create a simple Response with a 200 status code (the default)
-
-// create a JSON-response with a 200 status code
-//	    $response = new Response(json_encode($result));
-//	    $response->headers->set('Content-Type', 'application/json');
-
-
-//	    $response = new JsonResponse();
-//	    $response->setData($result);
-
-//	    $json = $result;
-//	    var_dump($json);
 	    return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
-
-//	    return $response;
-//	    return $this->render('AcmeEsBattleBundle:Default:json.html.twig', array('json' => $result));
     }
 
-	public function createAction($plateform,$game,$tags,$description,$start,$duree,$nbParticipant,$username,$token)
+	public function createAction($plateform,$game,$tags,$description,$start,$duree,$nbParticipant,$userGameId,$username,$token)
 	{
 
         $user = $this->getDoctrine()
@@ -105,17 +68,31 @@ class RdvController extends Controller
                 array('id' => $game)
             );
 
+        $userGame = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:UserGame')
+            ->findOneBy(
+                array('id' => $userGameId)
+            );
+
 		$startDay = new \DateTime();
 		$startDay->setTimestamp($start);
 		$nbParticipant = intval($nbParticipant);
 
+        $aDuree = preg_split('/:/',$duree);
+
+        $dateInterval = new \DateInterval('P0Y0M0DT'.$aDuree[0].'H'.$aDuree[1].'M0S');
+        $endDay = new \DateTime();
+        $endDay->setTimestamp($start);
+        $endDay->add($dateInterval);
+
 		$appointment = new Appointment();
 		$appointment->setDescription($description);
 		$appointment->setStart($startDay);
+		$appointment->setEnd($endDay);
 		$appointment->setDuree($duree);
 		$appointment->setNbParticipant($nbParticipant);
         $appointment->setLeader($user);
-        $appointment->addUser($user);
+        $appointment->addUsersGame($userGame);
         $appointment->setPlateform($myPlateform);
         $appointment->setGame($myGame);
 
@@ -150,17 +127,27 @@ class RdvController extends Controller
 		return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
 	}
 
-    public function joinRdvAction($rdvId,$username,$apikey){
+    public function joinRdvAction($rdvId,$userGameId,$username,$apikey){
         $user = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:User')
             ->findOneBy(array('username'=>$username,'apikey'=>$apikey));
+
+        if($user === null){
+            return new Response(null, 501, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+        }
 
 
         $appointment = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:Appointment')
             ->findOneBy(array('id'=>$rdvId));
 
-        $appointment->addUsersInQueue($user);
+        $userGame = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:UserGame')
+            ->findOneBy(
+                array('id' => $userGameId)
+            );
+
+        $appointment->addUsersGameInQueue($userGame);
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($appointment);
@@ -171,7 +158,7 @@ class RdvController extends Controller
 
     }
 
-    public function acceptUserAction($userId,$rdvId,$username,$apikey){
+    public function acceptUserAction($userGameId,$rdvId,$username,$apikey){
 
         $appointment = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:Appointment')
@@ -181,12 +168,12 @@ class RdvController extends Controller
 
         if($leader->getUsername() == $username && $leader->getApikey() == $apikey){
 
-            $user = $this->getDoctrine()
-                ->getRepository('AcmeEsBattleBundle:User')
-                ->findOneBy(array('id'=>$userId));
+            $userGame = $this->getDoctrine()
+                ->getRepository('AcmeEsBattleBundle:UserGame')
+                ->findOneBy(array('id'=>$userGameId));
 
-            $appointment->removeUsersInQueue($user);
-            $appointment->addUser($user);
+            $appointment->removeUsersGameInQueue($userGame);
+            $appointment->addUsersGame($userGame);
 
             $em = $this->getDoctrine()->getManager();
             $em->persist($appointment);
@@ -201,7 +188,7 @@ class RdvController extends Controller
         }
     }
 
-    public function kickUserAction($userId,$rdvId,$username,$apikey){
+    public function kickUserAction($userGameId,$rdvId,$username,$apikey){
         $appointment = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:Appointment')
             ->findOneBy(array('id'=>$rdvId));
@@ -209,11 +196,11 @@ class RdvController extends Controller
         $leader = $appointment->getLeader();
 
         if($leader->getUsername() == $username && $leader->getApikey() == $apikey){
-            $user = $this->getDoctrine()
-                ->getRepository('AcmeEsBattleBundle:User')
-                ->findOneBy(array('id'=>$userId));
+            $userGame = $this->getDoctrine()
+                ->getRepository('AcmeEsBattleBundle:UserGame')
+                ->findOneBy(array('id'=>$userGameId));
 
-            $appointment->removeUser($user);
+            $appointment->removeUsersGame($userGame);
 
             $em = $this->getDoctrine()->getManager();
             $em->persist($appointment);
@@ -228,23 +215,29 @@ class RdvController extends Controller
         }
     }
 
-    public function leaveRdvAction($rdvId,$username,$apikey){
+    public function leaveRdvAction($rdvId,$userGameId,$username,$apikey){
         $appointment = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:Appointment')
             ->findOneBy(array('id'=>$rdvId));
 
-        $user = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:User')
-            ->findOneBy(array('username'=>$username,'apikey'=>$apikey));
+        $userGame = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:UserGame')
+            ->findOneBy(array('id'=>$userGameId));
 
-        $appointment->removeUser($user);
-        $appointment->removeUsersInQueue($user);
+        $user = $userGame->getUser();
 
-        $json = $appointment->_toJson();
+        if($user->getUsername() !== $username || $user->getApikey() !== $apikey){
+            return new Response(null, 501, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+        }
+
+        $appointment->removeUsersGame($userGame);
+        $appointment->removeUsersGameInQueue($userGame);
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($appointment);
         $em->flush();
+
+        $json = $appointment->_toJson();
 
         return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
 

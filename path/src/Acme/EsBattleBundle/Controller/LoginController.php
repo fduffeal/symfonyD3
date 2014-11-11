@@ -119,7 +119,7 @@ class LoginController extends Controller
 		return new Response(null, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
 	}
 
-    public function updateUserGameAction($plateformId,$gameId,$profilName,$data1,$data2,$data3,$data4,$username,$apikey){
+    public function updateUserGameAction($plateformId,$gameId,$profilName,$gameUsername,$data1,$data2,$data3,$data4,$username,$apikey){
         $user = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:User')
             ->findOneBy(
@@ -157,6 +157,7 @@ class LoginController extends Controller
         }
 
         $userGame->setGameProfilName($profilName);
+        $userGame->setGameUsername($gameUsername);
         $userGame->setData1($data1);
         $userGame->setData2($data2);
         $userGame->setData3($data3);

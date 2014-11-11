@@ -32,14 +32,14 @@ class UserGame {
     protected $user;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Game",inversedBy="games")
+     * @ORM\ManyToOne(targetEntity="Game", inversedBy="games")
      * @ORM\JoinColumn(name="game_id", referencedColumnName="id")
      */
     protected $game;
 
 
     /**
-     * @ORM\ManyToOne(targetEntity="Plateform",inversedBy="plateforms")
+     * @ORM\ManyToOne(targetEntity="Plateform", inversedBy="plateforms")
      * @ORM\JoinColumn(name="plateform_id", referencedColumnName="id")
      */
     protected $plateform;
@@ -51,6 +51,13 @@ class UserGame {
      * @ORM\Column(name="game_profil_name", type="string", length=255)
      */
     private $game_profil_name;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="game_username", type="string", length=255)
+     */
+    private $game_username;
 
     /**
      * @var string
@@ -98,7 +105,7 @@ class UserGame {
      * Set game_profil_name
      *
      * @param string $gameProfilName
-     * @return User_Game
+     * @return UserGame
      */
     public function setGameProfilName($gameProfilName)
     {
@@ -121,7 +128,7 @@ class UserGame {
      * Set data_1
      *
      * @param string $data1
-     * @return User_Game
+     * @return UserGame
      */
     public function setData1($data1)
     {
@@ -144,7 +151,7 @@ class UserGame {
      * Set data_2
      *
      * @param string $data2
-     * @return User_Game
+     * @return UserGame
      */
     public function setData2($data2)
     {
@@ -167,7 +174,7 @@ class UserGame {
      * Set data_3
      *
      * @param string $data3
-     * @return User_Game
+     * @return UserGame
      */
     public function setData3($data3)
     {
@@ -190,7 +197,7 @@ class UserGame {
      * Set data_4
      *
      * @param string $data4
-     * @return User_Game
+     * @return UserGame
      */
     public function setData4($data4)
     {
@@ -213,7 +220,7 @@ class UserGame {
      * Set user
      *
      * @param \Acme\EsBattleBundle\Entity\User $user
-     * @return User_Game
+     * @return UserGame
      */
     public function setUser(\Acme\EsBattleBundle\Entity\User $user = null)
     {
@@ -236,7 +243,7 @@ class UserGame {
      * Set game
      *
      * @param \Acme\EsBattleBundle\Entity\Game $game
-     * @return User_Game
+     * @return UserGame
      */
     public function setGame(\Acme\EsBattleBundle\Entity\Game $game = null)
     {
@@ -259,7 +266,7 @@ class UserGame {
      * Set plateform
      *
      * @param \Acme\EsBattleBundle\Entity\Plateform $plateform
-     * @return User_Game
+     * @return UserGame
      */
     public function setPlateform(\Acme\EsBattleBundle\Entity\Plateform $plateform = null)
     {
@@ -290,6 +297,7 @@ class UserGame {
         return array(
             'id' => $this->getId(),
             'gameProfilName' => $this->getGameProfilName(),
+            'gameUsername' => $this->getGameUsername(),
             'plateform' => $this->getPlateform()->_toArray(),
             'game' => $this->getGame()->_toArray(),
             'data1' => $this->getData1(),
@@ -308,5 +316,28 @@ class UserGame {
         $serializer = new Serializer($normalizers, $encoders);
 
         return $serializer->serialize($aUserGame, 'json');
+    }
+
+    /**
+     * Set game_username
+     *
+     * @param string $gameUsername
+     * @return UserGame
+     */
+    public function setGameUsername($gameUsername)
+    {
+        $this->game_username = $gameUsername;
+
+        return $this;
+    }
+
+    /**
+     * Get game_username
+     *
+     * @return string 
+     */
+    public function getGameUsername()
+    {
+        return $this->game_username;
     }
 }
