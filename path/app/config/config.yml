@@ -3,7 +3,8 @@ imports:
     - { resource: security.yml }
 
 framework:
-    #esi:             ~
+    esi: true # Pour utiliser les tags ESI dans les templates Twig
+    fragments:     { path: /_proxy }
     translator:      { fallback: "%locale%" }
     secret:          "%secret%"
     router:

@@ -14,6 +14,7 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
  *
  * @ORM\Table()
  * @ORM\Entity
+ * @ORM\HasLifecycleCallbacks()
  */
 class Appointment
 {
@@ -107,6 +108,14 @@ class Appointment
      * @ORM\JoinColumn(name="plateform_id", referencedColumnName="id")
      */
     protected $plateform;
+
+
+	/**
+	 * @var \DateTime
+	 *
+	 * @ORM\Column(name="updated", type="datetime")
+	 */
+	protected $updated;
 
     /**
      * Get id
@@ -513,4 +522,38 @@ class Appointment
     {
         return $this->end;
     }
+
+    /**
+     * Set updated
+     *
+     * @param \DateTime $updated
+     *
+     * @return Appointment
+     */
+    public function setUpdated($updated)
+    {
+        $this->updated = $updated;
+
+        return $this;
+    }
+
+    /**
+     * Get updated
+     *
+     * @return \DateTime 
+     */
+    public function getUpdated()
+    {
+        return $this->updated;
+    }
+
+
+	/**
+	 * @ORM\PrePersist
+	 * @ORM\PreUpdate
+	 */
+	public function setUpdatedValue()
+	{
+		$this->updated = new \DateTime();
+	}
 }

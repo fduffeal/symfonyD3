@@ -48,8 +48,8 @@ class RdvController extends Controller
 
         $response->setPublic();
         // définit l'âge max des caches privés ou des caches partagés
-        $response->setMaxAge(600);
-        $response->setSharedMaxAge(600);
+        $response->setMaxAge(60);
+        $response->setSharedMaxAge(60);
 
         return $response;
     }
@@ -130,8 +130,29 @@ class RdvController extends Controller
 			->getRepository('AcmeEsBattleBundle:Appointment')
 			->findOneBy(array('id'=>$rdvId));
 
-		$json = $appointment->_toJson();
-		return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+		$response = new Response();
+//		var_dump($appointment->getUpdated());
+		//$response->setLastModified($appointment->getUpdated());
+		$response->setETag('RDV_'.$appointment->getId().'_'.$appointment->getUpdated()->getTimestamp());
+		$response->headers->set('Access-Control-Allow-Origin','http://localhost:8000');
+		$response->headers->set('Content-Type','application/json');
+//		$response->headers->set(array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+		// Définit la réponse comme publique. Sinon elle sera privée par défaut.
+		$response->setPublic();
+		// définit l'âge max des caches privés ou des caches partagés
+//		$response->setMaxAge(600);
+//		$response->setSharedMaxAge(600);
+
+		// Vérifie que l'objet Response n'est pas modifié
+		// pour un objet Request donné
+		if ($response->isNotModified($this->getRequest())) {
+			// Retourne immédiatement un objet 304 Response
+			return $response;
+		} else {
+			$json = $appointment->_toJson();
+			$response->setContent($json);
+			return $response;
+		}
 	}
 
     public function joinRdvAction($rdvId,$userGameId,$username,$apikey){
@@ -155,6 +176,7 @@ class RdvController extends Controller
             );
 
         $appointment->addUsersGameInQueue($userGame);
+	    $appointment->setUpdatedValue();
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($appointment);
@@ -181,6 +203,7 @@ class RdvController extends Controller
 
             $appointment->removeUsersGameInQueue($userGame);
             $appointment->addUsersGame($userGame);
+	        $appointment->setUpdatedValue();
 
             $em = $this->getDoctrine()->getManager();
             $em->persist($appointment);
@@ -208,6 +231,7 @@ class RdvController extends Controller
                 ->findOneBy(array('id'=>$userGameId));
 
             $appointment->removeUsersGame($userGame);
+	        $appointment->setUpdatedValue();
 
             $em = $this->getDoctrine()->getManager();
             $em->persist($appointment);
@@ -239,6 +263,7 @@ class RdvController extends Controller
 
         $appointment->removeUsersGame($userGame);
         $appointment->removeUsersGameInQueue($userGame);
+	    $appointment->setUpdatedValue();
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($appointment);
