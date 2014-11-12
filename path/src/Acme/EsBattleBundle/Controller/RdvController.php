@@ -63,6 +63,10 @@ class RdvController extends Controller
                 array('username' => $username,'apikey' => $token)
             );
 
+        if($user === null){
+            return new Response(null, 401, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+        }
+
         $myPlateform = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:Plateform')
             ->findOneBy(
@@ -140,8 +144,8 @@ class RdvController extends Controller
 		// Définit la réponse comme publique. Sinon elle sera privée par défaut.
 		$response->setPublic();
 		// définit l'âge max des caches privés ou des caches partagés
-//		$response->setMaxAge(600);
-//		$response->setSharedMaxAge(600);
+		$response->setMaxAge(10);
+		$response->setSharedMaxAge(10);
 
 		// Vérifie que l'objet Response n'est pas modifié
 		// pour un objet Request donné

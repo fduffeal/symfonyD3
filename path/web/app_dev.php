@@ -25,6 +25,8 @@ require_once __DIR__.'/../app/AppCache.php';
 
 $kernel = new AppKernel('dev', true);
 $kernel->loadClassCache();
+// encapsule le AppKernel par défaut avec AppCache
+$kernel = new AppCache($kernel);
 $request = Request::createFromGlobals();
 $response = $kernel->handle($request);
 $response->send();

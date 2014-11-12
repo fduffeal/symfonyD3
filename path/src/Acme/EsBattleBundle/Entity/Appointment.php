@@ -327,6 +327,8 @@ class Appointment
 		    }
 	    }
 
+        $leader = $this->getLeader();
+
         return array(
             'id' => $this->getId(),
             'description' => $this->getDescription(),
@@ -334,7 +336,7 @@ class Appointment
             'end' => $this->getEnd()->getTimestamp(),
             'duree' => $this->getDuree(),
             'nbParticipant' => $this->getNbParticipant(),
-            'leader' => $this->getLeader()->_toArray(),
+            'leader' => ($leader)?$leader->_toArray():null,
             'tags' => $aTags,
             'plateform' => ($plateform)?$plateform->_toArray():null,
             'game' => ($game)?$game->_toArray():null,
