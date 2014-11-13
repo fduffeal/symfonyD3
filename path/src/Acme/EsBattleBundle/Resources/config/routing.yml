@@ -6,6 +6,10 @@ acme_es_battle_login:
     path:     /login/{username}/{password}
     defaults: { _controller: AcmeEsBattleBundle:Login:index }
 
+acme_es_battle_login_by_token:
+    path:     /login/token/{username}/{token}
+    defaults: { _controller: AcmeEsBattleBundle:Login:refresh }
+
 acme_es_battle_register:
     path:     /register/{email}/{password}/{username}
     defaults: { _controller: AcmeEsBattleBundle:Login:register }

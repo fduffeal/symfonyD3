@@ -55,6 +55,44 @@ class LoginController extends Controller
 
     }
 
+
+	public function refreshAction($username,$token)
+	{
+
+		$user = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:User')
+			->findOneBy(
+				array('username' => $username,'apikey'=>$token)
+			);
+
+		if($user){
+			$userGameCollection = $this->getDoctrine()
+				->getRepository('AcmeEsBattleBundle:UserGame')
+				->findBy(
+					array('user' => $user)
+				);
+
+			foreach($userGameCollection as $key => $userGame){
+				$userGameCollection[$key] = $userGame->_toArray();
+			}
+
+
+			$aUser = array(
+				'username' => $user->getUsername(),
+				'email' => $user->getEmail(),
+				'token' => $user->getApikey(),
+				'userGame'=> $userGameCollection
+			);
+
+			$json = json_encode($aUser);
+
+			return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+		} else {
+			return new Response(null, 404, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+		}
+
+	}
+
 	/**
 	 * @param $email
 	 * @param $password
