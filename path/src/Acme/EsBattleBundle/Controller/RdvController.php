@@ -44,7 +44,7 @@ class RdvController extends Controller
 
         $json = json_encode($aResult);
 
-	    $response = new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+	    $response = new Response($json, 200, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
 
         $response->setPublic();
         // définit l'âge max des caches privés ou des caches partagés
@@ -125,24 +125,37 @@ class RdvController extends Controller
         $json = $appointment->_toJson();
 
 
-        return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+        return new Response($json, 200, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
 
 	}
 
 	public function getRdvByIdAction($rdvId){
+
+        $response = new Response();
+        $response->headers->set('Access-Control-Allow-Origin','http://localhost:8000');
+        $response->headers->set('Content-Type','application/json');
+        // Définit la réponse comme publique. Sinon elle sera privée par défaut.
+        $response->setPublic();
+
 		$appointment = $this->getDoctrine()
 			->getRepository('AcmeEsBattleBundle:Appointment')
 			->findOneBy(array('id'=>$rdvId));
 
-		$response = new Response();
+        if($appointment === null){
+            // définit l'âge max des caches privés ou des caches partagés
+            $response->setMaxAge(3600);
+            $response->setSharedMaxAge(3600);
+            $response->setStatusCode(404);
+            $content = array('msg'=> 'rdv not found');
+            $response->setContent(json_encode($content));
+            return $response;
+        }
+
+
 //		var_dump($appointment->getUpdated());
 		//$response->setLastModified($appointment->getUpdated());
 		$response->setETag('RDV_'.$appointment->getId().'_'.$appointment->getUpdated()->getTimestamp());
-		$response->headers->set('Access-Control-Allow-Origin','http://localhost:8000');
-		$response->headers->set('Content-Type','application/json');
-//		$response->headers->set(array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
-		// Définit la réponse comme publique. Sinon elle sera privée par défaut.
-		$response->setPublic();
+
 		// définit l'âge max des caches privés ou des caches partagés
 		$response->setMaxAge(10);
 		$response->setSharedMaxAge(10);
@@ -165,7 +178,7 @@ class RdvController extends Controller
             ->findOneBy(array('username'=>$username,'apikey'=>$apikey));
 
         if($user === null){
-            return new Response(null, 501, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+            return new Response(null, 401, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
         }
 
 
@@ -187,7 +200,7 @@ class RdvController extends Controller
         $em->flush();
 
         $json = $appointment->_toJson();
-        return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+        return new Response($json, 200, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
 
     }
 
@@ -214,11 +227,11 @@ class RdvController extends Controller
             $em->flush();
 
             $json = $appointment->_toJson();
-            return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+            return new Response($json, 200, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
 
 
         }else{
-            return new Response(null, 501, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+            return new Response(null, 401, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
         }
     }
 
@@ -242,10 +255,10 @@ class RdvController extends Controller
             $em->flush();
 
             $json = $appointment->_toJson();
-            return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+            return new Response($json, 200, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
 
         }else {
-            return new Response(null, 501, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+            return new Response(null, 401, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
 
         }
     }
@@ -262,7 +275,29 @@ class RdvController extends Controller
         $user = $userGame->getUser();
 
         if($user->getUsername() !== $username || $user->getApikey() !== $apikey){
-            return new Response(null, 501, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+            return new Response(null, 401, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+        }
+        $leader = $appointment->getLeader();
+        if($user === $leader){
+            $aUsersGame = $appointment->getUsersGame();
+            $hasNewLeader = false;
+            foreach($aUsersGame as $userGameCanBeLeader){
+                $userGameCanBeLeaderAccount = $userGameCanBeLeader->getUser();
+                if($userGameCanBeLeaderAccount !== $leader){
+                    $appointment->setLeader($userGameCanBeLeaderAccount);
+                    $hasNewLeader = true;
+                    break;
+                }
+            }
+
+            if($hasNewLeader === false){
+                $em = $this->getDoctrine()->getManager();
+                $em->remove($appointment);
+                $em->flush();
+
+                return new Response(null, 308, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+
+            }
         }
 
         $appointment->removeUsersGame($userGame);
@@ -275,7 +310,39 @@ class RdvController extends Controller
 
         $json = $appointment->_toJson();
 
-        return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+        return new Response($json, 200, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+
+
+    }
+
+    public function promoteRdvAction($rdvId,$userGameId,$username,$apikey){
+
+        $appointment = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Appointment')
+            ->findOneBy(array('id'=>$rdvId));
+
+        $userGame = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:UserGame')
+            ->findOneBy(array('id'=>$userGameId));
+
+        $newLeader = $userGame->getUser();
+
+        $oldLeader = $appointment->getLeader();
+
+        if($oldLeader->getUsername() !== $username || $oldLeader->getApikey() !== $apikey){
+            return new Response(null, 401, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+        }
+
+        $appointment->setLeader($newLeader);
+        $appointment->setUpdatedValue();
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($appointment);
+        $em->flush();
+
+        $json = $appointment->_toJson();
+
+        return new Response($json, 200, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
 
 
     }

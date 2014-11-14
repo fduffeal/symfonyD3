@@ -42,6 +42,10 @@ acme_es_battle_rdv_leave:
     path:     /rdv/leave/{rdvId}/{userGameId}/{username}/{apikey}
     defaults: { _controller: AcmeEsBattleBundle:Rdv:leaveRdv }
 
+acme_es_battle_rdv_promote:
+    path:     /rdv/promote/{rdvId}/{userGameId}/{username}/{apikey}
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:promoteRdv }
+
 acme_es_battle_rdv_form_info:
     path:     /rdv/form_info
     defaults: { _controller: AcmeEsBattleBundle:Rdv:getFormInfo }
