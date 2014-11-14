@@ -48,9 +48,14 @@ class LoginController extends Controller
 
             $json = json_encode($aUser);
 
-		    return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+		    $response = new Response();
+		    $response->setContent($json);
+		    return $response;
+
 	    } else {
-		    return new Response(null, 404, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+		    $response = new Response();
+		    $response->setStatusCode(404);
+		    return $response;
 	    }
 
     }
@@ -86,9 +91,14 @@ class LoginController extends Controller
 
 			$json = json_encode($aUser);
 
-			return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+			$response = new Response();
+			$response->setContent($json);
+			return $response;
+
 		} else {
-			return new Response(null, 404, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+			$response = new Response();
+			$response->setStatusCode(404);
+			return $response;
 		}
 
 	}
@@ -133,7 +143,9 @@ class LoginController extends Controller
 
         $json = json_encode($aUser);
 
-        return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+		$response = new Response();
+		$response->setContent($json);
+		return $response;
 	}
 
 	public function forgetPasswordAction($email){
@@ -165,7 +177,9 @@ class LoginController extends Controller
             );
 
         if($user === null || $user->isPasswordOk($apikey)){
-            return new Response(null, 501, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+	        $response = new Response();
+	        $response->setStatusCode(501);
+	        return $response;
         }
 
         $plateform = $this->getDoctrine()
@@ -226,7 +240,9 @@ class LoginController extends Controller
 
         $json = json_encode($aUser);
 
-        return new Response($json, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+	    $response = new Response();
+	    $response->setContent($json);
+	    return $response;
 
     }
 }
