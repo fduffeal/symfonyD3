@@ -97,6 +97,11 @@ class User
      **/
     private $clans;
 
+    /**
+     * @ORM\OneToMany(targetEntity="UserGame",mappedBy="user")
+     */
+    protected $usergames;
+
     public function __construct() {
 	    $this->salt = base_convert(sha1(uniqid(mt_rand(), true)), 16, 36);
         $this->clans = new ArrayCollection();
@@ -208,9 +213,19 @@ class User
 	 */
 	public function _toArray()
 	{
+        $aUserGameCollection = array();
+
+        $userGameCollection = $this->getUsergames();
+        foreach($userGameCollection as $key => $userGame){
+            $aUserGameCollection[$key] = $userGame->_toArray();
+        }
+
 		return array(
             'id' => $this->getId(),
-			'username' => $this->getUsername()
+            'username' => $this->getUsername(),
+            'email' => $this->getEmail(),
+            'token' => $this->getApikey(),
+            'userGame'=> $aUserGameCollection
 		);
 	}
 
@@ -396,5 +411,38 @@ class User
     public function getForgetTime()
     {
         return $this->forgetTime;
+    }
+
+    /**
+     * Add usergames
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserGame $usergames
+     * @return User
+     */
+    public function addUsergame(\Acme\EsBattleBundle\Entity\UserGame $usergames)
+    {
+        $this->usergames[] = $usergames;
+
+        return $this;
+    }
+
+    /**
+     * Remove usergames
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserGame $usergames
+     */
+    public function removeUsergame(\Acme\EsBattleBundle\Entity\UserGame $usergames)
+    {
+        $this->usergames->removeElement($usergames);
+    }
+
+    /**
+     * Get usergames
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getUsergames()
+    {
+        return $this->usergames;
     }
 }

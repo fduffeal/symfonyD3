@@ -10,6 +10,10 @@ acme_es_battle_login_by_token:
     path:     /login/token/{username}/{token}
     defaults: { _controller: AcmeEsBattleBundle:Login:refresh }
 
+acme_es_battle_login_by_forget_token:
+    path:     /login/forgetToken/{username}/{token}
+    defaults: { _controller: AcmeEsBattleBundle:Login:forgetAuth }
+
 acme_es_battle_register:
     path:     /register/{email}/{password}/{username}
     defaults: { _controller: AcmeEsBattleBundle:Login:register }
@@ -53,6 +57,10 @@ acme_es_battle_rdv_form_info:
 acme_es_battle_forget_password:
     path:     /forget_password/{email}
     defaults: { _controller: AcmeEsBattleBundle:Login:forgetPassword }
+
+acme_es_battle_update_password:
+    path:     /update_password/{password}/{username}/{apikey}
+    defaults: { _controller: AcmeEsBattleBundle:Login:updatePassword }
 
 acme_es_battle_game_data_update:
     path:     /game_data/update/{plateformId}/{gameId}/{profilName}/{gameUsername}/{data1}/{data2}/{data3}/{data4}/{username}/{apikey}

@@ -26,7 +26,7 @@ class UserGame {
     protected $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="User",inversedBy="users")
+     * @ORM\ManyToOne(targetEntity="User",inversedBy="usergames")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
     protected $user;

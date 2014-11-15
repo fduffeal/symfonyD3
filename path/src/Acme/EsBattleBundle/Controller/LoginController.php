@@ -62,6 +62,39 @@ class LoginController extends Controller
 
     }
 
+    public function forgetAuthAction($username,$token){
+
+        $user = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:User')
+            ->findOneBy(
+                array('username' => $username,'forgetKey'=>$token)
+            );
+
+        $response = new Response();
+
+
+
+        if($user){
+
+            $user->setForgetKey(null);
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($user);
+            $em->flush();
+
+
+            $json = $user->_toJson();
+            $response->setContent($json);
+            return $response;
+
+        } else {
+
+            $response->setStatusCode(401);
+            $content = array('msg'=> 'token_expired');
+            $response->setContent(json_encode($content));
+            return $response;
+        }
+    }
+
 
 	public function refreshAction($username,$token)
 	{
@@ -150,6 +183,42 @@ class LoginController extends Controller
 		return $response;
 	}
 
+    /**
+     * @param $email
+     * @param $password
+     * @param $username
+     * @return Response
+     *
+     * @todo checker email et username
+     */
+    public function updatePasswordAction($password,$username,$apikey)
+    {
+
+        $response = new Response();
+
+        $user = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:User')
+            ->findOneBy(
+                array('username' => $username,'apikey'=>$apikey)
+            );
+
+        if($user === null){
+            $response->setStatusCode(401);
+            return $response;
+        }
+
+        $user->setPassword($user->makePassword($password));
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($user);
+        $em->flush();
+
+        $result = $user->_toJson();
+
+        $response = new Response();
+        $response->setContent($result);
+        return $response;
+    }
+
 	public function forgetPasswordAction($email){
 
 		$user = $this->getDoctrine()
@@ -158,9 +227,9 @@ class LoginController extends Controller
 				array('email' => $email)
 			);
 
-        $stop_date = strtotime('+1 hour', time());
+        $stop_date = strtotime('-1 hour', time());
 
-        if($user->getForgetTime() && $user->getForgetTime()->getTimestamp() < $stop_date){
+        if($user->getForgetTime() && $user->getForgetTime()->getTimestamp() > $stop_date){
             $response = new Response();
             $response->setStatusCode(403);
             $content = array('msg'=> 'mail_already_send');
@@ -187,7 +256,7 @@ class LoginController extends Controller
 			->setFrom('contact.esbattle@gmail.com')
 			->setTo($email)
 			->setBody($this->renderView('AcmeEsBattleBundle:Mail:forgetPassword.html.twig',array('username' => $username,'forgetKey'=>$forgetKey)));
-		//$this->get('mailer')->send($message);
+		$this->get('mailer')->send($message);
 
         return new Response();
 	}
