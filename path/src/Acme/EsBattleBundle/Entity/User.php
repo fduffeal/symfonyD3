@@ -76,16 +76,16 @@ class User
     /**
      * @var string
      *
-     * @ORM\Column(name="psn", type="string", length=255,nullable=true)
+     * @ORM\Column(name="forgetKey", type="string", length=255,nullable=true)
      */
-    private  $psn;
+    private  $forgetKey;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="xbox", type="string", length=255,nullable=true)
+     * @ORM\Column(name="forgetTime", type="datetime",nullable=true)
      */
-    private  $xbox;
+    private  $forgetTime;
 
 
     /**
@@ -353,48 +353,48 @@ class User
     }
 
     /**
-     * Set psn
+     * Set forgetKey
      *
-     * @param string $psn
+     * @param string $forgetKey
      * @return User
      */
-    public function setPsn($psn)
+    public function setForgetKey($forgetKey)
     {
-        $this->psn = $psn;
+        $this->forgetKey = $forgetKey;
 
         return $this;
     }
 
     /**
-     * Get psn
+     * Get forgetKey
      *
      * @return string 
      */
-    public function getPsn()
+    public function getForgetKey()
     {
-        return $this->psn;
+        return $this->forgetKey;
     }
 
     /**
-     * Set xbox
+     * Set forgetTime
      *
-     * @param string $xbox
+     * @param \DateTime $forgetTime
      * @return User
      */
-    public function setXbox($xbox)
+    public function setForgetTime($forgetTime)
     {
-        $this->xbox = $xbox;
+        $this->forgetTime = $forgetTime;
 
         return $this;
     }
 
     /**
-     * Get xbox
+     * Get forgetTime
      *
-     * @return string 
+     * @return \DateTime 
      */
-    public function getXbox()
+    public function getForgetTime()
     {
-        return $this->xbox;
+        return $this->forgetTime;
     }
 }

@@ -54,7 +54,9 @@ class LoginController extends Controller
 
 	    } else {
 		    $response = new Response();
-		    $response->setStatusCode(404);
+		    $response->setStatusCode(401);
+            $content = array('msg'=> 'connection_refused');
+            $response->setContent(json_encode($content));
 		    return $response;
 	    }
 
@@ -156,17 +158,38 @@ class LoginController extends Controller
 				array('email' => $email)
 			);
 
-		$username = $user->getUsername();
+        $stop_date = strtotime('+1 hour', time());
+
+        if($user->getForgetTime() && $user->getForgetTime()->getTimestamp() < $stop_date){
+            $response = new Response();
+            $response->setStatusCode(403);
+            $content = array('msg'=> 'mail_already_send');
+            $response->setContent(json_encode($content));
+            return $response;
+        }
+
+
+        $user->setForgetKey($user->createApiKey());
+
+        $forgetDay = new \DateTime();
+        $user->setForgetTime($forgetDay);
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($user);
+        $em->flush();
+
+        $username = $user->getUsername();
+        $forgetKey = $user->getForgetKey();
 
 		$message = \Swift_Message::newInstance()
 			->setContentType('text/html')
 			->setSubject('Welcome to Esbattle.com')
 			->setFrom('contact.esbattle@gmail.com')
 			->setTo($email)
-			->setBody($this->renderView('AcmeEsBattleBundle:Mail:forgetPassword.html.twig',array('username' => $username)));
-		$this->get('mailer')->send($message);
+			->setBody($this->renderView('AcmeEsBattleBundle:Mail:forgetPassword.html.twig',array('username' => $username,'forgetKey'=>$forgetKey)));
+		//$this->get('mailer')->send($message);
 
-		return new Response(null, 201, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+        return new Response();
 	}
 
     public function updateUserGameAction($plateformId,$gameId,$profilName,$gameUsername,$data1,$data2,$data3,$data4,$username,$apikey){
