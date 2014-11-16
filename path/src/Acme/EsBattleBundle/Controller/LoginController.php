@@ -252,7 +252,7 @@ class LoginController extends Controller
 
 		$message = \Swift_Message::newInstance()
 			->setContentType('text/html')
-			->setSubject('Welcome to Esbattle.com')
+			->setSubject('Esbattle.com password lost ?')
 			->setFrom('contact.esbattle@gmail.com')
 			->setTo($email)
 			->setBody($this->renderView('AcmeEsBattleBundle:Mail:forgetPassword.html.twig',array('username' => $username,'forgetKey'=>$forgetKey)));

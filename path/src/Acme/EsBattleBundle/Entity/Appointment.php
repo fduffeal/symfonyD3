@@ -341,7 +341,8 @@ class Appointment
             'plateform' => ($plateform)?$plateform->_toArray():null,
             'game' => ($game)?$game->_toArray():null,
             'users' => $aUsers,
-            'usersInQueue' => $aUsersInQueue
+            'usersInQueue' => $aUsersInQueue,
+            'lastUpdate' => $this->getUpdated()->getTimestamp()
 
         );
     }
