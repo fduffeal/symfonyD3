@@ -199,4 +199,37 @@ class Notification
     {
         return $this->appointment;
     }
+
+    /**
+     * @return string|\Symfony\Component\Serializer\Encoder\scalar
+     */
+    public function _toJson(){
+        $aNotifications = $this->_toArray();
+
+        $encoders = array(new XmlEncoder(), new JsonEncoder());
+        $normalizers = array(new GetSetMethodNormalizer());
+
+        $serializer = new Serializer($normalizers, $encoders);
+
+        return $serializer->serialize($aNotifications, 'json');
+    }
+
+    /*
+    * Serializes Notification.
+    *
+    * The serialized data have to contain the fields used by the equals method and the username.
+    *
+    * @return string
+    */
+    public function _toArray()
+    {
+        return array(
+            'id' => $this->getId(),
+            'code' => $this->getCode(),
+            'created_at' => $this->getCreated()->getTimestamp(),
+            'expediteur' => $this->getExpediteur()->_toArray(),
+            'destinataire' => $this->getDestinataire()->_toArray(),
+            'rdv' => $this->getAppointment()->_toArray()
+        );
+    }
 }

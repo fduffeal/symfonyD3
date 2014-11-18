@@ -415,25 +415,32 @@ class RdvController extends Controller
 	 * @return Response@TODO
 	 */
 	public function getNotificationsAction(){
-//		$stop_date = date('Y-m-d H:i:s', strtotime('-1 hour', time()));
-//
-//		$em = $this->getDoctrine()->getManager();
-//		$query = $em->createQuery(
-//			'SELECT notifications
-//            FROM AcmeEsBattleBundle:Notification notifications
-//            WHERE notifications.created > :stop_date'
-//		)->setParameter('stop_date', $stop_date);
-//
-//		$collection = $query->getResult();
-//
-//		$response = new Response();
-//		$response->setContent($json);
-//		$response->setPublic();
-//		// définit l'âge max des caches privés ou des caches partagés
+		$stop_date = date('Y-m-d H:i:s', strtotime('-5 hour', time()));
+
+		$em = $this->getDoctrine()->getManager();
+		$query = $em->createQuery(
+			'SELECT notifications
+            FROM AcmeEsBattleBundle:Notification notifications
+            JOIN notifications.expediteur expediteur
+            JOIN notifications.destinataire destinataire
+            WHERE notifications.created > :stop_date'
+		)->setParameter('stop_date', $stop_date);
+
+		$collection = $query->getResult();
+
+        $aNotification = array();
+        foreach($collection as $key => $notification){
+            $aNotification[$key] = $notification->_toArray();
+        }
+
+		$response = new Response();
+		$response->setContent(json_encode($aNotification));
+		$response->setPublic();
+		// définit l'âge max des caches privés ou des caches partagés
 //		$response->setMaxAge(20);
 //		$response->setSharedMaxAge(20);
 //
-//		return $response;
+		return $response;
 	}
 
     public function getFormInfoAction(){

@@ -28,25 +28,7 @@ class LoginController extends Controller
             $em->persist($user);
             $em->flush();
 
-            $userGameCollection = $this->getDoctrine()
-                ->getRepository('AcmeEsBattleBundle:UserGame')
-                ->findBy(
-                    array('user' => $user)
-                );
-
-            foreach($userGameCollection as $key => $userGame){
-                $userGameCollection[$key] = $userGame->_toArray();
-            }
-
-
-            $aUser = array(
-                'username' => $user->getUsername(),
-                'email' => $user->getEmail(),
-                'token' => $user->getApikey(),
-                'userGame'=> $userGameCollection
-            );
-
-            $json = json_encode($aUser);
+            $json = $user->_toJsonPrivate();
 
 		    $response = new Response();
 		    $response->setContent($json);
@@ -82,7 +64,7 @@ class LoginController extends Controller
             $em->flush();
 
 
-            $json = $user->_toJson();
+            $json = $user->_toJsonPrivate();
             $response->setContent($json);
             return $response;
 
@@ -212,7 +194,7 @@ class LoginController extends Controller
         $em->persist($user);
         $em->flush();
 
-        $result = $user->_toJson();
+        $result = $user->_toJsonPrivate();
 
         $response = new Response();
         $response->setContent($result);
@@ -311,26 +293,7 @@ class LoginController extends Controller
         $em->persist($userGame);
         $em->flush();
 
-
-        $userGameCollection = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:UserGame')
-            ->findBy(
-                array('user' => $user)
-            );
-
-        foreach($userGameCollection as $key => $userGame){
-            $userGameCollection[$key] = $userGame->_toArray();
-        }
-
-
-        $aUser = array(
-            'username' => $user->getUsername(),
-            'email' => $user->getEmail(),
-            'token' => $user->getApikey(),
-            'userGame'=> $userGameCollection
-        );
-
-        $json = json_encode($aUser);
+        $json = $user->_toJsonPrivate();
 
 	    $response = new Response();
 	    $response->setContent($json);

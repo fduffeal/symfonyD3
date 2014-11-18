@@ -223,14 +223,41 @@ class User
 		return array(
             'id' => $this->getId(),
             'username' => $this->getUsername(),
-            'email' => $this->getEmail(),
-            'token' => $this->getApikey(),
             'userGame'=> $aUserGameCollection
 		);
 	}
 
+    /**
+     * Serializes the user private.
+     *
+     * The serialized data have to contain the fields used by the equals method and the username.
+     *
+     * @return string
+     */
+    public function _toArrayPrivate()
+    {
+
+        $aUserPublic = $this->_toArray();
+
+        $aUserPublic['token'] = $this->getApikey();
+        $aUserPublic['email'] = $this->getEmail();
+
+        return $aUserPublic;
+    }
+
     public function _toJson(){
         $aUser = $this->_toArray();
+
+        $encoders = array(new XmlEncoder(), new JsonEncoder());
+        $normalizers = array(new GetSetMethodNormalizer());
+
+        $serializer = new Serializer($normalizers, $encoders);
+
+        return $serializer->serialize($aUser, 'json');
+    }
+
+    public function _toJsonPrivate(){
+        $aUser = $this->_toArrayPrivate();
 
         $encoders = array(new XmlEncoder(), new JsonEncoder());
         $normalizers = array(new GetSetMethodNormalizer());

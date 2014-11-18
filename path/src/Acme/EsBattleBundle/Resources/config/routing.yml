@@ -38,6 +38,10 @@ acme_es_battle_rdv_accept_user:
     path:     /rdv/accept_user/{userGameId}/{rdvId}/{username}/{apikey}
     defaults: { _controller: AcmeEsBattleBundle:Rdv:acceptUser }
 
+acme_es_battle_rdv_accept_user:
+    path:     /notifications/
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:getNotifications }
+
 acme_es_battle_rdv_kick_user:
     path:     /rdv/kick_user/{userGameId}/{rdvId}/{username}/{apikey}
     defaults: { _controller: AcmeEsBattleBundle:Rdv:kickUser }
@@ -65,3 +69,5 @@ acme_es_battle_update_password:
 acme_es_battle_game_data_update:
     path:     /game_data/update/{plateformId}/{gameId}/{profilName}/{gameUsername}/{data1}/{data2}/{data3}/{data4}/{username}/{apikey}
     defaults: { _controller: AcmeEsBattleBundle:Login:updateUserGame }
+
+
