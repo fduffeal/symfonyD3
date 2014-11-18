@@ -18,6 +18,7 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 
 use Acme\EsBattleBundle\Entity\User;
 use Acme\EsBattleBundle\Entity\Appointment;
+use Acme\EsBattleBundle\Entity\Notification;
 
 class RdvController extends Controller
 {
@@ -204,6 +205,14 @@ class RdvController extends Controller
         $em->persist($appointment);
         $em->flush();
 
+	    $notification = new Notification();
+	    $notification->setCode($notification::NEW_PLAYER_JOIN);
+	    $notification->setDestinataire($appointment->getLeader());
+	    $notification->setExpediteur($user);
+	    $notification->setAppointment($appointment);
+	    $em->persist($notification);
+	    $em->flush();
+
         $json = $appointment->_toJson();
 	    $response = new Response();
 	    $response->setContent($json);
@@ -231,6 +240,15 @@ class RdvController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($appointment);
             $em->flush();
+
+
+	        $notification = new Notification();
+	        $notification->setCode($notification::YOU_HAVE_BEEN_ACCEPTED);
+	        $notification->setDestinataire($userGame->getUser());
+	        $notification->setExpediteur($leader);
+	        $notification->setAppointment($appointment);
+	        $em->persist($notification);
+	        $em->flush();
 
             $json = $appointment->_toJson();
 	        $response = new Response();
@@ -263,6 +281,14 @@ class RdvController extends Controller
             $em->persist($appointment);
             $em->flush();
 
+	        $notification = new Notification();
+	        $notification->setCode($notification::YOU_HAVE_BEEN_KICKED);
+	        $notification->setDestinataire($userGame->getUser());
+	        $notification->setExpediteur($leader);
+	        $notification->setAppointment($appointment);
+	        $em->persist($notification);
+	        $em->flush();
+
             $json = $appointment->_toJson();
 	        $response = new Response();
 	        $response->setContent($json);
@@ -291,9 +317,9 @@ class RdvController extends Controller
             return new Response(null, 401, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
         }
         $leader = $appointment->getLeader();
+	    $hasNewLeader = false;
         if($user === $leader){
             $aUsersGame = $appointment->getUsersGame();
-            $hasNewLeader = false;
             foreach($aUsersGame as $userGameCanBeLeader){
                 $userGameCanBeLeaderAccount = $userGameCanBeLeader->getUser();
                 if($userGameCanBeLeaderAccount !== $leader){
@@ -320,6 +346,20 @@ class RdvController extends Controller
         $em = $this->getDoctrine()->getManager();
         $em->persist($appointment);
         $em->flush();
+
+
+	    $notification = new Notification();
+	    if($hasNewLeader === false){
+		    $notification->setCode($notification::ONE_USER_LEAVE);
+		    $notification->setDestinataire($leader);
+	    }else {
+		    $notification->setCode($notification::LEADER_LEAVE_YOU_ARE_NEW_LEADER);
+		    $notification->setDestinataire($appointment->getLeader());
+	    }
+	    $notification->setExpediteur($user);
+	    $notification->setAppointment($appointment);
+	    $em->persist($notification);
+	    $em->flush();
 
         $json = $appointment->_toJson();
 
@@ -354,7 +394,15 @@ class RdvController extends Controller
         $em->persist($appointment);
         $em->flush();
 
-        $json = $appointment->_toJson();
+	    $notification = new Notification();
+        $notification->setCode($notification::YOU_HAVE_BEEN_PROMOTED);
+	    $notification->setDestinataire($newLeader);
+	    $notification->setExpediteur($oldLeader);
+	    $notification->setAppointment($appointment);
+	    $em->persist($notification);
+	    $em->flush();
+
+	    $json = $appointment->_toJson();
 
 	    $response = new Response();
 	    $response->setContent($json);
@@ -362,6 +410,31 @@ class RdvController extends Controller
 
 
     }
+
+	/**
+	 * @return Response@TODO
+	 */
+	public function getNotificationsAction(){
+//		$stop_date = date('Y-m-d H:i:s', strtotime('-1 hour', time()));
+//
+//		$em = $this->getDoctrine()->getManager();
+//		$query = $em->createQuery(
+//			'SELECT notifications
+//            FROM AcmeEsBattleBundle:Notification notifications
+//            WHERE notifications.created > :stop_date'
+//		)->setParameter('stop_date', $stop_date);
+//
+//		$collection = $query->getResult();
+//
+//		$response = new Response();
+//		$response->setContent($json);
+//		$response->setPublic();
+//		// définit l'âge max des caches privés ou des caches partagés
+//		$response->setMaxAge(20);
+//		$response->setSharedMaxAge(20);
+//
+//		return $response;
+	}
 
     public function getFormInfoAction(){
         $tags = $this->getDoctrine()
