@@ -20,6 +20,13 @@ class LoginController extends Controller
                 array('username' => $username)
             );
 
+        $response = new Response();
+
+        if($user === null){
+            $response->setStatusCode(401);
+            return $response;
+        }
+
 	    if($user->isPasswordOk($password)){
 
             $user->setApikey($user->createApiKey());
@@ -29,13 +36,11 @@ class LoginController extends Controller
             $em->flush();
 
             $json = $user->_toJsonPrivate();
-
-		    $response = new Response();
 		    $response->setContent($json);
 		    return $response;
 
 	    } else {
-		    $response = new Response();
+
 		    $response->setStatusCode(401);
             $content = array('msg'=> 'connection_refused');
             $response->setContent(json_encode($content));
