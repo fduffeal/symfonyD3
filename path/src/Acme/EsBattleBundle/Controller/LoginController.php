@@ -131,6 +131,34 @@ class LoginController extends Controller
 	public function registerAction($email,$password,$username)
 	{
 
+        $response = new Response();
+
+        $error = array();
+        $userWithSameUserName = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:User')
+            ->findOneBy(array('username'=>$username));
+
+        if($userWithSameUserName !== null){
+            $error[] = 'username_already_taken';
+        }
+
+        $userWithSameEmail = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:User')
+            ->findOneBy(array('email'=>$email));
+
+        if($userWithSameEmail !== null){
+            $error[] = 'email_already_taken';
+        }
+
+        if(sizeof($error) !== 0){
+            $result = array('aError' => $error);
+            $json = json_encode($result);
+
+            $response->setContent($json);
+            $response->setStatusCode(403);
+            return $response;
+        }
+
 
 
 		$user = new User;
@@ -160,7 +188,6 @@ class LoginController extends Controller
 
         $json = json_encode($aUser);
 
-		$response = new Response();
 		$response->setContent($json);
 		return $response;
 	}

@@ -19,6 +19,7 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Acme\EsBattleBundle\Entity\User;
 use Acme\EsBattleBundle\Entity\Appointment;
 use Acme\EsBattleBundle\Entity\Notification;
+use Acme\EsBattleBundle\Entity\Tag;
 
 class RdvController extends Controller
 {
@@ -114,15 +115,23 @@ class RdvController extends Controller
 
         $aTags = preg_split("/[\s,]+/",$tags);
 
+        $em = $this->getDoctrine()->getManager();
+
         foreach($aTags as $key){
             $selectedTag = $this->getDoctrine()
                 ->getRepository('AcmeEsBattleBundle:Tag')
                 ->findOneBy(array('nom' => $key));
 
+            if($selectedTag === null){
+                $selectedTag = new Tag();
+                $selectedTag->setNom($key);
+                $selectedTag->setPoids(0);
+                $em->persist($selectedTag);
+            }
+
             $appointment->addTag($selectedTag);
         }
 
-		$em = $this->getDoctrine()->getManager();
 		$em->persist($appointment);
 		$em->flush();
 
@@ -412,7 +421,7 @@ class RdvController extends Controller
     }
 
 	/**
-	 * @return Response@TODO
+	 * @return Response
 	 */
 	public function getNotificationsAction(){
 		$stop_date = date('Y-m-d H:i:s', strtotime('-5 hour', time()));
@@ -437,16 +446,23 @@ class RdvController extends Controller
 		$response->setContent(json_encode($aNotification));
 		$response->setPublic();
 		// définit l'âge max des caches privés ou des caches partagés
-//		$response->setMaxAge(20);
-//		$response->setSharedMaxAge(20);
-//
+		$response->setMaxAge(20);
+		$response->setSharedMaxAge(20);
+
 		return $response;
 	}
 
     public function getFormInfoAction(){
-        $tags = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:Tag')
-            ->findAll();
+
+        $poidsMini = 0;
+        $em = $this->getDoctrine()->getManager();
+        $query = $em->createQuery(
+            'SELECT tags
+            FROM AcmeEsBattleBundle:Tag tags
+            WHERE tags.poids > :poids_mini'
+        )->setParameter('poids_mini', $poidsMini);
+
+        $tags = $query->getResult();
 
         $aTags = array();
         foreach($tags as $tag){
