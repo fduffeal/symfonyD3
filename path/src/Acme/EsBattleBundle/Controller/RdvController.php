@@ -122,7 +122,9 @@ class RdvController extends Controller
                 ->getRepository('AcmeEsBattleBundle:Tag')
                 ->findOneBy(array('nom' => $key));
 
-            if($selectedTag === null){
+	        $key = trim($key);
+
+            if($selectedTag === null && $key !== ""){
                 $selectedTag = new Tag();
                 $selectedTag->setNom($key);
                 $selectedTag->setPoids(0);
