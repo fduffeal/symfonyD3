@@ -1,10 +1,14 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: francisduffeal
+ * Date: 04/11/14
+ * Time: 21:12
+ */
 
 namespace Acme\EsBattleBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
-use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
@@ -12,13 +16,13 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 
 /**
- * Game
+ * Plateform
  *
  * @ORM\Table()
  * @ORM\Entity
  */
-class Game
-{
+class Plateform {
+
     /**
      * @var integer
      *
@@ -30,18 +34,9 @@ class Game
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
+     * @ORM\Column(name="nom", type="string",length=255)
      */
-    private $name;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="site", type="string", length=255)
-     */
-    private $site;
-
+    private $nom;
 
     /**
      * Get id
@@ -54,67 +49,43 @@ class Game
     }
 
     /**
-     * Set name
+     * Set nom
      *
-     * @param string $name
-     * @return Game
+     * @param string $nom
+     * @return Plateform
      */
-    public function setName($name)
+    public function setNom($nom)
     {
-        $this->name = $name;
+        $this->nom = $nom;
 
         return $this;
     }
 
     /**
-     * Get name
+     * Get nom
      *
      * @return string 
      */
-    public function getName()
+    public function getNom()
     {
-        return $this->name;
-    }
-
-    /**
-     * Set site
-     *
-     * @param string $site
-     * @return Game
-     */
-    public function setSite($site)
-    {
-        $this->site = $site;
-
-        return $this;
-    }
-
-    /**
-     * Get site
-     *
-     * @return string 
-     */
-    public function getSite()
-    {
-        return $this->site;
+        return $this->nom;
     }
 
     public function _toArray(){
         return array(
             'id' => $this->getId(),
-            'name' => $this->getName(),
-            'site' => $this->getSite()
+            'nom' => $this->getNom()
         );
     }
 
     public function _toJson(){
-        $aAppointment = $this->_toArray();
+        $plateform = $this->_toArray();
 
         $encoders = array(new XmlEncoder(), new JsonEncoder());
         $normalizers = array(new GetSetMethodNormalizer());
 
         $serializer = new Serializer($normalizers, $encoders);
 
-        return $serializer->serialize($aAppointment, 'json');
+        return $serializer->serialize($plateform, 'json');
     }
 }

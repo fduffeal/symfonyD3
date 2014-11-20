@@ -3,5 +3,71 @@ acme_es_battle_homepage:
     defaults: { _controller: AcmeEsBattleBundle:Default:index }
 
 acme_es_battle_login:
-    path:     /login/{login}/{password}
+    path:     /login/{username}/{password}
     defaults: { _controller: AcmeEsBattleBundle:Login:index }
+
+acme_es_battle_login_by_token:
+    path:     /login/token/{username}/{token}
+    defaults: { _controller: AcmeEsBattleBundle:Login:refresh }
+
+acme_es_battle_login_by_forget_token:
+    path:     /login/forgetToken/{username}/{token}
+    defaults: { _controller: AcmeEsBattleBundle:Login:forgetAuth }
+
+acme_es_battle_register:
+    path:     /register/{email}/{password}/{username}
+    defaults: { _controller: AcmeEsBattleBundle:Login:register }
+
+acme_es_battle_rdv:
+    path:     /rdv/
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:index }
+
+acme_es_battle_rdv_create:
+    path:     /rdv/add/{plateform}/{game}/{tags}/{description}/{start}/{duree}/{nbParticipant}/{userGameId}/{username}/{token}
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:create }
+
+acme_es_battle_rdv_get:
+    path:     /rdv/get/{rdvId}
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:getRdvById }
+
+acme_es_battle_rdv_join:
+    path:     /rdv/join/{rdvId}/{userGameId}/{username}/{apikey}
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:joinRdv }
+
+acme_es_battle_rdv_accept_user:
+    path:     /rdv/accept_user/{userGameId}/{rdvId}/{username}/{apikey}
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:acceptUser }
+
+acme_es_battle_rdv_accept_user:
+    path:     /notifications/
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:getNotifications }
+
+acme_es_battle_rdv_kick_user:
+    path:     /rdv/kick_user/{userGameId}/{rdvId}/{username}/{apikey}
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:kickUser }
+
+acme_es_battle_rdv_leave:
+    path:     /rdv/leave/{rdvId}/{userGameId}/{username}/{apikey}
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:leaveRdv }
+
+acme_es_battle_rdv_promote:
+    path:     /rdv/promote/{rdvId}/{userGameId}/{username}/{apikey}
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:promoteRdv }
+
+acme_es_battle_rdv_form_info:
+    path:     /rdv/form_info
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:getFormInfo }
+
+acme_es_battle_forget_password:
+    path:     /forget_password/{email}
+    defaults: { _controller: AcmeEsBattleBundle:Login:forgetPassword }
+
+acme_es_battle_update_password:
+    path:     /update_password/{password}/{username}/{apikey}
+    defaults: { _controller: AcmeEsBattleBundle:Login:updatePassword }
+
+acme_es_battle_game_data_update:
+    path:     /game_data/update/{plateformId}/{gameId}/{profilName}/{gameUsername}/{data1}/{data2}/{data3}/{data4}/{username}/{apikey}
+    defaults: { _controller: AcmeEsBattleBundle:Login:updateUserGame }
+
+

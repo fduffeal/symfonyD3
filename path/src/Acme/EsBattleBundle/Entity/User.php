@@ -1,64 +1,289 @@
 <?php
 
-// src/Acme/EsBattleBundle/Entity/User.php
-
 namespace Acme\EsBattleBundle\Entity;
 
-use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping as ORM;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+
 /**
- * Acme\UserBundle\Entity\User
+ * User
  *
- * @ORM\Table(name="acme_users")
- * @ORM\Entity(repositoryClass="Acme\EsBattleBundle\Repository\UserRepository")
+ * @ORM\Table(name="user")
+ * @ORM\Entity
  */
-class User implements UserInterface, \Serializable
+class User
 {
     /**
-     * @ORM\Column(type="integer")
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    protected $id;
 
     /**
-     * @ORM\Column(type="string", length=25, unique=true)
+     * @var string
+     *
+     * @ORM\Column(name="avatar", type="string", length=255,nullable=true)
      */
-    private $username;
+    private  $avatar;
+
+
+	/**
+	 * @var string
+	 *
+	 * @ORM\Column(name="username", type="string", length=255)
+	 */
+	private  $username;
+
+
+	/**
+	 * @var string
+	 *
+	 * @ORM\Column(name="email", type="string", length=255)
+	 */
+	private  $email;
+
+	/**
+	 * @var string
+	 *
+	 * @ORM\Column(name="password", type="string", length=255)
+	 */
+	private  $password;
+
+
+	/**
+	 * @var string
+	 *
+	 * @ORM\Column(name="salt", type="string", length=255)
+	 */
+	private  $salt;
 
     /**
-     * @ORM\Column(type="string", length=25, unique=true)
+     * @var string
+     *
+     * @ORM\Column(name="apikey", type="string", length=255)
      */
-    private $email;
+    private  $apikey;
 
     /**
-     * @ORM\Column(type="string", length=32)
+     * @var string
+     *
+     * @ORM\Column(name="forgetKey", type="string", length=255,nullable=true)
      */
-    private $salt;
+    private  $forgetKey;
 
     /**
-     * @ORM\Column(type="string", length=40)
+     * @var string
+     *
+     * @ORM\Column(name="forgetTime", type="datetime",nullable=true)
      */
-    private $password;
+    private  $forgetTime;
+
 
     /**
-     * @ORM\Column(name="is_active", type="boolean")
-     */
-    private $isActive;
+     * @ORM\ManyToMany(targetEntity="Clan")
+     * @ORM\JoinTable(name="users_clans",
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="clan_id", referencedColumnName="id")}
+     *      )
+     **/
+    private $clans;
 
-    public function __construct()
-    {
-        $this->isActive = true;
-        $this->salt = md5(uniqid(null, true));
+    /**
+     * @ORM\OneToMany(targetEntity="UserGame",mappedBy="user")
+     */
+    protected $usergames;
+
+    public function __construct() {
+	    $this->salt = base_convert(sha1(uniqid(mt_rand(), true)), 16, 36);
+        $this->clans = new ArrayCollection();
     }
 
-    public function getId(){
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Groupe", inversedBy="users")
+     * @ORM\JoinColumn(name="groupe_id", referencedColumnName="id")
+     */
+    protected $groupe;
+
+
+    /**
+     * Get id
+     *
+     * @return integer 
+     */
+    public function getId()
+    {
         return $this->id;
     }
 
     /**
-     * @inheritDoc
+     * Set avatar
+     *
+     * @param string $avatar
+     * @return User
+     */
+    public function setAvatar($avatar)
+    {
+        $this->avatar = $avatar;
+
+        return $this;
+    }
+
+    /**
+     * Get avatar
+     *
+     * @return string 
+     */
+    public function getAvatar()
+    {
+        return $this->avatar;
+    }
+
+    /**
+     * Add clans
+     *
+     * @param \Acme\EsBattleBundle\Entity\Clan $clans
+     * @return User
+     */
+    public function addClan(\Acme\EsBattleBundle\Entity\Clan $clans)
+    {
+        $this->clans[] = $clans;
+
+        return $this;
+    }
+
+    /**
+     * Remove clans
+     *
+     * @param \Acme\EsBattleBundle\Entity\Clan $clans
+     */
+    public function removeClan(\Acme\EsBattleBundle\Entity\Clan $clans)
+    {
+        $this->clans->removeElement($clans);
+    }
+
+    /**
+     * Get clans
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getClans()
+    {
+        return $this->clans;
+    }
+
+    /**
+     * Set groupe
+     *
+     * @param \Acme\EsBattleBundle\Entity\Groupe $groupe
+     * @return User
+     */
+    public function setGroupe(\Acme\EsBattleBundle\Entity\Groupe $groupe = null)
+    {
+        $this->groupe = $groupe;
+
+        return $this;
+    }
+
+    /**
+     * Get groupe
+     *
+     * @return \Acme\EsBattleBundle\Entity\Groupe 
+     */
+    public function getGroupe()
+    {
+        return $this->groupe;
+    }
+
+	/**
+	 * Serializes the user.
+	 *
+	 * The serialized data have to contain the fields used by the equals method and the username.
+	 *
+	 * @return string
+	 */
+	public function _toArray()
+	{
+        $aUserGameCollection = array();
+
+        $userGameCollection = $this->getUsergames();
+        foreach($userGameCollection as $key => $userGame){
+            $aUserGameCollection[$key] = $userGame->_toArray();
+        }
+
+		return array(
+            'id' => $this->getId(),
+            'username' => $this->getUsername(),
+            'userGame'=> $aUserGameCollection
+		);
+	}
+
+    /**
+     * Serializes the user private.
+     *
+     * The serialized data have to contain the fields used by the equals method and the username.
+     *
+     * @return string
+     */
+    public function _toArrayPrivate()
+    {
+
+        $aUserPublic = $this->_toArray();
+
+        $aUserPublic['token'] = $this->getApikey();
+        $aUserPublic['email'] = $this->getEmail();
+
+        return $aUserPublic;
+    }
+
+    public function _toJson(){
+        $aUser = $this->_toArray();
+
+        $encoders = array(new XmlEncoder(), new JsonEncoder());
+        $normalizers = array(new GetSetMethodNormalizer());
+
+        $serializer = new Serializer($normalizers, $encoders);
+
+        return $serializer->serialize($aUser, 'json');
+    }
+
+    public function _toJsonPrivate(){
+        $aUser = $this->_toArrayPrivate();
+
+        $encoders = array(new XmlEncoder(), new JsonEncoder());
+        $normalizers = array(new GetSetMethodNormalizer());
+
+        $serializer = new Serializer($normalizers, $encoders);
+
+        return $serializer->serialize($aUser, 'json');
+    }
+
+    /**
+     * Set username
+     *
+     * @param string $username
+     * @return User
+     */
+    public function setUsername($username)
+    {
+        $this->username = $username;
+
+        return $this;
+    }
+
+    /**
+     * Get username
+     *
+     * @return string 
      */
     public function getUsername()
     {
@@ -66,74 +291,185 @@ class User implements UserInterface, \Serializable
     }
 
     /**
-     * @inheritDoc
+     * Set email
+     *
+     * @param string $email
+     * @return User
      */
-    public function setUsername($username)
+    public function setEmail($email)
     {
-        $this->username = $username;
-        $this->email = $username;
+        $this->email = $email;
+
+        return $this;
     }
 
     /**
-     * @inheritDoc
+     * Get email
+     *
+     * @return string 
      */
-    public function getSalt()
+    public function getEmail()
     {
-        return $this->salt;
-    }
-
-    public function setSalt($salt)
-    {
-        $this->salt = $salt;
+        return $this->email;
     }
 
     /**
-     * @inheritDoc
+     * Set password
+     *
+     * @param string $password
+     * @return User
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * Get password
+     *
+     * @return string 
      */
     public function getPassword()
     {
         return $this->password;
     }
 
-    public function setPassword($password)
+    /**
+     * Set salt
+     *
+     * @param string $salt
+     * @return User
+     */
+    public function setSalt($salt)
     {
-        $this->password = $password;
+        $this->salt = $salt;
+
+        return $this;
     }
 
     /**
-     * @inheritDoc
+     * Get salt
+     *
+     * @return string 
      */
-    public function getRoles()
+    public function getSalt()
     {
-        return array('ROLE_USER');
+        return $this->salt;
+    }
+
+	public function makePassword($password){
+		return base_convert(sha1($password.$this->salt), 16, 36);
+	}
+
+    public function createApiKey(){
+        return base_convert(sha1(uniqid(mt_rand(), true)), 16, 36).base_convert(sha1(uniqid(mt_rand(), true).$this->username.$this->id), 16, 36);
+    }
+
+	public function isPasswordOk($password){
+		return $this->password === $this->makePassword($password);
+	}
+
+    /**
+     * Set apikey
+     *
+     * @param string $apikey
+     * @return User
+     */
+    public function setApikey($apikey)
+    {
+        $this->apikey = $apikey;
+
+        return $this;
     }
 
     /**
-     * @inheritDoc
+     * Get apikey
+     *
+     * @return string 
      */
-    public function eraseCredentials()
+    public function getApikey()
     {
+        return $this->apikey;
     }
 
     /**
-     * @see \Serializable::serialize()
+     * Set forgetKey
+     *
+     * @param string $forgetKey
+     * @return User
      */
-    public function serialize()
+    public function setForgetKey($forgetKey)
     {
-        return serialize(
-            array(
-                $this->id,
-            )
-        );
+        $this->forgetKey = $forgetKey;
+
+        return $this;
     }
 
     /**
-     * @see \Serializable::unserialize()
+     * Get forgetKey
+     *
+     * @return string 
      */
-    public function unserialize($serialized)
+    public function getForgetKey()
     {
-        list (
-            $this->id,
-            ) = unserialize($serialized);
+        return $this->forgetKey;
+    }
+
+    /**
+     * Set forgetTime
+     *
+     * @param \DateTime $forgetTime
+     * @return User
+     */
+    public function setForgetTime($forgetTime)
+    {
+        $this->forgetTime = $forgetTime;
+
+        return $this;
+    }
+
+    /**
+     * Get forgetTime
+     *
+     * @return \DateTime 
+     */
+    public function getForgetTime()
+    {
+        return $this->forgetTime;
+    }
+
+    /**
+     * Add usergames
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserGame $usergames
+     * @return User
+     */
+    public function addUsergame(\Acme\EsBattleBundle\Entity\UserGame $usergames)
+    {
+        $this->usergames[] = $usergames;
+
+        return $this;
+    }
+
+    /**
+     * Remove usergames
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserGame $usergames
+     */
+    public function removeUsergame(\Acme\EsBattleBundle\Entity\UserGame $usergames)
+    {
+        $this->usergames->removeElement($usergames);
+    }
+
+    /**
+     * Get usergames
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getUsergames()
+    {
+        return $this->usergames;
     }
 }

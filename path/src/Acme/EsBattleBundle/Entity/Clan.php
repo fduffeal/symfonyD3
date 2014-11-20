@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Clan
  *
- * @ORM\Table()
+ * @ORM\Table(name="clan")
  * @ORM\Entity
  */
 class Clan
