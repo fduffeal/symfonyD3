@@ -38,7 +38,7 @@ acme_es_battle_rdv_accept_user:
     path:     /rdv/accept_user/{userGameId}/{rdvId}/{username}/{apikey}
     defaults: { _controller: AcmeEsBattleBundle:Rdv:acceptUser }
 
-acme_es_battle_rdv_accept_user:
+acme_es_battle_rdv_notification:
     path:     /notifications/
     defaults: { _controller: AcmeEsBattleBundle:Rdv:getNotifications }
 
