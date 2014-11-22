@@ -23,6 +23,7 @@ class Notification
 	const YOU_HAVE_BEEN_KICKED = "you_have_been_kicked";
 	const LEADER_LEAVE_YOU_ARE_NEW_LEADER = "leader_leave_you_are_new_leader";
 	const YOU_HAVE_BEEN_PROMOTED = "you_have_been_promoted";
+	const ONE_USER_LEAVE = "one_user_leave";
     /**
      * @var integer
      *
@@ -60,7 +61,7 @@ class Notification
 
 	/**
 	 * @ORM\ManyToOne(targetEntity="Appointment")
-	 * @ORM\JoinColumn(name="appointment_id", referencedColumnName="id",nullable=true)
+	 * @ORM\JoinColumn(name="appointment_id", referencedColumnName="id",nullable=true,onDelete="CASCADE")
 	 */
 	protected $appointment;
 
