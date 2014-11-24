@@ -4,7 +4,6 @@ namespace Acme\EsBattleBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use FOS\UserBundle\Model\UserInterface;
 
 use Symfony\Component\HttpFoundation\Response;
 
