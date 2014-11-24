@@ -117,6 +117,14 @@ class Appointment
 	 */
 	protected $updated;
 
+
+    /**
+     *
+     * @var boolean
+     *
+     * @ORM\Column(name="isMatchmaking",type="boolean")
+     */
+
     /**
      * Get id
      *

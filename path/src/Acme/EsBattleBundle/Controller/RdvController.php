@@ -503,4 +503,30 @@ class RdvController extends Controller
 
         return $response;
     }
+
+    public function createMatchmakingAction($matchmakingId,$username,$apikey){
+        $response = new Response();
+
+        $user = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:User')
+            ->findOneBy(
+                array('username' => $username,'apikey'=>$apikey)
+            );
+
+        if($user === null){
+            $response->setStatusCode(401);
+            return $response;
+        }
+
+        $matchmaking = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Matchmaking')
+            ->findOneBy(
+                array('id' => $matchmakingId)
+            );
+
+        if($matchmaking === null){
+            $response->setStatusCode(401);
+            return $response;
+        }
+    }
 }
