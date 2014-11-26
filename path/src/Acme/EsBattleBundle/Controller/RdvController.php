@@ -100,6 +100,9 @@ class RdvController extends Controller
         $endDay->setTimestamp($start);
         $endDay->add($dateInterval);
 
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
+		 */
 		$appointment = new Appointment();
 		$appointment->setDescription($description);
 		$appointment->setStart($startDay);
@@ -110,6 +113,7 @@ class RdvController extends Controller
         $appointment->addUsersGame($userGame);
         $appointment->setPlateform($myPlateform);
         $appointment->setGame($myGame);
+		$appointment->setIsMatchmaking(false);
 
 
         $aTags = preg_split("/[\s,]+/",$tags);
@@ -502,31 +506,5 @@ class RdvController extends Controller
         $response->setSharedMaxAge(600);
 
         return $response;
-    }
-
-    public function createMatchmakingAction($matchmakingId,$username,$apikey){
-        $response = new Response();
-
-        $user = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:User')
-            ->findOneBy(
-                array('username' => $username,'apikey'=>$apikey)
-            );
-
-        if($user === null){
-            $response->setStatusCode(401);
-            return $response;
-        }
-
-        $matchmaking = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:Matchmaking')
-            ->findOneBy(
-                array('id' => $matchmakingId)
-            );
-
-        if($matchmaking === null){
-            $response->setStatusCode(401);
-            return $response;
-        }
     }
 }

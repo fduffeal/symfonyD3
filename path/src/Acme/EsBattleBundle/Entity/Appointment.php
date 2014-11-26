@@ -124,6 +124,7 @@ class Appointment
      *
      * @ORM\Column(name="isMatchmaking",type="boolean")
      */
+	protected $isMatchmaking;
 
     /**
      * Get id
@@ -567,4 +568,27 @@ class Appointment
 	{
 		$this->updated = new \DateTime();
 	}
+
+    /**
+     * Set isMatchmaking
+     *
+     * @param boolean $isMatchmaking
+     * @return Appointment
+     */
+    public function setIsMatchmaking($isMatchmaking)
+    {
+        $this->isMatchmaking = $isMatchmaking;
+
+        return $this;
+    }
+
+    /**
+     * Get isMatchmaking
+     *
+     * @return boolean 
+     */
+    public function getIsMatchmaking()
+    {
+        return $this->isMatchmaking;
+    }
 }
