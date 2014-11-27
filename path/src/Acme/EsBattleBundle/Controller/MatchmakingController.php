@@ -67,7 +67,7 @@ class MatchmakingController extends Controller
 			);
 
 		if($matchmaking === null){
-			$response->setStatusCode(401);
+			$response->setStatusCode(403);
 			return $response;
 		}
 

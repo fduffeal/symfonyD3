@@ -10,7 +10,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 
 /**
- * Matchmaking
+ * @package Acme\EsBattleBundle\Entity
  *
  * @ORM\Table()
  * @ORM\Entity
