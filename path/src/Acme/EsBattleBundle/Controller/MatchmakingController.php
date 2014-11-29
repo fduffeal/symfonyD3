@@ -40,6 +40,93 @@ class MatchmakingController extends Controller
 		return $response;
 	}
 
+    public function joinAction($matchmakingId,$profilId,$username,$apikey){
+        $response = new Response();
+
+        /**
+         * @var \Acme\EsBattleBundle\Entity\User $user
+         */
+        $user = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:User')
+            ->findOneBy(
+                array('username' => $username,'apikey'=>$apikey)
+            );
+
+        if($user === null){
+            $response->setStatusCode(401);
+            return $response;
+        }
+
+
+        /**
+         * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
+         */
+        $userGame = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:UserGame')
+            ->findOneBy(
+                array('id' => $profilId)
+            );
+
+        if($userGame === null){
+            $response->setStatusCode(403);
+            return $response;
+        }
+
+        $now = date('Y-m-d H:i:s', time());
+
+
+        $em = $this->getDoctrine()->getManager();
+
+        $query = $em->createQuery('
+            SELECT appointment FROM AcmeEsBattleBundle:Appointment appointment
+            JOIN appointment.matchmaking matchmaking
+            JOIN appointment.usersGame usersGame
+            WHERE matchmaking.id = :id
+            AND appointment.start < :now
+            AND appointment.end > :now
+            ORDER BY appointment.start ASC'
+            )->setParameters(array('id'=> $matchmakingId,'now'=>$now));
+
+        $collection = $query->getResult();
+
+        $sizeOfResult = sizeof($collection);
+
+        //var_dump($collection);die();
+
+        if($sizeOfResult === 0){
+
+            $response = $this->forward('AcmeEsBattleBundle:Matchmaking:create', array(
+                'matchmakingId'  => $matchmakingId,
+                'profilId'  => $profilId,
+                'username'  => $username,
+                'apikey' => $apikey,
+            ));
+
+            return $response;
+        }
+
+
+
+        $aMatchmaking = array();
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
+         */
+        foreach($collection as $appointment){
+
+            $collectionUsersGame = $appointment->getUsersGame();
+
+            if(sizeof($collectionUsersGame) < $appointment->getNbParticipant()){
+
+                $response = $this->forward('AcmeEsBattleBundle:Rdv:addUserGameInAppointment', array(
+                    'userGame'  => $userGame,
+                    'appointment'  => $appointment
+                ));
+
+                return $response;
+            }
+        }
+    }
+
 	public function createAction($matchmakingId,$profilId,$username,$apikey){
 		$response = new Response();
 
@@ -108,8 +195,7 @@ class MatchmakingController extends Controller
 		$appointment->addUsersGame($userGame);
 		$appointment->setPlateform($myPlateform);
 		$appointment->setGame($myGame);
-		$appointment->setIsMatchmaking(true);
-
+        $appointment->setMatchmaking($matchmaking);
 
 		$em = $this->getDoctrine()->getManager();
 

@@ -117,14 +117,11 @@ class Appointment
 	 */
 	protected $updated;
 
-
     /**
-     *
-     * @var boolean
-     *
-     * @ORM\Column(name="isMatchmaking",type="boolean")
+     * @ORM\ManyToOne(targetEntity="Matchmaking", inversedBy="matchmaking")
+     * @ORM\JoinColumn(name="matchmaking_id", referencedColumnName="id")
      */
-	protected $isMatchmaking;
+    protected $matchmaking;
 
     /**
      * Get id
@@ -570,25 +567,25 @@ class Appointment
 	}
 
     /**
-     * Set isMatchmaking
+     * Set matchmaking
      *
-     * @param boolean $isMatchmaking
+     * @param \Acme\EsBattleBundle\Entity\Matchmaking $matchmaking
      * @return Appointment
      */
-    public function setIsMatchmaking($isMatchmaking)
+    public function setMatchmaking(\Acme\EsBattleBundle\Entity\Matchmaking $matchmaking = null)
     {
-        $this->isMatchmaking = $isMatchmaking;
+        $this->matchmaking = $matchmaking;
 
         return $this;
     }
 
     /**
-     * Get isMatchmaking
+     * Get matchmaking
      *
-     * @return boolean 
+     * @return \Acme\EsBattleBundle\Entity\Matchmaking 
      */
-    public function getIsMatchmaking()
+    public function getMatchmaking()
     {
-        return $this->isMatchmaking;
+        return $this->matchmaking;
     }
 }

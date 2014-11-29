@@ -74,7 +74,7 @@ acme_es_battle_matchmaking_conf:
     path:     /matchmaking/
     defaults: { _controller: AcmeEsBattleBundle:Matchmaking:index }
 
-acme_es_battle_matchmaking_create:
-    path:     /matchmaking/create/{matchmakingId}/{profilId}/{username}/{apikey}
-    defaults: { _controller: AcmeEsBattleBundle:Matchmaking:create }
+acme_es_battle_matchmaking_join:
+    path:     /matchmaking/join/{matchmakingId}/{profilId}/{username}/{apikey}
+    defaults: { _controller: AcmeEsBattleBundle:Matchmaking:join }
 
