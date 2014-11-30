@@ -349,7 +349,7 @@ class Appointment
             'users' => $aUsers,
             'usersInQueue' => $aUsersInQueue,
             'lastUpdate' => $this->getUpdated()->getTimestamp(),
-            'matchmaking' => $this->getMatchmaking()->_toArray()
+            'matchmaking' => ($this->getMatchmaking())?$this->getMatchmaking()->_toArray():''
 
         );
     }

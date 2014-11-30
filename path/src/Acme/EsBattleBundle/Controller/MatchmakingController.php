@@ -124,6 +124,14 @@ class MatchmakingController extends Controller
         }
     }
 
+    /**
+     * @todo virer l'utilisateur de ses autres parties
+     * @param $matchmakingId
+     * @param $profilId
+     * @param $username
+     * @param $apikey
+     * @return Response
+     */
 	public function createAction($matchmakingId,$profilId,$username,$apikey){
 		$response = new Response();
 
@@ -189,7 +197,6 @@ class MatchmakingController extends Controller
 		$appointment->setDuree($duree);
 		$appointment->setNbParticipant($nbParticipant);
 		$appointment->setLeader($user);
-		$appointment->addUsersGame($userGame);
 		$appointment->setPlateform($myPlateform);
 		$appointment->setGame($myGame);
         $appointment->setMatchmaking($matchmaking);
@@ -205,11 +212,11 @@ class MatchmakingController extends Controller
 		$em->persist($appointment);
 		$em->flush();
 
-		$json = $appointment->_toJson();
+        $response = $this->forward('AcmeEsBattleBundle:Rdv:addUserGameInAppointment', array(
+            'userGame'  => $userGame,
+            'appointment'  => $appointment
+        ));
+        return $response;
 
-
-		$response = new Response();
-		$response->setContent($json);
-		return $response;
 	}
 }
