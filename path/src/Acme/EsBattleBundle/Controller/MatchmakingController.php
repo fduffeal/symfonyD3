@@ -105,8 +105,6 @@ class MatchmakingController extends Controller
             return $response;
         }
 
-
-
         $aMatchmaking = array();
         /**
          * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
@@ -121,7 +119,6 @@ class MatchmakingController extends Controller
                     'userGame'  => $userGame,
                     'appointment'  => $appointment
                 ));
-
                 return $response;
             }
         }

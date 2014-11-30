@@ -348,7 +348,8 @@ class Appointment
             'game' => ($game)?$game->_toArray():null,
             'users' => $aUsers,
             'usersInQueue' => $aUsersInQueue,
-            'lastUpdate' => $this->getUpdated()->getTimestamp()
+            'lastUpdate' => $this->getUpdated()->getTimestamp(),
+            'matchmaking' => $this->getMatchmaking()->_toArray()
 
         );
     }

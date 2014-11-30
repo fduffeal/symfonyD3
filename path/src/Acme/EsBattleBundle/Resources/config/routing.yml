@@ -14,6 +14,10 @@ acme_es_battle_login_by_forget_token:
     path:     /login/forgetToken/{username}/{token}
     defaults: { _controller: AcmeEsBattleBundle:Login:forgetAuth }
 
+acme_es_battle_login_set_online:
+    path:     /login/online/{username}/{token}
+    defaults: { _controller: AcmeEsBattleBundle:Login:setOnline }
+
 acme_es_battle_register:
     path:     /register/{email}/{password}/{username}
     defaults: { _controller: AcmeEsBattleBundle:Login:register }

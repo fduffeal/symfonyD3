@@ -16,6 +16,7 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
  *
  * @ORM\Table(name="user")
  * @ORM\Entity
+ * @ORM\HasLifecycleCallbacks()
  */
 class User
 {
@@ -87,6 +88,12 @@ class User
      */
     private  $forgetTime;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="onlineTime", type="datetime",nullable=true)
+     */
+    private  $onlineTime;
 
     /**
      * @ORM\ManyToMany(targetEntity="Clan")
@@ -223,7 +230,8 @@ class User
 		return array(
             'id' => $this->getId(),
             'username' => $this->getUsername(),
-            'userGame'=> $aUserGameCollection
+            'userGame'=> $aUserGameCollection,
+            'onlineTime' => $this->getOnlineTime()->getTimestamp()
 		);
 	}
 
@@ -471,5 +479,37 @@ class User
     public function getUsergames()
     {
         return $this->usergames;
+    }
+
+    /**
+     * Set onlineTime
+     *
+     * @param \DateTime $onlineTime
+     * @return User
+     */
+    public function setOnlineTime($onlineTime)
+    {
+        $this->onlineTime = $onlineTime;
+
+        return $this;
+    }
+
+    /**
+     * Get onlineTime
+     *
+     * @return \DateTime 
+     */
+    public function getOnlineTime()
+    {
+        return $this->onlineTime;
+    }
+
+    /**
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     */
+    public function setOnlineTimeValue()
+    {
+        $this->onlineTime = new \DateTime();
     }
 }

@@ -77,6 +77,28 @@ class LoginController extends Controller
         return $response;
     }
 
+    public function setOnlineAction($username,$token){
+        $response = new Response();
+
+        $user = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:User')
+            ->findOneBy(
+                array('username' => $username,'apikey'=>$token)
+            );
+
+        if($user){
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($user);
+            $em->flush();
+
+            $json = $user->_toJsonPrivate();
+            $response->setContent($json);
+        } else {
+            $response->setStatusCode(404);
+        }
+
+        return $response;
+    }
 
 	public function refreshAction($username,$token)
 	{
