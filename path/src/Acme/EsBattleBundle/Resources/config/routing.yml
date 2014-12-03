@@ -70,8 +70,12 @@ acme_es_battle_update_password:
     path:     /update_password/{password}/{username}/{apikey}
     defaults: { _controller: AcmeEsBattleBundle:Login:updatePassword }
 
+acme_es_battle_game_data_create:
+    path:     /game_data/create/{plateformId}/{gameId}/{profilName}/{gameUsername}/{data1}/{data2}/{data3}/{data4}/{username}/{apikey}
+    defaults: { _controller: AcmeEsBattleBundle:Login:createUserGame }
+
 acme_es_battle_game_data_update:
-    path:     /game_data/update/{plateformId}/{gameId}/{profilName}/{gameUsername}/{data1}/{data2}/{data3}/{data4}/{username}/{apikey}
+    path:     /game_data/update/{plateformId}/{gameId}/{profilId}/{profilName}/{gameUsername}/{data1}/{data2}/{data3}/{data4}/{username}/{apikey}
     defaults: { _controller: AcmeEsBattleBundle:Login:updateUserGame }
 
 acme_es_battle_matchmaking_conf:
