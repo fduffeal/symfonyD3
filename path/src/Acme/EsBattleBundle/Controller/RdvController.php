@@ -4,7 +4,6 @@ namespace Acme\EsBattleBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use FOS\UserBundle\Model\UserInterface;
 
 use Symfony\Component\HttpFoundation\Response;
 
@@ -101,6 +100,9 @@ class RdvController extends Controller
         $endDay->setTimestamp($start);
         $endDay->add($dateInterval);
 
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
+		 */
 		$appointment = new Appointment();
 		$appointment->setDescription($description);
 		$appointment->setStart($startDay);
@@ -152,6 +154,9 @@ class RdvController extends Controller
         // Définit la réponse comme publique. Sinon elle sera privée par défaut.
         $response->setPublic();
 
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
+		 */
 		$appointment = $this->getDoctrine()
 			->getRepository('AcmeEsBattleBundle:Appointment')
 			->findOneBy(array('id'=>$rdvId));
@@ -165,6 +170,40 @@ class RdvController extends Controller
             $response->setContent(json_encode($content));
             return $response;
         }
+
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\Matchmaking $matchmaking
+		 */
+		$matchmaking = $appointment->getMatchmaking();
+
+		if($matchmaking !== null){
+			$now = new \DateTime();
+			$time = $now->getTimestamp();
+
+			$usersGameCollection = $appointment->getUsersGame();
+
+			$bAppointmentNeedUpdate = false;
+			/**
+			 * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
+			 */
+			foreach($usersGameCollection as $userGame){
+				/**
+				 * @var \Acme\EsBattleBundle\Entity\User $user
+				 */
+				$user = $userGame->getUser();
+				if($time > $user->getOnlineTime()->getTimestamp() + 5 * 60){
+					$appointment->removeUsersGame($userGame);
+					$bAppointmentNeedUpdate = true;
+				}
+
+			}
+
+			if($bAppointmentNeedUpdate === true){
+				$em = $this->getDoctrine()->getManager();
+				$em->persist($appointment);
+				$em->flush();
+			}
+		}
 
 
 //		var_dump($appointment->getUpdated());
@@ -503,5 +542,81 @@ class RdvController extends Controller
         $response->setSharedMaxAge(600);
 
         return $response;
+    }
+
+
+    /**
+     * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
+     * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
+     */
+    public function addUserGameInAppointmentAction($userGame,$appointment){
+
+        $this->removeUserGameInAllOtherGameInSameTime($userGame,$appointment);
+
+        $appointment->addUsersGame($userGame);
+        $appointment->setUpdatedValue();
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($appointment);
+        $em->flush();
+
+        $json = $appointment->_toJson();
+        $response = new Response();
+        $response->setContent($json);
+        return $response;
+
+    }
+
+    /**
+     * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
+     * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
+     */
+    public function removeUserGameInAllOtherGameInSameTime($userGame,$appointment){
+        $em = $this->getDoctrine()->getManager();
+
+        $query = $em->createQuery('
+            SELECT appointment FROM AcmeEsBattleBundle:Appointment appointment
+            JOIN appointment.usersGameInQueue usersGameInQueue
+            WHERE (appointment.start >= :myStart AND appointment.start <= :myEnd)
+            OR (appointment.end >= :myStart AND appointment.end <= :myEnd)
+            OR (appointment.start <= :myStart AND appointment.end >= :myEnd)
+            AND (usersGameInQueue = :currentUserGame)'
+        )->setParameters(array('myStart'=> $appointment->getStart(),'myEnd'=>$appointment->getEnd(),'currentUserGame'=>$userGame));
+
+        $collectionInQueue = $query->getResult();
+
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Appointment $appointmentConflict
+         */
+        foreach($collectionInQueue as $appointmentConflict){
+            $appointmentConflict->removeUsersGameInQueue($userGame);
+
+            $em->persist($appointmentConflict);
+            $em->flush();
+        }
+
+
+        $query = $em->createQuery('
+            SELECT appointment FROM AcmeEsBattleBundle:Appointment appointment
+            JOIN appointment.usersGame usersGame
+            WHERE (appointment.start >= :myStart AND appointment.start <= :myEnd)
+            OR (appointment.end >= :myStart AND appointment.end <= :myEnd)
+            OR (appointment.start <= :myStart AND appointment.end >= :myEnd)
+            AND (usersGame = :currentUserGame)'
+        )->setParameters(array('myStart'=> $appointment->getStart(),'myEnd'=>$appointment->getEnd(),'currentUserGame'=>$userGame));
+
+
+        $collection = $query->getResult();
+
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Appointment $appointmentConflict
+         */
+        foreach($collection as $appointmentConflict){
+            $appointmentConflict->removeUsersGame($userGame);
+
+            $em->persist($appointmentConflict);
+            $em->flush();
+        }
+
     }
 }

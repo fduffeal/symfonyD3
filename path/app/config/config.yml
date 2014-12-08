@@ -70,8 +70,3 @@ swiftmailer:
     transport: mail
     username:  "%mailer_user%"
     password:  "%mailer_password%"
-
-fos_user:
-    db_driver: orm # other valid values are 'mongodb', 'couchdb' and 'propel'
-    firewall_name: main
-    user_class: Acme\EsBattleBundle\Entity\User

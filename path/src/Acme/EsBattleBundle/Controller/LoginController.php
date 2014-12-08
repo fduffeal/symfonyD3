@@ -37,15 +37,14 @@ class LoginController extends Controller
 
             $json = $user->_toJsonPrivate();
 		    $response->setContent($json);
-		    return $response;
-
 	    } else {
-
 		    $response->setStatusCode(401);
             $content = array('msg'=> 'connection_refused');
             $response->setContent(json_encode($content));
-		    return $response;
+
 	    }
+
+        return $response;
 
     }
 
@@ -59,8 +58,6 @@ class LoginController extends Controller
 
         $response = new Response();
 
-
-
         if($user){
 
             $user->setForgetKey(null);
@@ -68,23 +65,45 @@ class LoginController extends Controller
             $em->persist($user);
             $em->flush();
 
-
             $json = $user->_toJsonPrivate();
             $response->setContent($json);
-            return $response;
-
         } else {
-
             $response->setStatusCode(401);
             $content = array('msg'=> 'token_expired');
             $response->setContent(json_encode($content));
-            return $response;
+
         }
+
+        return $response;
     }
 
+    public function setOnlineAction($username,$token){
+        $response = new Response();
+
+        $user = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:User')
+            ->findOneBy(
+                array('username' => $username,'apikey'=>$token)
+            );
+
+        if($user){
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($user);
+            $em->flush();
+
+            $json = $user->_toJsonPrivate();
+            $response->setContent($json);
+        } else {
+            $response->setStatusCode(404);
+        }
+
+        return $response;
+    }
 
 	public function refreshAction($username,$token)
 	{
+
+        $response = new Response();
 
 		$user = $this->getDoctrine()
 			->getRepository('AcmeEsBattleBundle:User')
@@ -93,36 +112,13 @@ class LoginController extends Controller
 			);
 
 		if($user){
-			$userGameCollection = $this->getDoctrine()
-				->getRepository('AcmeEsBattleBundle:UserGame')
-				->findBy(
-					array('user' => $user)
-				);
-
-			foreach($userGameCollection as $key => $userGame){
-				$userGameCollection[$key] = $userGame->_toArray();
-			}
-
-
-			$aUser = array(
-				'username' => $user->getUsername(),
-				'email' => $user->getEmail(),
-				'token' => $user->getApikey(),
-				'userGame'=> $userGameCollection
-			);
-
-			$json = json_encode($aUser);
-
-			$response = new Response();
+            $json = $user->_toJsonPrivate();
 			$response->setContent($json);
-			return $response;
-
 		} else {
-			$response = new Response();
 			$response->setStatusCode(404);
-			return $response;
 		}
 
+        return $response;
 	}
 
 	/**
@@ -131,7 +127,6 @@ class LoginController extends Controller
 	 * @param $username
 	 * @return Response
 	 *
-	 * @todo checker email et username
 	 */
 	public function registerAction($email,$password,$username)
 	{
@@ -186,12 +181,7 @@ class LoginController extends Controller
 			->setBody($this->renderView('AcmeEsBattleBundle:Mail:register.html.twig',array('username' => $username)));
 		$this->get('mailer')->send($message);
 
-        $aUser = array(
-            'username' => $user->getUsername(),
-            'token' => $user->getApikey()
-        );
-
-        $json = json_encode($aUser);
+        $json = $user->_toJsonPrivate();
 
 		$response->setContent($json);
 		return $response;
@@ -203,7 +193,6 @@ class LoginController extends Controller
      * @param $username
      * @return Response
      *
-     * @todo checker email et username
      */
     public function updatePasswordAction($password,$username,$apikey)
     {
@@ -275,16 +264,17 @@ class LoginController extends Controller
         return new Response();
 	}
 
-    public function updateUserGameAction($plateformId,$gameId,$profilName,$gameUsername,$data1,$data2,$data3,$data4,$username,$apikey){
+    public function updateUserGameAction($plateformId,$gameId,$profilId,$profilName,$gameUsername,$data1,$data2,$data3,$data4,$username,$apikey){
+
         $user = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:User')
             ->findOneBy(
-                array('username' => $username)
+                array('username' => $username,'apikey'=>$apikey)
             );
 
-        if($user === null || $user->isPasswordOk($apikey)){
+        if($user === null){
 	        $response = new Response();
-	        $response->setStatusCode(501);
+	        $response->setStatusCode(401);
 	        return $response;
         }
 
@@ -304,16 +294,21 @@ class LoginController extends Controller
         $userGame = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:UserGame')
             ->findOneBy(
-                array('user' => $user,'plateform' => $plateform,'game' => $game)
+                array('id' => $profilId,'user' => $user)
             );
 
         if($userGame === null){
-            $userGame = new UserGame();
-            $userGame->setUser($user);
-            $userGame->setPlateform($plateform);
-            $userGame->setGame($game);
+
+            $response = new Response();
+            $response->setStatusCode(401);
+            return $response;
+
+
         }
 
+        $userGame->setUser($user);
+        $userGame->setPlateform($plateform);
+        $userGame->setGame($game);
         $userGame->setGameProfilName($profilName);
         $userGame->setGameUsername($gameUsername);
         $userGame->setData1($data1);
@@ -330,6 +325,58 @@ class LoginController extends Controller
 	    $response = new Response();
 	    $response->setContent($json);
 	    return $response;
+
+    }
+
+    public function createUserGameAction($plateformId,$gameId,$profilName,$gameUsername,$data1,$data2,$data3,$data4,$username,$apikey){
+
+        $response = new Response();
+
+        $user = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:User')
+            ->findOneBy(
+                array('username' => $username,'apikey'=>$apikey)
+            );
+
+        if($user === null){
+            $response->setStatusCode(401);
+            return $response;
+        }
+
+        $plateform = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Plateform')
+            ->findOneBy(
+                array('id' => $plateformId)
+            );
+
+        $game = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Game')
+            ->findOneBy(
+                array('id' => $gameId)
+            );
+
+        /**
+         * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
+         */
+        $userGame = new UserGame();
+        $userGame->setUser($user);
+        $userGame->setPlateform($plateform);
+        $userGame->setGame($game);
+        $userGame->setGameProfilName($profilName);
+        $userGame->setGameUsername($gameUsername);
+        $userGame->setData1($data1);
+        $userGame->setData2($data2);
+        $userGame->setData3($data3);
+        $userGame->setData4($data4);
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($userGame);
+        $em->flush();
+
+        $json = $user->_toJsonPrivate();
+
+        $response->setContent($json);
+        return $response;
 
     }
 }

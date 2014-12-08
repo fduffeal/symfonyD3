@@ -118,6 +118,12 @@ class Appointment
 	protected $updated;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Matchmaking", inversedBy="matchmaking")
+     * @ORM\JoinColumn(name="matchmaking_id", referencedColumnName="id")
+     */
+    protected $matchmaking;
+
+    /**
      * Get id
      *
      * @return integer 
@@ -342,7 +348,8 @@ class Appointment
             'game' => ($game)?$game->_toArray():null,
             'users' => $aUsers,
             'usersInQueue' => $aUsersInQueue,
-            'lastUpdate' => $this->getUpdated()->getTimestamp()
+            'lastUpdate' => $this->getUpdated()->getTimestamp(),
+            'matchmaking' => ($this->getMatchmaking())?$this->getMatchmaking()->_toArray():''
 
         );
     }
@@ -559,4 +566,27 @@ class Appointment
 	{
 		$this->updated = new \DateTime();
 	}
+
+    /**
+     * Set matchmaking
+     *
+     * @param \Acme\EsBattleBundle\Entity\Matchmaking $matchmaking
+     * @return Appointment
+     */
+    public function setMatchmaking(\Acme\EsBattleBundle\Entity\Matchmaking $matchmaking = null)
+    {
+        $this->matchmaking = $matchmaking;
+
+        return $this;
+    }
+
+    /**
+     * Get matchmaking
+     *
+     * @return \Acme\EsBattleBundle\Entity\Matchmaking 
+     */
+    public function getMatchmaking()
+    {
+        return $this->matchmaking;
+    }
 }
