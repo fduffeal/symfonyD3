@@ -154,6 +154,9 @@ class RdvController extends Controller
         // Définit la réponse comme publique. Sinon elle sera privée par défaut.
         $response->setPublic();
 
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
+		 */
 		$appointment = $this->getDoctrine()
 			->getRepository('AcmeEsBattleBundle:Appointment')
 			->findOneBy(array('id'=>$rdvId));
@@ -167,6 +170,40 @@ class RdvController extends Controller
             $response->setContent(json_encode($content));
             return $response;
         }
+
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\Matchmaking $matchmaking
+		 */
+		$matchmaking = $appointment->getMatchmaking();
+
+		if($matchmaking !== null){
+			$now = new \DateTime();
+			$time = $now->getTimestamp();
+
+			$usersGameCollection = $appointment->getUsersGame();
+
+			$bAppointmentNeedUpdate = false;
+			/**
+			 * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
+			 */
+			foreach($usersGameCollection as $userGame){
+				/**
+				 * @var \Acme\EsBattleBundle\Entity\User $user
+				 */
+				$user = $userGame->getUser();
+				if($time > $user->getOnlineTime()->getTimestamp() + 5 * 60){
+					$appointment->removeUsersGame($userGame);
+					$bAppointmentNeedUpdate = true;
+				}
+
+			}
+
+			if($bAppointmentNeedUpdate === true){
+				$em = $this->getDoctrine()->getManager();
+				$em->persist($appointment);
+				$em->flush();
+			}
+		}
 
 
 //		var_dump($appointment->getUpdated());
