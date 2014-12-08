@@ -36,6 +36,10 @@ class MatchmakingController extends Controller
 		}
 
 		$response->setContent(json_encode($aMatchmaking));
+		$response->setPublic();
+		// définit l'âge max des caches privés ou des caches partagés
+		$response->setMaxAge(600);
+		$response->setSharedMaxAge(600);
 
 		return $response;
 	}
