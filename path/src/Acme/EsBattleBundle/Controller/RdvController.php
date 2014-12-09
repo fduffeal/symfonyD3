@@ -237,7 +237,9 @@ class RdvController extends Controller
 	        return $response;
         }
 
-
+	    /**
+	     * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
+	     */
         $appointment = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:Appointment')
             ->findOneBy(array('id'=>$rdvId));
@@ -248,24 +250,38 @@ class RdvController extends Controller
                 array('id' => $userGameId)
             );
 
-        $appointment->addUsersGameInQueue($userGame);
-	    $appointment->setUpdatedValue();
+	    /**
+	     * @var \Acme\EsBattleBundle\Entity\Matchmaking $matchmaking
+	     */
+	    $matchmaking = $appointment->getMatchmaking();
 
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($appointment);
-        $em->flush();
+	    if($matchmaking !== null){
+		    $response = $this->forward('AcmeEsBattleBundle:Rdv:addUserGameInAppointment', array(
+			    'userGame'  => $userGame,
+			    'appointment'  => $appointment
+		    ));
+	    } else {
+		    $appointment->addUsersGameInQueue($userGame);
+		    $appointment->setUpdatedValue();
 
-	    $notification = new Notification();
-	    $notification->setCode($notification::NEW_PLAYER_JOIN);
-	    $notification->setDestinataire($appointment->getLeader());
-	    $notification->setExpediteur($user);
-	    $notification->setAppointment($appointment);
-	    $em->persist($notification);
-	    $em->flush();
+		    $em = $this->getDoctrine()->getManager();
+		    $em->persist($appointment);
+		    $em->flush();
 
-        $json = $appointment->_toJson();
-	    $response = new Response();
-	    $response->setContent($json);
+		    $notification = new Notification();
+		    $notification->setCode($notification::NEW_PLAYER_JOIN);
+		    $notification->setDestinataire($appointment->getLeader());
+		    $notification->setExpediteur($user);
+		    $notification->setAppointment($appointment);
+		    $em->persist($notification);
+		    $em->flush();
+
+		    $json = $appointment->_toJson();
+		    $response = new Response();
+		    $response->setContent($json);
+	    }
+
+
 	    return $response;
     }
 
@@ -283,26 +299,20 @@ class RdvController extends Controller
                 ->getRepository('AcmeEsBattleBundle:UserGame')
                 ->findOneBy(array('id'=>$userGameId));
 
-            $appointment->removeUsersGameInQueue($userGame);
-            $appointment->addUsersGame($userGame);
-	        $appointment->setUpdatedValue();
-
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($appointment);
-            $em->flush();
-
+	        $response = $this->forward('AcmeEsBattleBundle:Rdv:addUserGameInAppointment', array(
+		        'userGame'  => $userGame,
+		        'appointment'  => $appointment
+	        ));
 
 	        $notification = new Notification();
 	        $notification->setCode($notification::YOU_HAVE_BEEN_ACCEPTED);
 	        $notification->setDestinataire($userGame->getUser());
 	        $notification->setExpediteur($leader);
 	        $notification->setAppointment($appointment);
+	        $em = $this->getDoctrine()->getManager();
 	        $em->persist($notification);
 	        $em->flush();
 
-            $json = $appointment->_toJson();
-	        $response = new Response();
-	        $response->setContent($json);
 	        return $response;
 
         }else{
