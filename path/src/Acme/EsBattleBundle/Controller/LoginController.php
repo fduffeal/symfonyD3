@@ -80,6 +80,9 @@ class LoginController extends Controller
     public function setOnlineAction($username,$token){
         $response = new Response();
 
+	    /**
+	     * @var \Acme\EsBattleBundle\Entity\User $user
+	     */
         $user = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:User')
             ->findOneBy(
@@ -88,6 +91,7 @@ class LoginController extends Controller
 
         if($user){
             $em = $this->getDoctrine()->getManager();
+	        $user->setOnlineTimeValue();
             $em->persist($user);
             $em->flush();
 

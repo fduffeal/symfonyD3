@@ -558,6 +558,14 @@ class RdvController extends Controller
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($appointment);
+
+	    /**
+	     * mets à jour l'online du user
+	     */
+	    $user = $userGame->getUser();
+	    $user->setOnlineTimeValue();
+	    $em->persist($user);
+
         $em->flush();
 
         $json = $appointment->_toJson();

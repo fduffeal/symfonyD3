@@ -129,7 +129,6 @@ class MatchmakingController extends Controller
     }
 
     /**
-     * @todo virer l'utilisateur de ses autres parties
      * @param $matchmakingId
      * @param $profilId
      * @param $username
