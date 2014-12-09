@@ -223,9 +223,11 @@ class User
         $aUserGameCollection = array();
 
         $userGameCollection = $this->getUsergames();
-        foreach($userGameCollection as $key => $userGame){
-            $aUserGameCollection[$key] = $userGame->_toArray();
-        }
+		if($userGameCollection !== null){
+			foreach($userGameCollection as $key => $userGame){
+				$aUserGameCollection[$key] = $userGame->_toArray();
+			}
+		}
 
 		return array(
             'id' => $this->getId(),
