@@ -577,6 +577,17 @@ class RdvController extends Controller
         $appointment->addUsersGame($userGame);
         $appointment->setUpdatedValue();
 
+	    $matchmaking = $appointment->getMatchmaking();
+	    /**
+	     * on ajoute 30 minutes
+	     */
+	    if($matchmaking !== null){
+		    $dateInterval = new \DateInterval('P0Y0M0DT0H30M0S');
+		    $endDay = new \DateTime();
+		    $endDay->add($dateInterval);
+		    $appointment->setEnd($endDay);
+	    }
+
         $em = $this->getDoctrine()->getManager();
         $em->persist($appointment);
 
