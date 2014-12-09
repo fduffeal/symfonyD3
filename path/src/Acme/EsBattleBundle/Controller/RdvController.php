@@ -353,9 +353,21 @@ class RdvController extends Controller
     }
 
     public function leaveRdvAction($rdvId,$userGameId,$username,$apikey){
+	    $response = new Response();
+
         $appointment = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:Appointment')
             ->findOneBy(array('id'=>$rdvId));
+
+	    if($appointment === null){
+		    // définit l'âge max des caches privés ou des caches partagés
+		    $response->setMaxAge(3600);
+		    $response->setSharedMaxAge(3600);
+		    $response->setStatusCode(404);
+		    $content = array('msg'=> 'rdv not found');
+		    $response->setContent(json_encode($content));
+		    return $response;
+	    }
 
         $userGame = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:UserGame')
@@ -413,7 +425,6 @@ class RdvController extends Controller
 
         $json = $appointment->_toJson();
 
-	    $response = new Response();
 	    $response->setContent($json);
 	    return $response;
 
