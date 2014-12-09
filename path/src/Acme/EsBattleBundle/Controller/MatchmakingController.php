@@ -85,11 +85,13 @@ class MatchmakingController extends Controller
             SELECT appointment FROM AcmeEsBattleBundle:Appointment appointment
             JOIN appointment.matchmaking matchmaking
             JOIN appointment.usersGame usersGame
+            JOIN appointment.plateform plateform
             WHERE matchmaking.id = :id
             AND appointment.start < :now
             AND appointment.end > :now
+            AND plateform.id = :plateformId
             ORDER BY appointment.start ASC'
-            )->setParameters(array('id'=> $matchmakingId,'now'=>$now));
+            )->setParameters(array('id'=> $matchmakingId,'now'=>$now,'plateformId'=>$userGame->getPlateform()->getId()));
 
         $collection = $query->getResult();
 
