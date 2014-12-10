@@ -33,6 +33,7 @@ class RdvController extends Controller
         $query = $em->createQuery(
             'SELECT rdv
             FROM AcmeEsBattleBundle:Appointment rdv
+            JOIN rdv.usersGame usersGame
             WHERE rdv.start > :now'
         )->setParameter('now', $stop_date);
 
@@ -49,8 +50,8 @@ class RdvController extends Controller
 
         $response->setPublic();
         // définit l'âge max des caches privés ou des caches partagés
-        $response->setMaxAge(60);
-        $response->setSharedMaxAge(60);
+        $response->setMaxAge(30);
+        $response->setSharedMaxAge(30);
         $response->setContent($json);
 
         return $response;
@@ -135,6 +136,11 @@ class RdvController extends Controller
 
             $appointment->addTag($selectedTag);
         }
+
+		/**
+		 * on supprime les autres lien à un rdv avant de sauvegarder le nouveau
+		 */
+		$this->removeUserGameInAllOtherGameInSameTime($userGame,$appointment);
 
 		$em->persist($appointment);
 		$em->flush();
