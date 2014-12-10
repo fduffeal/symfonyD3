@@ -614,6 +614,7 @@ class RdvController extends Controller
     }
 
     /**
+     * @todo faire le check sur l'utilisateur, plutot que sur le profil de jeu
      * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
      * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
      */
