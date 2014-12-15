@@ -26,7 +26,7 @@ class RdvController extends Controller
     {
 
 
-        $stop_date = date('Y-m-d H:i:s', strtotime('-1 day', time()));
+        $stop_date = date('Y-m-d H:i:s', strtotime('-10 day', time()));
 
 
         $em = $this->getDoctrine()->getManager();
