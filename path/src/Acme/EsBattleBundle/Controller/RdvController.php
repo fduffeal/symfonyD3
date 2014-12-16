@@ -397,15 +397,7 @@ class RdvController extends Controller
         $leader = $appointment->getLeader();
 	    $hasNewLeader = false;
         if($user === $leader){
-            $aUsersGame = $appointment->getUsersGame();
-            foreach($aUsersGame as $userGameCanBeLeader){
-                $userGameCanBeLeaderAccount = $userGameCanBeLeader->getUser();
-                if($userGameCanBeLeaderAccount !== $leader){
-                    $appointment->setLeader($userGameCanBeLeaderAccount);
-                    $hasNewLeader = true;
-                    break;
-                }
-            }
+            $hasNewLeader = $this->setNewLeader($appointment);
 
             if($hasNewLeader === false){
                 $em = $this->getDoctrine()->getManager();
@@ -659,11 +651,58 @@ class RdvController extends Controller
          * @var \Acme\EsBattleBundle\Entity\Appointment $appointmentConflict
          */
         foreach($collection as $appointmentConflict){
+            $userToRemove = $userGame->getUser();
             $appointmentConflict->removeUsersGame($userGame);
+
+            $leader = $appointmentConflict->getLeader();
+            if($userToRemove === $leader){
+                $hasNewLeader = $this->setNewLeader($appointmentConflict);
+
+                if($hasNewLeader === false){
+                    $em = $this->getDoctrine()->getManager();
+                    $em->remove($appointmentConflict);
+                    $em->flush();
+                    continue;
+                }
+            }
+
 
             $em->persist($appointmentConflict);
             $em->flush();
         }
 
+    }
+
+    /**
+     * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
+     */
+    public function setNewLeader($appointment){
+        $hasNewLeader = false;
+        $leader = $appointment->getLeader();
+        $aUsersGame = $appointment->getUsersGame();
+        foreach($aUsersGame as $userGameCanBeLeader){
+            $userGameCanBeLeaderAccount = $userGameCanBeLeader->getUser();
+            if($userGameCanBeLeaderAccount !== $leader){
+                $appointment->setLeader($userGameCanBeLeaderAccount);
+                $hasNewLeader = true;
+                break;
+            }
+        }
+
+        if($hasNewLeader === false){
+            $aUsersGame = $appointment->getUsersGameInQueue();
+            foreach($aUsersGame as $userGameCanBeLeader){
+                $userGameCanBeLeaderAccount = $userGameCanBeLeader->getUser();
+                if($userGameCanBeLeaderAccount !== $leader){
+                    $appointment->setLeader($userGameCanBeLeaderAccount);
+                    $appointment->removeUsersGameInQueue($userGameCanBeLeader);
+                    $appointment->addUsersGame($userGameCanBeLeader);
+                    $hasNewLeader = true;
+                    break;
+                }
+            }
+        }
+
+        return $hasNewLeader;
     }
 }
