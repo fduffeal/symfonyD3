@@ -119,7 +119,7 @@ class LoginController extends Controller
             $json = $user->_toJsonPrivate();
 			$response->setContent($json);
 		} else {
-			$response->setStatusCode(404);
+			$response->setStatusCode(401);
 		}
 
         return $response;
