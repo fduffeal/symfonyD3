@@ -232,7 +232,18 @@ class RdvController extends Controller
 		}
 	}
 
+    /**
+     * joinRdvAction : rejoindre une partie depuis la page party/waiting (peut afficher des rdv ou matchmaking)
+     * @param $rdvId
+     * @param $userGameId
+     * @param $username
+     * @param $apikey
+     * @return Response
+     */
     public function joinRdvAction($rdvId,$userGameId,$username,$apikey){
+        /**
+         * @var \Acme\EsBattleBundle\Entity\User $user
+         */
         $user = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:User')
             ->findOneBy(array('username'=>$username,'apikey'=>$apikey));
@@ -256,36 +267,37 @@ class RdvController extends Controller
                 array('id' => $userGameId)
             );
 
-	    /**
-	     * @var \Acme\EsBattleBundle\Entity\Matchmaking $matchmaking
-	     */
-	    $matchmaking = $appointment->getMatchmaking();
+        $isMatchmaking = ($appointment->getMatchmaking() === null);
 
-	    if($matchmaking !== null){
-		    $response = $this->forward('AcmeEsBattleBundle:Rdv:addUserGameInAppointment', array(
-			    'userGame'  => $userGame,
-			    'appointment'  => $appointment
-		    ));
-	    } else {
-		    $appointment->addUsersGameInQueue($userGame);
-		    $appointment->setUpdatedValue();
+        $collectionUsersGame = $appointment->getUsersGame();
+        /**
+         * il reste de la place on ajoute à la liste
+         */
+        if(sizeof($collectionUsersGame) < $appointment->getNbParticipant()){
+            $response = $this->forward('AcmeEsBattleBundle:Rdv:addUserGameInAppointment', array(
+                'userGame'  => $userGame,
+                'appointment'  => $appointment
+            ));
+        /**
+         * plus de place on ajoute à la file d'attente
+         */
+        } else{
+            $response = $this->forward('AcmeEsBattleBundle:Rdv:addUserInQueue', array(
+                'userGame'  => $userGame,
+                'appointment'  => $appointment
+            ));
+        }
 
-		    $em = $this->getDoctrine()->getManager();
-		    $em->persist($appointment);
-		    $em->flush();
-
-		    $notification = new Notification();
-		    $notification->setCode($notification::NEW_PLAYER_JOIN);
-		    $notification->setDestinataire($appointment->getLeader());
-		    $notification->setExpediteur($user);
-		    $notification->setAppointment($appointment);
-		    $em->persist($notification);
-		    $em->flush();
-
-		    $json = $appointment->_toJson();
-		    $response = new Response();
-		    $response->setContent($json);
-	    }
+        if($isMatchmaking === false){
+            $notification = new Notification();
+            $notification->setCode($notification::NEW_PLAYER_JOIN);
+            $notification->setDestinataire($appointment->getLeader());
+            $notification->setExpediteur($user);
+            $notification->setAppointment($appointment);
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($notification);
+            $em->flush();
+        }
 
 
 	    return $response;
@@ -293,6 +305,9 @@ class RdvController extends Controller
 
     public function acceptUserAction($userGameId,$rdvId,$username,$apikey){
 
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
+         */
         $appointment = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:Appointment')
             ->findOneBy(array('id'=>$rdvId));
@@ -328,7 +343,30 @@ class RdvController extends Controller
         }
     }
 
+    /**
+     * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
+     * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
+     */
+    public function addUserInQueueAction($appointment,$userGame){
+
+        $appointment->removeUsersGame($userGame);
+        $appointment->addUsersGameInQueue($userGame);
+        $appointment->setUpdatedValue();
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($appointment);
+        $em->flush();
+
+        $json = $appointment->_toJson();
+        $response = new Response();
+        $response->setContent($json);
+        return $response;
+    }
+
     public function kickUserAction($userGameId,$rdvId,$username,$apikey){
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
+         */
         $appointment = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:Appointment')
             ->findOneBy(array('id'=>$rdvId));
@@ -340,32 +378,25 @@ class RdvController extends Controller
                 ->getRepository('AcmeEsBattleBundle:UserGame')
                 ->findOneBy(array('id'=>$userGameId));
 
-            $appointment->removeUsersGame($userGame);
-	        $appointment->setUpdatedValue();
+            $response = $this->forward('AcmeEsBattleBundle:Rdv:addUserInQueue', array(
+                'userGame'  => $userGame,
+                'appointment'  => $appointment
+            ));
 
+            $notification = new Notification();
+            $notification->setCode($notification::YOU_HAVE_BEEN_KICKED);
+            $notification->setDestinataire($userGame->getUser());
+            $notification->setExpediteur($leader);
+            $notification->setAppointment($appointment);
             $em = $this->getDoctrine()->getManager();
-            $em->persist($appointment);
+            $em->persist($notification);
             $em->flush();
 
-	        $notification = new Notification();
-	        $notification->setCode($notification::YOU_HAVE_BEEN_KICKED);
-	        $notification->setDestinataire($userGame->getUser());
-	        $notification->setExpediteur($leader);
-	        $notification->setAppointment($appointment);
-	        $em->persist($notification);
-	        $em->flush();
-
-            $json = $appointment->_toJson();
-	        $response = new Response();
-	        $response->setContent($json);
-	        return $response;
-
         }else {
-
 	        $response = new Response();
 	        $response->setStatusCode(401);
-	        return $response;
         }
+        return $response;
     }
 
     public function leaveRdvAction($rdvId,$userGameId,$username,$apikey){
