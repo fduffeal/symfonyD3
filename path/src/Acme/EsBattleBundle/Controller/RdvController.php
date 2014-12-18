@@ -267,7 +267,7 @@ class RdvController extends Controller
                 array('id' => $userGameId)
             );
 
-        $isMatchmaking = ($appointment->getMatchmaking() === null);
+        $isMatchmaking = ($appointment->getMatchmaking() !== null);
 
         $collectionUsersGame = $appointment->getUsersGame();
         /**
