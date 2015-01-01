@@ -383,4 +383,42 @@ class LoginController extends Controller
         return $response;
 
     }
+
+    public function getUsersAction(){
+
+        $response = new Response();
+
+
+        $stop_date = date('Y-m-d H:i:s', strtotime('-1 day', time()));
+
+        $em = $this->getDoctrine()->getManager();
+        $query = $em->createQuery(
+            'SELECT user
+            FROM AcmeEsBattleBundle:User user
+            WHERE user.onlineTime > :now'
+        )->setParameter('now', $stop_date);
+
+        $collection = $query->getResult();
+
+
+        $aResult = [];
+        /**
+         * @var \Acme\EsBattleBundle\Entity\User $user
+         */
+        foreach($collection as $user){
+            $aResult[] = $user->_toArray();
+        }
+
+        $json = json_encode($aResult);
+
+
+
+        $response->setPublic();
+        // définit l'âge max des caches privés ou des caches partagés
+        $response->setMaxAge(30);
+        $response->setSharedMaxAge(30);
+        $response->setContent($json);
+
+        return $response;
+    }
 }

@@ -86,3 +86,7 @@ acme_es_battle_matchmaking_join:
     path:     /matchmaking/join/{matchmakingId}/{profilId}/{username}/{apikey}
     defaults: { _controller: AcmeEsBattleBundle:Matchmaking:join }
 
+acme_es_battle_users_list:
+    path:     /users/
+    defaults: { _controller: AcmeEsBattleBundle:Login:getUsers }
+
