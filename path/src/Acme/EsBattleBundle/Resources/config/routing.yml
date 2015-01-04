@@ -88,5 +88,13 @@ acme_es_battle_matchmaking_join:
 
 acme_es_battle_users_list:
     path:     /users/
-    defaults: { _controller: AcmeEsBattleBundle:Login:getUsers }
+    defaults: { _controller: AcmeEsBattleBundle:User:getUsers }
+
+acme_es_battle_user_add_friend:
+    path:     /user/friend/add/{friendUsername}/{username}/{apikey}
+    defaults: { _controller: AcmeEsBattleBundle:User:addFriend }
+
+acme_es_battle_user_remove_friend:
+    path:     /user/friend/remove/{friendUsername}/{username}/{apikey}
+    defaults: { _controller: AcmeEsBattleBundle:User:removeFriend }
 

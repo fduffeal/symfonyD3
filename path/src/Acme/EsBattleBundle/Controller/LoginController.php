@@ -78,27 +78,33 @@ class LoginController extends Controller
     }
 
     public function setOnlineAction($username,$token){
+
         $response = new Response();
 
-	    /**
-	     * @var \Acme\EsBattleBundle\Entity\User $user
-	     */
-        $user = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:User')
-            ->findOneBy(
-                array('username' => $username,'apikey'=>$token)
-            );
-
-        if($user){
-            $em = $this->getDoctrine()->getManager();
-	        $user->setOnlineTimeValue();
-            $em->persist($user);
-            $em->flush();
-
-            $json = $user->_toJsonPrivate();
-            $response->setContent($json);
+        if($username === 'null' && $token === 'null'){
+            $response->setStatusCode(403);
         } else {
-            $response->setStatusCode(404);
+
+            /**
+             * @var \Acme\EsBattleBundle\Entity\User $user
+             */
+            $user = $this->getDoctrine()
+                ->getRepository('AcmeEsBattleBundle:User')
+                ->findOneBy(
+                    array('username' => $username, 'apikey' => $token)
+                );
+
+            if ($user) {
+                $em = $this->getDoctrine()->getManager();
+                $user->setOnlineTimeValue();
+                $em->persist($user);
+                $em->flush();
+
+                $json = $user->_toJsonPrivate();
+                $response->setContent($json);
+            } else {
+                $response->setStatusCode(404);
+            }
         }
 
         return $response;
