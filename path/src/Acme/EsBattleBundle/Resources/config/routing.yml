@@ -98,3 +98,7 @@ acme_es_battle_user_remove_friend:
     path:     /user/friend/remove/{friendUsername}/{username}/{apikey}
     defaults: { _controller: AcmeEsBattleBundle:User:removeFriend }
 
+acme_es_battle_bungie:
+    path:     /bungie
+    defaults: { _controller: AcmeEsBattleBundle:Bungie:index }
+
