@@ -56,7 +56,31 @@ class Bungie
         return $this->player;
     }
 
-    public function getCharacters($membershipType,$destinyMembershipId){
+    public function getCharacters($membershipType,$displayName){
+
+        $player = $this->getPlayer($membershipType,$displayName);
+        $account = $this->_Account($membershipType,$player->membershipId);
+
+        $characters = $account->Response->data->characters;
+        $clanName = $account->Response->data->clanName;
+
+        $this->characters = [];
+        foreach($characters as $key => $value){
+
+            $this->characters[] = array(
+                'gamerTag' => $displayName,
+                'level' => $value->characterLevel,
+                'class' => $this->classMapping[$value->characterBase->classType],
+                'clan' => $clanName,
+                'backgroundPath' => self::BUNGIE_URL.$value->backgroundPath,
+                'emblemPath' => self::BUNGIE_URL.$value->emblemPath
+            );
+        }
+
+        return $this->characters;
+    }
+
+    public function getCharactersOld($membershipType,$destinyMembershipId){
         $curl = $this->_Account($membershipType,$destinyMembershipId);
 
         $characters = $curl->Response->data->characters;

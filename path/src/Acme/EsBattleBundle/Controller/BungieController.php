@@ -14,9 +14,9 @@ class BungieController extends Controller
     public function indexAction(){
 
         $bungie = $this->get('acme_es_battle.bungie');
-        $player = $bungie->getPlayer(2,'Fifoukiller84');
+        //$player = $bungie->getPlayer(2,'Fifoukiller84');
 
-        $characters = $bungie->getCharacters(2,$player->membershipId);
+        $characters = $bungie->getCharactersNew(2,'Fifoukiller84');
 
 //        var_dump($player,$characters);
 
@@ -31,10 +31,8 @@ class BungieController extends Controller
     public function getCharactersAction($plateform,$gamerTag){
 
         $bungie = $this->get('acme_es_battle.bungie');
-        $player = $bungie->getPlayer($plateform,$gamerTag);
 
-        $characters = $bungie->getCharacters(2,$player->membershipId);
-
+        $characters = $bungie->getCharacters(2,$gamerTag);
 //        var_dump($player,$characters);
 
         echo json_encode($characters);
