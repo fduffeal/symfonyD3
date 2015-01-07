@@ -2,46 +2,23 @@
 
 namespace Acme\EsBattleBundle\Controller;
 
+use Foo\Bar\B;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
-use Acme\EsBattleBundle\DependencyInjection\Configuration as Configuration;
-
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\Config\FileLocator;
+use Acme\EsBattleBundle\Bungie;
 
 class BungieController extends Controller
 {
 
-    public function load(array $configs, ContainerBuilder $container)
-    {
-        // préparer votre variable $config
+    public function indexAction(){
 
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $bungie = $this->get('acme_es_battle.bungie');
+        $player = $bungie->SearchDestinyPlayer(2,'Fifoukiller84');
 
-        if (isset($config['enabled']) && $config['enabled']) {
-            $loader->load('services.xml');
-        }
-    }
+        var_dump($player);
+        die();
 
-    public function indexAction(ContainerBuilder $container){
-//        $conf = new Configuration();
-//        $tree = $conf->getConfigTreeBuilder()->root('bungie');
-//        var_dump($tree);die();
-
-
-        // préparer votre variable $config
-
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.xml');
-
-//        if (!isset($config['my_type'])) {
-//            throw new \InvalidArgumentException('The "my_type" option must be set');
-//        }
-//
-//        $container->setParameter('acme_hello.my_service_type', $config['my_type']);
-
-        var_dump('test');die();
     }
     public function searchDestinyPlayerAction($membershipType,$displayName){
 

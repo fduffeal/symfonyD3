@@ -70,6 +70,3 @@ swiftmailer:
     transport: mail
     username:  "%mailer_user%"
     password:  "%mailer_password%"
-
-imports:
-    - { resource: "@AcmeEsBattleBundle/Resources/config/services.yml" }

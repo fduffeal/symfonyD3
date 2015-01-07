@@ -1,10 +1,10 @@
 parameters:
-    acme_es_battle.example.class: Acme\EsBattleBundle\Example
+    acme_es_battle.example.class: Acme\EsBattleBundle\Bungie
 
 services:
+    acme_es_battle.bungie:
+        arguments: ["%bungie%"]
+        class: "%acme_es_battle.example.class%"
 #    acme_es_battle.example:
 #        class: %acme_es_battle.example.class%
 #        arguments: [@service_id, "plain_value", %parameter%]
-  acme_es_battle.bungie:
-    apikey: "%bungie%"
-    class: %acme_es_battle.example.class%
