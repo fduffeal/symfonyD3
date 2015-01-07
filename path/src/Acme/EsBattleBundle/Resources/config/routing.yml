@@ -102,3 +102,7 @@ acme_es_battle_bungie:
     path:     /bungie
     defaults: { _controller: AcmeEsBattleBundle:Bungie:index }
 
+acme_es_battle_bungie_characters:
+    path:     /bungie/characters/{plateform}/{gamerTag}
+    defaults: { _controller: AcmeEsBattleBundle:Bungie:getCharacters }
+

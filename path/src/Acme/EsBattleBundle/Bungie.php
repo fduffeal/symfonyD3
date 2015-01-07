@@ -8,6 +8,8 @@ namespace Acme\EsBattleBundle;
 class Bungie
 {
     private $apikey2;
+    public $player;
+    public $characters;
     /**
      * {@inheritDoc}
      */
@@ -16,12 +18,7 @@ class Bungie
         $this->apikey = $args;
     }
 
-    /*
-     * Returns a list of Destiny memberships given a full Gamertag or PSN ID.
-     */
-    public function SearchDestinyPlayer($membershipType,$displayName){
-
-        $url = '/SearchDestinyPlayer/'.$membershipType.'/'.$displayName.'/';
+    private function _curl($url){
         // initialisation de la session
         $ch = curl_init();
 
@@ -32,6 +29,7 @@ class Bungie
         $headers[] = "X-API-Key:".$this->apikey;
 
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
         curl_setopt($ch, CURLOPT_HEADER, 0);
 
@@ -41,6 +39,40 @@ class Bungie
         // fermeture des ressources
         curl_close($ch);
 
-        return $return;
+        $result = json_decode($return);
+
+        return $result;
+    }
+
+    public function getPlayer($membershipType,$displayName){
+        $searchDestinyPlayerCurl = $this->_SearchDestinyPlayer($membershipType,$displayName);
+
+        $this->player = $searchDestinyPlayerCurl->Response[0];
+
+        return $this->player;
+    }
+
+    public function getCharacters($membershipType,$destinyMembershipId){
+        $curl = $this->_Account($membershipType,$destinyMembershipId);
+
+        $this->characters = $curl->Response->data->characters;
+
+        return $this->characters;
+    }
+
+    /*
+     * Returns a list of Destiny memberships given a full Gamertag or PSN ID.
+     */
+    private function _SearchDestinyPlayer($membershipType,$displayName){
+
+        $url = '/SearchDestinyPlayer/'.$membershipType.'/'.$displayName.'/';
+
+        return $this->_curl($url);
+    }
+
+    private function _Account($membershipType,$destinyMembershipId){
+        $url = $membershipType.'/Account/'.$destinyMembershipId.'/';
+
+        return $this->_curl($url);
     }
 }
