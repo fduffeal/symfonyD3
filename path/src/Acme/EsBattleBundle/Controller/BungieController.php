@@ -16,20 +16,7 @@ class BungieController extends Controller
         $bungie = $this->get('acme_es_battle.bungie');
         $player = $bungie->SearchDestinyPlayer(2,'Fifoukiller84');
 
-        var_dump($player);
         die();
 
-    }
-    public function searchDestinyPlayerAction($membershipType,$displayName){
-
-        $ch = curl_init("http://www.example.com/");
-        $fp = fopen("example_homepage.txt", "w");
-
-        curl_setopt($ch, CURLOPT_FILE, $fp);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-
-        curl_exec($ch);
-        curl_close($ch);
-        fclose($fp);
     }
 }

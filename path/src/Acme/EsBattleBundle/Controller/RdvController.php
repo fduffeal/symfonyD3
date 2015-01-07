@@ -134,7 +134,9 @@ class RdvController extends Controller
                 $em->persist($selectedTag);
             }
 
-            $appointment->addTag($selectedTag);
+            if($selectedTag !== null){
+                $appointment->addTag($selectedTag);
+            }
         }
 
 		/**
