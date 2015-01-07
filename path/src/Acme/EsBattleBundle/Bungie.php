@@ -7,6 +7,10 @@ namespace Acme\EsBattleBundle;
  */
 class Bungie
 {
+    const BUNGIE_URL = "https://www.bungie.net";
+
+    public $classMapping = array(0 => 'titan',1 => 'hunter',2 => 'warlock');
+
     private $apikey2;
     public $player;
     public $characters;
@@ -23,7 +27,7 @@ class Bungie
         $ch = curl_init();
 
         // configuration des options
-        curl_setopt($ch, CURLOPT_URL,  "https://www.bungie.net/platform/destiny/".$url);
+        curl_setopt($ch, CURLOPT_URL,  self::BUNGIE_URL."/platform/destiny/".$url);
 
         $headers = [];
         $headers[] = "X-API-Key:".$this->apikey;
@@ -55,7 +59,18 @@ class Bungie
     public function getCharacters($membershipType,$destinyMembershipId){
         $curl = $this->_Account($membershipType,$destinyMembershipId);
 
-        $this->characters = $curl->Response->data->characters;
+        $characters = $curl->Response->data->characters;
+
+        $this->characters = [];
+        foreach($characters as $key => $value){
+
+            $this->characters[] = array(
+                'level' => $value->characterLevel,
+                'class' => $this->classMapping[$value->characterBase->classType],
+                'backgroundPath' => self::BUNGIE_URL.$value->backgroundPath,
+                'emblemPath' => self::BUNGIE_URL.$value->emblemPath
+            );
+        }
 
         return $this->characters;
     }
