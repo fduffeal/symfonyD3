@@ -24,18 +24,12 @@ class RdvController extends Controller
 {
     public function indexAction()
     {
-
-
-        $stop_date = date('Y-m-d H:i:s', strtotime('-10 day', time()));
-
-
         $em = $this->getDoctrine()->getManager();
         $query = $em->createQuery(
             'SELECT rdv
             FROM AcmeEsBattleBundle:Appointment rdv
-            JOIN rdv.usersGame usersGame
-            WHERE rdv.start > :now'
-        )->setParameter('now', $stop_date);
+            JOIN rdv.usersGame usersGame'
+        );
 
         $collection = $query->getResult();
 
