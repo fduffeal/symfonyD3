@@ -39,6 +39,12 @@ class Plateform {
     private $nom;
 
     /**
+     * @var int
+     * @ORM\Column(name="bungiePlateformId", type="integer")
+     */
+    private $bungiePlateformId;
+
+    /**
      * Get id
      *
      * @return integer 
@@ -74,7 +80,8 @@ class Plateform {
     public function _toArray(){
         return array(
             'id' => $this->getId(),
-            'nom' => $this->getNom()
+            'nom' => $this->getNom(),
+            'bungiePlateformId' => $this->getBungiePlateformId()
         );
     }
 
@@ -87,5 +94,28 @@ class Plateform {
         $serializer = new Serializer($normalizers, $encoders);
 
         return $serializer->serialize($plateform, 'json');
+    }
+
+    /**
+     * Set bungiePlateformId
+     *
+     * @param integer $bungiePlateformId
+     * @return Plateform
+     */
+    public function setBungiePlateformId($bungiePlateformId)
+    {
+        $this->bungiePlateformId = $bungiePlateformId;
+
+        return $this;
+    }
+
+    /**
+     * Get bungiePlateformId
+     *
+     * @return integer 
+     */
+    public function getBungiePlateformId()
+    {
+        return $this->bungiePlateformId;
     }
 }

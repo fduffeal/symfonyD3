@@ -11,15 +11,21 @@ class Bungie
 
     public $classMapping = array(0 => 'titan',1 => 'hunter',2 => 'warlock');
 
-    private $apikey2;
     public $player;
     public $characters;
+    public $apikey;
+    public $destinyGameId;
     /**
      * {@inheritDoc}
      */
-    public function __construct($args)
+    public function __construct($apikey,$destinyGameId)
     {
-        $this->apikey = $args;
+        $this->apikey = $apikey;
+        $this->destinyGameId = $destinyGameId;
+    }
+
+    public function getDestinyGameId(){
+        return $this->destinyGameId;
     }
 
     private function _curl($url){
@@ -51,14 +57,25 @@ class Bungie
     public function getPlayer($membershipType,$displayName){
         $searchDestinyPlayerCurl = $this->_SearchDestinyPlayer($membershipType,$displayName);
 
+        if (!isset($searchDestinyPlayerCurl->Response) || !array_key_exists(0,$searchDestinyPlayerCurl->Response)){
+            return null;
+        }
+
         $this->player = $searchDestinyPlayerCurl->Response[0];
 
         return $this->player;
     }
 
+    public function getAccount($membershipType,$destinyMembershipId){
+        return $this->_Account($membershipType,$destinyMembershipId);
+    }
+
     public function getCharacters($membershipType,$displayName){
 
         $player = $this->getPlayer($membershipType,$displayName);
+        if($player === null){
+            return null;
+        }
         $account = $this->_Account($membershipType,$player->membershipId);
 
         $characters = $account->Response->data->characters;
@@ -73,26 +90,8 @@ class Bungie
                 'class' => $this->classMapping[$value->characterBase->classType],
                 'clan' => $clanName,
                 'backgroundPath' => self::BUNGIE_URL.$value->backgroundPath,
-                'emblemPath' => self::BUNGIE_URL.$value->emblemPath
-            );
-        }
-
-        return $this->characters;
-    }
-
-    public function getCharactersOld($membershipType,$destinyMembershipId){
-        $curl = $this->_Account($membershipType,$destinyMembershipId);
-
-        $characters = $curl->Response->data->characters;
-
-        $this->characters = [];
-        foreach($characters as $key => $value){
-
-            $this->characters[] = array(
-                'level' => $value->characterLevel,
-                'class' => $this->classMapping[$value->characterBase->classType],
-                'backgroundPath' => self::BUNGIE_URL.$value->backgroundPath,
-                'emblemPath' => self::BUNGIE_URL.$value->emblemPath
+                'emblemPath' => self::BUNGIE_URL.$value->emblemPath,
+                'characterId' => $value->characterBase->characterId
             );
         }
 

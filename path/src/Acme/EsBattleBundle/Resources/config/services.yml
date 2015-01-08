@@ -3,7 +3,7 @@ parameters:
 
 services:
     acme_es_battle.bungie:
-        arguments: ["%bungie%"]
+        arguments: ["%bungie%","%destinyGameId%"]
         class: "%acme_es_battle.example.class%"
 #    acme_es_battle.example:
 #        class: %acme_es_battle.example.class%
