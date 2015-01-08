@@ -45,8 +45,8 @@ class Annonce
     private $tags;
 
     /**
-     * @ORM\ManyToOne(targetEntity="User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     * @ORM\ManyToOne(targetEntity="UserGame")
+     * @ORM\JoinColumn(name="user_game_id", referencedColumnName="id")
      */
     protected $author;
 
@@ -174,28 +174,6 @@ class Annonce
         return $this->tags;
     }
 
-    /**
-     * Set author
-     *
-     * @param \Acme\EsBattleBundle\Entity\User $author
-     * @return Annonce
-     */
-    public function setAuthor(\Acme\EsBattleBundle\Entity\User $author = null)
-    {
-        $this->author = $author;
-
-        return $this;
-    }
-
-    /**
-     * Get author
-     *
-     * @return \Acme\EsBattleBundle\Entity\User 
-     */
-    public function getAuthor()
-    {
-        return $this->author;
-    }
 
     /**
      * Set game
@@ -241,5 +219,71 @@ class Annonce
     public function getPlateform()
     {
         return $this->plateform;
+    }
+
+    /**
+     * Set author
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserGame $author
+     * @return Annonce
+     */
+    public function setAuthor(\Acme\EsBattleBundle\Entity\UserGame $author = null)
+    {
+        $this->author = $author;
+
+        return $this;
+    }
+
+    /**
+     * Get author
+     *
+     * @return \Acme\EsBattleBundle\Entity\UserGame 
+     */
+    public function getAuthor()
+    {
+        return $this->author;
+    }
+
+    /*
+    * Serializes appointment.
+    *
+    * The serialized data have to contain the fields used by the equals method and the username.
+    *
+    * @return string
+    */
+    public function _toArray()
+    {
+
+        $tags = $this->getTags();
+        $aTags = array();
+        foreach($tags as $tag){
+            $aTags[] = $tag->_toArray();
+        }
+
+        $plateform = $this->getPlateform();
+        $game = $this->getGame();
+
+        $author = $this->getAuthor();
+
+        return array(
+            'id' => $this->getId(),
+            'description' => $this->getDescription(),
+            'author' => ($author)?$author->_toArray():null,
+            'tags' => $aTags,
+            'plateform' => ($plateform)?$plateform->_toArray():null,
+            'game' => ($game)?$game->_toArray():null,
+            'created' => $this->getCreated()->getTimestamp()
+        );
+    }
+
+    public function _toJson(){
+        $aAnnonce = $this->_toArray();
+
+        $encoders = array(new XmlEncoder(), new JsonEncoder());
+        $normalizers = array(new GetSetMethodNormalizer());
+
+        $serializer = new Serializer($normalizers, $encoders);
+
+        return $serializer->serialize($aAnnonce, 'json');
     }
 }

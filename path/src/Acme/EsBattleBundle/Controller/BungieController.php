@@ -62,6 +62,8 @@ class BungieController extends Controller
         $em = $this->getDoctrine()->getManager();
         $em->persist($userGame);
         $em->flush();
+
+        return $userGame;
     }
 
     /*
@@ -112,8 +114,9 @@ class BungieController extends Controller
             return $response;
         }
 
-        foreach($characters as $character){
-            $this->_saveGameUserInfo($character,$user,$plaform,$game);
+        foreach($characters as $key => $character){
+            $userGame = $this->_saveGameUserInfo($character,$user,$plaform,$game);
+            $characters[$key]["userGameId"] = $userGame->getId();
         }
 //        var_dump($player,$characters);
 
