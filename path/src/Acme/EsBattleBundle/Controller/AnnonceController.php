@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Acme\EsBattleBundle\Entity\User as User;
 use Acme\EsBattleBundle\Entity\Annonce as Annonce;
+use Acme\EsBattleBundle\Entity\Tag;
 
 use Symfony\Component\HttpFoundation\Response;
 
