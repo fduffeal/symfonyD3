@@ -321,6 +321,8 @@ class UserGame {
             'data2' => $this->getData2(),
             'data3' => $this->getData3(),
             'data4' => $this->getData4(),
+            'data5' => $this->getData5(),
+            'extId' => $this->getExtId()
         );
     }
 
