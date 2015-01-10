@@ -135,13 +135,17 @@ class LoginController extends Controller
 	 * @param $email
 	 * @param $password
 	 * @param $username
+	 * @param $plateformId
+	 * @param $gamerTag
 	 * @return Response
 	 *
 	 */
-	public function registerAction($email,$password,$username)
+	public function registerAction($email,$password,$username,$plateformId,$gamerTag)
 	{
 
         $response = new Response();
+
+        $bungie = $this->get('acme_es_battle.bungie');
 
         $error = array();
         $userWithSameUserName = $this->getDoctrine()
@@ -160,15 +164,24 @@ class LoginController extends Controller
             $error[] = 'email_already_taken';
         }
 
-        if(sizeof($error) !== 0){
-            $result = array('aError' => $error);
-            $json = json_encode($result);
 
-            $response->setContent($json);
-            $response->setStatusCode(403);
-            return $response;
-        }
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Plateform $plaform
+         */
+        $plaform = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Plateform')
+            ->findOneBy(
+                array('id' => $plateformId)
+            );
 
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Game $game
+         */
+        $game = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Game')
+            ->findOneBy(
+                array('id' => $bungie->getDestinyGameId())
+            );
 
 
 		$user = new User;
@@ -179,9 +192,28 @@ class LoginController extends Controller
 
 		$user->setApikey($user->createApiKey());
 
+        $characters = $bungie->getCharacters($plaform->getBungiePlateformId(),$gamerTag);
+        if($characters === null){
+            $error[] = 'gamertag_not_found';
+        }
+
+        if(sizeof($error) !== 0){
+            $result = array('aError' => $error);
+            $json = json_encode($result);
+
+            $response->setContent($json);
+            $response->setStatusCode(403);
+            return $response;
+        }
+
 		$em = $this->getDoctrine()->getManager();
 		$em->persist($user);
 		$em->flush();
+
+        foreach($characters as $key => $character){
+            $userGame = $bungie->saveGameUserInfo($character,$user,$plaform,$game);
+            $user->addUsergame($userGame);
+        }
 
 		$message = \Swift_Message::newInstance()
 			->setContentType('text/html')
@@ -190,7 +222,7 @@ class LoginController extends Controller
 			->setTo($email)
 			->setBody($this->renderView('AcmeEsBattleBundle:Mail:register.html.twig',array('username' => $username)));
 		$this->get('mailer')->send($message);
-
+        
         $json = $user->_toJsonPrivate();
 
 		$response->setContent($json);

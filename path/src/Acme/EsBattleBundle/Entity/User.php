@@ -114,8 +114,8 @@ class User
         $this->clans = new ArrayCollection();
         $this->friends = new ArrayCollection();
         $this->friendsWithMe = new ArrayCollection();
-        $this->$hasBlacklistedMe = new ArrayCollection();
-        $this->$blacklistedUser = new ArrayCollection();
+        $this->hasBlacklistedMe = new ArrayCollection();
+        $this->blacklistedUser = new ArrayCollection();
     }
 
 

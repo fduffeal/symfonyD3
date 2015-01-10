@@ -19,7 +19,7 @@ acme_es_battle_login_set_online:
     defaults: { _controller: AcmeEsBattleBundle:Login:setOnline }
 
 acme_es_battle_register:
-    path:     /register/{email}/{password}/{username}
+    path:     /register/{email}/{password}/{username}/{plateformId}/{gamerTag}
     defaults: { _controller: AcmeEsBattleBundle:Login:register }
 
 acme_es_battle_rdv:

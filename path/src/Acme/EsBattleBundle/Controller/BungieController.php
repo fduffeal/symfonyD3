@@ -28,44 +28,6 @@ class BungieController extends Controller
 
     }
 
-
-    /**
-     * @param $character
-     * @param \Acme\EsBattleBundle\Entity\User $user
-     */
-    private function _saveGameUserInfo($character,$user = null,$plaform = null,$game = null){
-        /**
-         * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
-         */
-        $userGame = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:UserGame')
-            ->findOneBy(
-                array('ext_id' => $character['characterId'],'user' => $user)
-            );
-
-        if($userGame === null){
-            $userGame = new UserGame();
-        }
-
-        $userGame->setGameProfilName($character['class'].' '.$character['level']);
-        $userGame->setGameUsername($character['gamerTag']);
-        $userGame->setData1($character['class']);
-        $userGame->setData2($character['level']);
-        $userGame->setData3($character['clan']);
-        $userGame->setData4($character['backgroundPath']);
-        $userGame->setData5($character['emblemPath']);
-        $userGame->setExtId($character['characterId']);
-        $userGame->setUser($user);
-        $userGame->setPlateform($plaform);
-        $userGame->setGame($game);
-
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($userGame);
-        $em->flush();
-
-        return $userGame;
-    }
-
     /*
      * $plateform 1 > Xbox, 2 > Playstation
      */
@@ -114,9 +76,11 @@ class BungieController extends Controller
             return $response;
         }
 
+        $aUserGame = [];
         foreach($characters as $key => $character){
-            $userGame = $this->_saveGameUserInfo($character,$user,$plaform,$game);
-            $characters[$key]["userGameId"] = $userGame->getId();
+            $userGame = $bungie->saveGameUserInfo($character,$user,$plaform,$game);
+            $aUserGame[] = $userGame->_toArray();
+            //$characters[$key]["userGameId"] = $userGame->getId();
         }
 //        var_dump($player,$characters);
 
@@ -124,7 +88,8 @@ class BungieController extends Controller
         // définit l'âge max des caches privés ou des caches partagés
         $response->setMaxAge(30);
         $response->setSharedMaxAge(30);
-        $response->setContent(json_encode($characters));
+        //$response->setContent(json_encode($characters));
+        $response->setContent(json_encode($aUserGame));
 
         return $response;
 

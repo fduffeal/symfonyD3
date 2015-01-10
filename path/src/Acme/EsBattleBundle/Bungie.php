@@ -2,6 +2,8 @@
 
 namespace Acme\EsBattleBundle;
 
+use Acme\EsBattleBundle\Entity\UserGame;
+
 /**
  * https://www.bungie.net/platform/destiny/help/
  */
@@ -15,13 +17,15 @@ class Bungie
     public $characters;
     public $apikey;
     public $destinyGameId;
+    public $doctrine;
     /**
      * {@inheritDoc}
      */
-    public function __construct($apikey,$destinyGameId)
+    public function __construct($apikey,$destinyGameId,$doctrine)
     {
         $this->apikey = $apikey;
         $this->destinyGameId = $destinyGameId;
+        $this->doctrine = $doctrine;
     }
 
     public function getDestinyGameId(){
@@ -96,6 +100,47 @@ class Bungie
         }
 
         return $this->characters;
+    }
+
+    public function getDoctrine(){
+        return $this->doctrine;
+    }
+
+    /**
+     * @param $character
+     * @param \Acme\EsBattleBundle\Entity\User $user
+     */
+    public function saveGameUserInfo($character,$user = null,$plaform = null,$game = null){
+        /**
+         * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
+         */
+        $userGame = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:UserGame')
+            ->findOneBy(
+                array('ext_id' => $character['characterId'],'user' => $user)
+            );
+
+        if($userGame === null){
+            $userGame = new UserGame();
+        }
+
+        $userGame->setGameProfilName($character['class'].' '.$character['level']);
+        $userGame->setGameUsername($character['gamerTag']);
+        $userGame->setData1($character['class']);
+        $userGame->setData2($character['level']);
+        $userGame->setData3($character['clan']);
+        $userGame->setData4($character['backgroundPath']);
+        $userGame->setData5($character['emblemPath']);
+        $userGame->setExtId($character['characterId']);
+        $userGame->setUser($user);
+        $userGame->setPlateform($plaform);
+        $userGame->setGame($game);
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($userGame);
+        $em->flush();
+
+        return $userGame;
     }
 
     /*
