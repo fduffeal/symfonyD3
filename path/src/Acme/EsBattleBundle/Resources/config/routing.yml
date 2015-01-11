@@ -114,3 +114,11 @@ acme_es_battle_annonce:
     path:     /annonce
     defaults: { _controller: AcmeEsBattleBundle:Annonce:index }
 
+acme_es_battle_admin_check_usergame:
+    path:     /francis/usergame
+    defaults: { _controller: AcmeEsBattleBundle:Admin:checkUserGame }
+
+acme_es_battle_admin_remove_old_usergame:
+    path:     /francis/remove
+    defaults: { _controller: AcmeEsBattleBundle:Admin:removeOldUserGame }
+
