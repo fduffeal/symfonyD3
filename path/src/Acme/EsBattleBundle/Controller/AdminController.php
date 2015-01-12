@@ -80,12 +80,6 @@ class AdminController extends Controller
         $response = new Response();
 
         $em = $this->getDoctrine()->getManager();
-        $query = $em->createQuery(
-            'SELECT usergame
-            FROM AcmeEsBattleBundle:UserGame usergame
-            JOIN usergame.user user
-            WHERE  usergame.ext_id IS NULL'
-        );
 
         $query = $em->createQuery(
             'SELECT appointment
@@ -177,6 +171,31 @@ class AdminController extends Controller
 
         return $response;
 
+    }
+
+
+    public function deleteOldUserGameAction()
+    {
+        $response = new Response();
+
+        $em = $this->getDoctrine()->getManager();
+        $query = $em->createQuery(
+            'SELECT usergame
+            FROM AcmeEsBattleBundle:UserGame usergame
+            JOIN usergame.user user
+            WHERE  usergame.ext_id IS NULL'
+        );
+
+        $collection = $query->getResult();
+
+        foreach($collection as $usergame){
+            $em->remove($usergame);
+            echo 'remove '.$usergame->getId();
+        }
+
+        $em->flush();
+
+        return $response;
     }
 
     /**

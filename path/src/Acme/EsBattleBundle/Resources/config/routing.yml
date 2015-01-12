@@ -122,3 +122,7 @@ acme_es_battle_admin_remove_old_usergame:
     path:     /francis/remove
     defaults: { _controller: AcmeEsBattleBundle:Admin:removeOldUserGame }
 
+acme_es_battle_admin_delete_old_usergame:
+    path:     /francis/delete
+    defaults: { _controller: AcmeEsBattleBundle:Admin:deleteOldUserGame }
+
