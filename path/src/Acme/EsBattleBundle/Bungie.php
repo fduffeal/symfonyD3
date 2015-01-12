@@ -82,8 +82,11 @@ class Bungie
         }
         $account = $this->_Account($membershipType,$player->membershipId);
 
+        $clanName = '';
+        if($account->Response->data->clanName){
+            $clanName = $account->Response->data->clanName;
+        }
         $characters = $account->Response->data->characters;
-        $clanName = $account->Response->data->clanName;
 
         $this->characters = [];
         foreach($characters as $key => $value){
