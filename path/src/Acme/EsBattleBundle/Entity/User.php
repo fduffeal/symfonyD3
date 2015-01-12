@@ -260,11 +260,13 @@ class User
 			}
 		}
 
+        $online = $this->getOnlineTime();
+
 		return array(
             'id' => $this->getId(),
             'username' => $this->getUsername(),
             'userGame'=> $aUserGameCollection,
-            'onlineTime' => $this->getOnlineTime()->getTimestamp()
+            'onlineTime' => ($online!==null)?$this->getOnlineTime()->getTimestamp():''
 		);
 	}
 
