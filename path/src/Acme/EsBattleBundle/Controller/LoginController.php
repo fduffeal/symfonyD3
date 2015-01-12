@@ -78,27 +78,33 @@ class LoginController extends Controller
     }
 
     public function setOnlineAction($username,$token){
+
         $response = new Response();
 
-	    /**
-	     * @var \Acme\EsBattleBundle\Entity\User $user
-	     */
-        $user = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:User')
-            ->findOneBy(
-                array('username' => $username,'apikey'=>$token)
-            );
-
-        if($user){
-            $em = $this->getDoctrine()->getManager();
-	        $user->setOnlineTimeValue();
-            $em->persist($user);
-            $em->flush();
-
-            $json = $user->_toJsonPrivate();
-            $response->setContent($json);
+        if($username === 'null' && $token === 'null'){
+            $response->setStatusCode(403);
         } else {
-            $response->setStatusCode(404);
+
+            /**
+             * @var \Acme\EsBattleBundle\Entity\User $user
+             */
+            $user = $this->getDoctrine()
+                ->getRepository('AcmeEsBattleBundle:User')
+                ->findOneBy(
+                    array('username' => $username, 'apikey' => $token)
+                );
+
+            if ($user) {
+                $em = $this->getDoctrine()->getManager();
+                $user->setOnlineTimeValue();
+                $em->persist($user);
+                $em->flush();
+
+                $json = $user->_toJsonPrivate();
+                $response->setContent($json);
+            } else {
+                $response->setStatusCode(404);
+            }
         }
 
         return $response;
@@ -129,13 +135,17 @@ class LoginController extends Controller
 	 * @param $email
 	 * @param $password
 	 * @param $username
+	 * @param $plateformId
+	 * @param $gamerTag
 	 * @return Response
 	 *
 	 */
-	public function registerAction($email,$password,$username)
+	public function registerAction($email,$password,$username,$plateformId,$gamerTag)
 	{
 
         $response = new Response();
+
+        $bungie = $this->get('acme_es_battle.bungie');
 
         $error = array();
         $userWithSameUserName = $this->getDoctrine()
@@ -154,15 +164,24 @@ class LoginController extends Controller
             $error[] = 'email_already_taken';
         }
 
-        if(sizeof($error) !== 0){
-            $result = array('aError' => $error);
-            $json = json_encode($result);
 
-            $response->setContent($json);
-            $response->setStatusCode(403);
-            return $response;
-        }
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Plateform $plaform
+         */
+        $plaform = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Plateform')
+            ->findOneBy(
+                array('id' => $plateformId)
+            );
 
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Game $game
+         */
+        $game = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Game')
+            ->findOneBy(
+                array('id' => $bungie->getDestinyGameId())
+            );
 
 
 		$user = new User;
@@ -173,9 +192,28 @@ class LoginController extends Controller
 
 		$user->setApikey($user->createApiKey());
 
+        $characters = $bungie->getCharacters($plaform->getBungiePlateformId(),$gamerTag);
+        if($characters === null){
+            $error[] = 'gamertag_not_found';
+        }
+
+        if(sizeof($error) !== 0){
+            $result = array('aError' => $error);
+            $json = json_encode($result);
+
+            $response->setContent($json);
+            $response->setStatusCode(403);
+            return $response;
+        }
+
 		$em = $this->getDoctrine()->getManager();
 		$em->persist($user);
 		$em->flush();
+
+        foreach($characters as $key => $character){
+            $userGame = $bungie->saveGameUserInfo($character,$user,$plaform,$game);
+            $user->addUsergame($userGame);
+        }
 
 		$message = \Swift_Message::newInstance()
 			->setContentType('text/html')
@@ -184,7 +222,7 @@ class LoginController extends Controller
 			->setTo($email)
 			->setBody($this->renderView('AcmeEsBattleBundle:Mail:register.html.twig',array('username' => $username)));
 		$this->get('mailer')->send($message);
-
+        
         $json = $user->_toJsonPrivate();
 
 		$response->setContent($json);
@@ -382,5 +420,43 @@ class LoginController extends Controller
         $response->setContent($json);
         return $response;
 
+    }
+
+    public function getUsersAction(){
+
+        $response = new Response();
+
+
+        $stop_date = date('Y-m-d H:i:s', strtotime('-1 day', time()));
+
+        $em = $this->getDoctrine()->getManager();
+        $query = $em->createQuery(
+            'SELECT user
+            FROM AcmeEsBattleBundle:User user
+            WHERE user.onlineTime > :now'
+        )->setParameter('now', $stop_date);
+
+        $collection = $query->getResult();
+
+
+        $aResult = [];
+        /**
+         * @var \Acme\EsBattleBundle\Entity\User $user
+         */
+        foreach($collection as $user){
+            $aResult[] = $user->_toArray();
+        }
+
+        $json = json_encode($aResult);
+
+
+
+        $response->setPublic();
+        // définit l'âge max des caches privés ou des caches partagés
+        $response->setMaxAge(30);
+        $response->setSharedMaxAge(30);
+        $response->setContent($json);
+
+        return $response;
     }
 }

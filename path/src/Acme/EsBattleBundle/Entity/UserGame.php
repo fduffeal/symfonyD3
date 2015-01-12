@@ -27,7 +27,7 @@ class UserGame {
 
     /**
      * @ORM\ManyToOne(targetEntity="User",inversedBy="usergames")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=true)
      */
     protected $user;
 
@@ -62,7 +62,7 @@ class UserGame {
     /**
      * @var string
      *
-     * @ORM\Column(name="data_1", type="string", length=255)
+     * @ORM\Column(name="data_1", type="string", length=255,nullable=true)
      */
     private  $data_1;
 
@@ -70,23 +70,37 @@ class UserGame {
     /**
      * @var string
      *
-     * @ORM\Column(name="data_2", type="string", length=255)
+     * @ORM\Column(name="data_2", type="string", length=255,nullable=true)
      */
     private  $data_2;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="data_3", type="string", length=255)
+     * @ORM\Column(name="data_3", type="string", length=255,nullable=true)
      */
     private  $data_3;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="data_4", type="string", length=255)
+     * @ORM\Column(name="data_4", type="string", length=255,nullable=true)
      */
     private  $data_4;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="data_5", type="string", length=255,nullable=true)
+     */
+    private  $data_5;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="ext_id", type="string", length=255,nullable=true)
+     */
+    private  $ext_id;
 
 
 
@@ -294,16 +308,21 @@ class UserGame {
      */
     public function _toArray()
     {
+        $plateform = $this->getPlateform();
+        $game = $this->getGame();
+
         return array(
             'id' => $this->getId(),
             'gameProfilName' => $this->getGameProfilName(),
             'gameUsername' => $this->getGameUsername(),
-            'plateform' => $this->getPlateform()->_toArray(),
-            'game' => $this->getGame()->_toArray(),
+            'plateform' => ($plateform)?$this->getPlateform()->_toArray():'',
+            'game' => ($game)?$this->getGame()->_toArray():'',
             'data1' => $this->getData1(),
             'data2' => $this->getData2(),
             'data3' => $this->getData3(),
             'data4' => $this->getData4(),
+            'data5' => $this->getData5(),
+            'extId' => $this->getExtId()
         );
     }
 
@@ -339,5 +358,51 @@ class UserGame {
     public function getGameUsername()
     {
         return $this->game_username;
+    }
+
+    /**
+     * Set ext_id
+     *
+     * @param string $extId
+     * @return UserGame
+     */
+    public function setExtId($extId)
+    {
+        $this->ext_id = $extId;
+
+        return $this;
+    }
+
+    /**
+     * Get ext_id
+     *
+     * @return string 
+     */
+    public function getExtId()
+    {
+        return $this->ext_id;
+    }
+
+    /**
+     * Set data_5
+     *
+     * @param string $data5
+     * @return UserGame
+     */
+    public function setData5($data5)
+    {
+        $this->data_5 = $data5;
+
+        return $this;
+    }
+
+    /**
+     * Get data_5
+     *
+     * @return string 
+     */
+    public function getData5()
+    {
+        return $this->data_5;
     }
 }

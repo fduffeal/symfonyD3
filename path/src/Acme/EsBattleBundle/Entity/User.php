@@ -112,6 +112,10 @@ class User
     public function __construct() {
 	    $this->salt = base_convert(sha1(uniqid(mt_rand(), true)), 16, 36);
         $this->clans = new ArrayCollection();
+        $this->friends = new ArrayCollection();
+        $this->friendsWithMe = new ArrayCollection();
+        $this->hasBlacklistedMe = new ArrayCollection();
+        $this->blacklistedUser = new ArrayCollection();
     }
 
 
@@ -121,6 +125,33 @@ class User
      */
     protected $groupe;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="User", mappedBy="friends")
+     **/
+    private $friendsWithMe;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="User", inversedBy="friendsWithMe")
+     * @ORM\JoinTable(name="users_friends",
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="friend_user_id", referencedColumnName="id")}
+     *      )
+     **/
+    protected $friends;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="User", mappedBy="blacklistedUser")
+     **/
+    private $hasBlacklistedMe;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="User", inversedBy="hasBlacklistedMe")
+     * @ORM\JoinTable(name="users_blacklist",
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="blacklisted_user_id", referencedColumnName="id")}
+     *      )
+     **/
+    protected $blacklistedUser;
 
     /**
      * Get id
@@ -251,6 +282,7 @@ class User
 
         $aUserPublic['token'] = $this->getApikey();
         $aUserPublic['email'] = $this->getEmail();
+        $aUserPublic['friends'] = $this->getFriends()->toArray();
 
         return $aUserPublic;
     }
@@ -513,5 +545,137 @@ class User
     public function setOnlineTimeValue()
     {
         $this->onlineTime = new \DateTime();
+    }
+
+    /**
+     * Add friends
+     *
+     * @param \Acme\EsBattleBundle\Entity\User $friends
+     * @return User
+     */
+    public function addFriend(\Acme\EsBattleBundle\Entity\User $friends)
+    {
+        $this->friends[] = $friends;
+
+        return $this;
+    }
+
+    /**
+     * Remove friends
+     *
+     * @param \Acme\EsBattleBundle\Entity\User $friends
+     */
+    public function removeFriend(\Acme\EsBattleBundle\Entity\User $friends)
+    {
+        $this->friends->removeElement($friends);
+    }
+
+    /**
+     * Get friends
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getFriends()
+    {
+        return $this->friends;
+    }
+
+    /**
+     * Add friendsWithMe
+     *
+     * @param \Acme\EsBattleBundle\Entity\User $friendsWithMe
+     * @return User
+     */
+    public function addFriendsWithMe(\Acme\EsBattleBundle\Entity\User $friendsWithMe)
+    {
+        $this->friendsWithMe[] = $friendsWithMe;
+
+        return $this;
+    }
+
+    /**
+     * Remove friendsWithMe
+     *
+     * @param \Acme\EsBattleBundle\Entity\User $friendsWithMe
+     */
+    public function removeFriendsWithMe(\Acme\EsBattleBundle\Entity\User $friendsWithMe)
+    {
+        $this->friendsWithMe->removeElement($friendsWithMe);
+    }
+
+    /**
+     * Get friendsWithMe
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getFriendsWithMe()
+    {
+        return $this->friendsWithMe;
+    }
+
+    /**
+     * Add hasBlacklistedMe
+     *
+     * @param \Acme\EsBattleBundle\Entity\User $hasBlacklistedMe
+     * @return User
+     */
+    public function addHasBlacklistedMe(\Acme\EsBattleBundle\Entity\User $hasBlacklistedMe)
+    {
+        $this->hasBlacklistedMe[] = $hasBlacklistedMe;
+
+        return $this;
+    }
+
+    /**
+     * Remove hasBlacklistedMe
+     *
+     * @param \Acme\EsBattleBundle\Entity\User $hasBlacklistedMe
+     */
+    public function removeHasBlacklistedMe(\Acme\EsBattleBundle\Entity\User $hasBlacklistedMe)
+    {
+        $this->hasBlacklistedMe->removeElement($hasBlacklistedMe);
+    }
+
+    /**
+     * Get hasBlacklistedMe
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getHasBlacklistedMe()
+    {
+        return $this->hasBlacklistedMe;
+    }
+
+    /**
+     * Add blacklistedUser
+     *
+     * @param \Acme\EsBattleBundle\Entity\User $blacklistedUser
+     * @return User
+     */
+    public function addBlacklistedUser(\Acme\EsBattleBundle\Entity\User $blacklistedUser)
+    {
+        $this->blacklistedUser[] = $blacklistedUser;
+
+        return $this;
+    }
+
+    /**
+     * Remove blacklistedUser
+     *
+     * @param \Acme\EsBattleBundle\Entity\User $blacklistedUser
+     */
+    public function removeBlacklistedUser(\Acme\EsBattleBundle\Entity\User $blacklistedUser)
+    {
+        $this->blacklistedUser->removeElement($blacklistedUser);
+    }
+
+    /**
+     * Get blacklistedUser
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getBlacklistedUser()
+    {
+        return $this->blacklistedUser;
     }
 }
