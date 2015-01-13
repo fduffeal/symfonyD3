@@ -12,6 +12,13 @@ umask(0000);
 $loader = new ApcClassLoader('sf2', $loader);
 $loader->register(true);
 */
+
+if($_SERVER['SERVER_NAME'] === 'lfg.esbattle.com'){
+	header('Access-Control-Allow-Origin: http://localhost:8000');
+} else {
+	header('Access-Control-Allow-Origin: http://www.esbattle.com');
+}
+
 $loader = require_once __DIR__.'/../app/bootstrap.php.cache';
 
 require_once __DIR__.'/../app/AppKernel.php';
