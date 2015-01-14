@@ -98,6 +98,10 @@ acme_es_battle_user_remove_friend:
     path:     /user/friend/remove/{friendUsername}/{username}/{apikey}
     defaults: { _controller: AcmeEsBattleBundle:User:removeFriend }
 
+acme_es_battle_user_get_destiny_characters:
+    path:     /user/destiny/{membershipType}/{displayName}
+    defaults: { _controller: AcmeEsBattleBundle:User:getDestinyUsersGame }
+
 acme_es_battle_bungie:
     path:     /bungie
     defaults: { _controller: AcmeEsBattleBundle:Bungie:index }
@@ -114,15 +118,19 @@ acme_es_battle_annonce:
     path:     /annonce
     defaults: { _controller: AcmeEsBattleBundle:Annonce:index }
 
-acme_es_battle_admin_check_usergame:
-    path:     /francis/usergame
-    defaults: { _controller: AcmeEsBattleBundle:Admin:checkUserGame }
-
-acme_es_battle_admin_remove_old_usergame:
-    path:     /francis/remove
-    defaults: { _controller: AcmeEsBattleBundle:Admin:removeOldUserGame }
+#acme_es_battle_admin_check_usergame:
+#    path:     /francis/usergame
+#    defaults: { _controller: AcmeEsBattleBundle:Admin:checkUserGame }
+#
+#acme_es_battle_admin_remove_old_usergame:
+#    path:     /francis/remove
+#    defaults: { _controller: AcmeEsBattleBundle:Admin:removeOldUserGame }
+#
+#acme_es_battle_admin_delete_old_usergame:
+#    path:     /francis/delete
+#    defaults: { _controller: AcmeEsBattleBundle:Admin:deleteOldUserGame }
 
 acme_es_battle_admin_delete_old_usergame:
-    path:     /francis/delete
-    defaults: { _controller: AcmeEsBattleBundle:Admin:deleteOldUserGame }
+    path:     /francis/copy/{url}
+    defaults: { _controller: AcmeEsBattleBundle:Admin:copyJeuxVideo }
 

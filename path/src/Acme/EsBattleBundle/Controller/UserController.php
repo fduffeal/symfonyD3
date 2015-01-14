@@ -124,4 +124,26 @@ class UserController extends Controller
 
         return $response;
     }
+
+    public function getDestinyUsersGameAction($membershipType,$displayName){
+
+        $response = new Response();
+
+        $bungie = $this->get('acme_es_battle.bungie');
+
+        $player = $bungie->getPlayer($membershipType,$displayName);
+        if($player === null){
+            return null;
+        }
+        $account = $bungie->getAccount($membershipType,$player->membershipId);
+
+        $json= json_encode($account);
+        $response->setPublic();
+        // définit l'âge max des caches privés ou des caches partagés
+        $response->setMaxAge(86400);
+        $response->setSharedMaxAge(86400);
+        $response->setContent($json);
+
+        return $response;
+    }
 }

@@ -82,6 +82,10 @@ class Bungie
         }
         $account = $this->_Account($membershipType,$player->membershipId);
 
+        return $this->formatCharacters($account,$displayName);
+    }
+
+    public function formatCharacters($account,$displayName){
         $clanName = '';
 
         if(isset($account->Response->data->clanName)){

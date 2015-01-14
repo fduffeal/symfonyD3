@@ -6,6 +6,8 @@ use Acme\EsBattleBundle\Entity\UserGame;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Acme\EsBattleBundle\Entity\User as User;
+use Acme\EsBattleBundle\Entity\Annonce as Annonce;
+use Acme\EsBattleBundle\Entity\Tag as Tag;
 
 use Symfony\Component\HttpFoundation\Response;
 
@@ -223,5 +225,138 @@ class AdminController extends Controller
         }
 
         return false;
+    }
+
+    public function copyJeuxVideoAction($url){
+        $response = new Response();
+
+        $em = $this->getDoctrine()->getManager();
+
+        /**
+         * Acme\EsBattleBundle\JeuxVideo $jeuxvideo
+         */
+        $jeuxvideo = $this->get('acme_es_battle.jeuxvideo');
+        $bungie = $this->get('acme_es_battle.bungie');
+
+        $pagePost = $jeuxvideo->getPage($url);
+
+        $plateformId = 2;//PS4
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Plateform $plaform
+         */
+        $plaform = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Plateform')
+            ->findOneBy(
+                array('id' => $plateformId)
+            );
+
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Game $game
+         */
+        $game = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Game')
+            ->findOneBy(
+                array('id' => $bungie->getDestinyGameId())
+            );
+
+//        var_dump($pagePost[0]);die();
+
+        $aAnnonce = [];
+        foreach($pagePost as $post){
+            if($post === null){
+                continue;
+            }
+//            var_dump($post->gamerTag);die();
+            $displayName = $post->gamerTag;
+            $membershipType = $plaform->getBungiePlateformId();
+
+            $response = $this->forward('AcmeEsBattleBundle:User:getDestinyUsersGame', array(
+                'membershipType'  => $membershipType,
+                'displayName'  => $displayName
+            ));
+
+            $account = json_decode($response->getContent());
+            if($account === null){
+                continue;
+            }
+
+//            echo 'ACCOUNT <BR/>';
+//            var_dump($account);echo '<BR/><BR/>';
+
+
+
+
+            $characters = $bungie->formatCharacters($account,$displayName);
+
+//            var_dump($characters);
+            if(!$characters[0]){
+//                echo $displayName.' not found<br/>';
+                continue;
+            }
+
+            $userGameToSave = null;
+
+            foreach($characters as $character){
+                if($character['class'] ===  $post->class){
+//                    echo 'i m '. $post->class.'<br/>';
+                    $userGameToSave = $character;
+                }
+            }
+
+            if($userGameToSave === null){
+                $userGameToSave = $characters[0];
+            }
+
+            $userGame = $bungie->saveGameUserInfo($character,null,$plaform,$game);
+
+
+            /**
+             * @var \Acme\EsBattleBundle\Entity\Annonce $annonce
+             */
+            $annonce = new Annonce();
+            $annonce->setDescription($post->message);
+            $annonce->setAuthor($userGame);
+            $annonce->setPlateform($plaform);
+            $annonce->setGame($game);
+
+
+            $aTags = preg_split("/[\s,]+/",$post->tags);
+
+
+
+            foreach($aTags as $key){
+                $selectedTag = $this->getDoctrine()
+                    ->getRepository('AcmeEsBattleBundle:Tag')
+                    ->findOneBy(array('nom' => $key));
+
+                $key = trim($key);
+
+                if($selectedTag === null && $key !== ""){
+                    $selectedTag = new Tag();
+                    $selectedTag->setNom($key);
+                    $selectedTag->setPoids(0);
+                    $em->persist($selectedTag);
+                }
+
+                if($selectedTag !== null){
+                    $annonce->addTag($selectedTag);
+                }
+            }
+
+            $em->persist($annonce);
+
+            $aAnnonce[] = $annonce->_toArray();
+//            var_dump($annonce->_toJson());
+
+        }
+
+        $em->flush();
+
+        $response->setContent(json_encode($aAnnonce));
+        // définit l'âge max des caches privés ou des caches partagés
+        $response->setMaxAge(86400);
+        $response->setSharedMaxAge(86400);
+
+        return $response;
     }
 }

@@ -264,6 +264,7 @@ class Annonce
         $game = $this->getGame();
 
         $author = $this->getAuthor();
+        $created = $this->getCreated();
 
         return array(
             'id' => $this->getId(),
@@ -272,7 +273,7 @@ class Annonce
             'tags' => $aTags,
             'plateform' => ($plateform)?$plateform->_toArray():null,
             'game' => ($game)?$game->_toArray():null,
-            'created' => $this->getCreated()->getTimestamp()
+            'created' => ($created)?$created->getTimestamp():null
         );
     }
 
