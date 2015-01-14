@@ -18,7 +18,7 @@ class JeuxVideo
 
     public function __construct()
     {
-        $this->tag = ['caveau','cropta','atheon','raid','assaut','30','26'];
+        $this->tag = ['caveau','cropta','atheon','raid','assaut','30','26','nuit','noire','épique','epique','semaine'];
     }
 
 
