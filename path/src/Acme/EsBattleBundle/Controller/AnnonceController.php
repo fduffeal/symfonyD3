@@ -101,8 +101,9 @@ class AnnonceController extends Controller
             FROM AcmeEsBattleBundle:Annonce annonce
             JOIN annonce.author author
             JOIN annonce.plateform plateform
-            JOIN annonce.game game'
-        );
+            JOIN annonce.game game
+            ORDER BY annonce.created DESC'
+        )->setMaxResults(70);
 
         $result = $query->getResult();
         $aResult = [];
