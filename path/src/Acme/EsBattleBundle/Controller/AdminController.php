@@ -240,6 +240,17 @@ class AdminController extends Controller
 
         $pagePost = $jeuxvideo->getPage($url);
 
+        $aPost =[];
+        foreach($pagePost as $post) {
+            if ($post === null) {
+                continue;
+            }
+            $aPost[] = $post;
+        }
+//        echo 'NB POST :'. sizeof($aPost).'<br/>';
+
+//        die($jeuxvideo->plateform);
+
         $plateformId = 2;//PS4
         /**
          * @var \Acme\EsBattleBundle\Entity\Plateform $plaform
@@ -262,7 +273,7 @@ class AdminController extends Controller
 //        var_dump($pagePost[0]);die();
 
         $aAnnonce = [];
-        foreach($pagePost as $post){
+        foreach($aPost as $post){
             if($post === null){
                 continue;
             }
@@ -294,12 +305,15 @@ class AdminController extends Controller
                 continue;
             }
 
+            $characters = $bungie->sortCharacters($characters);
+
             $userGameToSave = null;
 
             foreach($characters as $character){
                 if($character['class'] ===  $post->class){
 //                    echo 'i m '. $post->class.'<br/>';
                     $userGameToSave = $character;
+                    break;
                 }
             }
 
@@ -346,8 +360,6 @@ class AdminController extends Controller
             $em->persist($annonce);
 
             $aAnnonce[] = $annonce->_toArray();
-//            var_dump($annonce->_toJson());
-
         }
 
         $em->flush();
