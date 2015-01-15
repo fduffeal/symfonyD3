@@ -113,6 +113,9 @@ class AnnonceController extends Controller
 
         $json = json_encode($aResult);
         $response = new Response();
+        $response->setPublic();
+        $response->setMaxAge(30);
+        $response->setSharedMaxAge(30);
         $response->setContent($json);
         return $response;
     }
