@@ -249,9 +249,7 @@ class AdminController extends Controller
         }
 //        echo 'NB POST :'. sizeof($aPost).'<br/>';
 
-//        die($jeuxvideo->plateform);
-
-        $plateformId = 2;//PS4
+        $plateformId = $jeuxvideo->plateform;//PS4
         /**
          * @var \Acme\EsBattleBundle\Entity\Plateform $plaform
          */
@@ -321,7 +319,7 @@ class AdminController extends Controller
                 $userGameToSave = $characters[0];
             }
 
-            $userGame = $bungie->saveGameUserInfo($character,null,$plaform,$game);
+            $userGame = $bungie->saveGameUserInfo($userGameToSave,null,$plaform,$game);
 
 
             /**
@@ -358,6 +356,11 @@ class AdminController extends Controller
             }
 
             $em->persist($annonce);
+
+            $aHeure = explode(':',$post->heure);
+            $date = new \DateTime();
+            $date->setTime($aHeure[0],$aHeure[1],$aHeure[2]);
+            $annonce->setCreated($date);
 
             $aAnnonce[] = $annonce->_toArray();
         }
