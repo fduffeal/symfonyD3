@@ -9,161 +9,211 @@ use Acme\EsBattleBundle\Entity\UserGame;
  */
 class Bungie
 {
-    const BUNGIE_URL = "https://www.bungie.net";
+	const BUNGIE_URL = "https://www.bungie.net";
 
-    public $classMapping = array(0 => 'titan',1 => 'hunter',2 => 'warlock');
+	public $classMapping = array(0 => 'titan', 1 => 'hunter', 2 => 'warlock');
 
-    public $player;
-    public $characters;
-    public $apikey;
-    public $destinyGameId;
-    public $doctrine;
-    /**
-     * {@inheritDoc}
-     */
-    public function __construct($apikey,$destinyGameId,$doctrine)
-    {
-        $this->apikey = $apikey;
-        $this->destinyGameId = $destinyGameId;
-        $this->doctrine = $doctrine;
-    }
+	public $player;
+	public $characters;
+	public $apikey;
+	public $destinyGameId;
+	public $doctrine;
 
-    public function getDestinyGameId(){
-        return $this->destinyGameId;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function __construct($apikey, $destinyGameId, $doctrine)
+	{
+		$this->apikey = $apikey;
+		$this->destinyGameId = $destinyGameId;
+		$this->doctrine = $doctrine;
+	}
 
-    private function _curl($url){
-        // initialisation de la session
-        $ch = curl_init();
+	public function getDestinyGameId()
+	{
+		return $this->destinyGameId;
+	}
 
-        // configuration des options
-        curl_setopt($ch, CURLOPT_URL,  self::BUNGIE_URL."/platform/destiny/".$url);
+	private function _curl($url)
+	{
+		// initialisation de la session
+		$ch = curl_init();
 
-        $headers = [];
-        $headers[] = "X-API-Key:".$this->apikey;
+		// configuration des options
+		curl_setopt($ch, CURLOPT_URL, self::BUNGIE_URL . "/platform/destiny/" . $url);
 
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		$headers = [];
+		$headers[] = "X-API-Key:" . $this->apikey;
 
-        curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-        // exécution de la session
-        $return = curl_exec($ch);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
 
-        // fermeture des ressources
-        curl_close($ch);
+		// exécution de la session
+		$return = curl_exec($ch);
 
-        $result = json_decode($return);
+		// fermeture des ressources
+		curl_close($ch);
 
-        return $result;
-    }
+		$result = json_decode($return);
 
-    public function getPlayer($membershipType,$displayName){
-        $searchDestinyPlayerCurl = $this->_SearchDestinyPlayer($membershipType,$displayName);
+		return $result;
+	}
 
-        if (!isset($searchDestinyPlayerCurl->Response) || !array_key_exists(0,$searchDestinyPlayerCurl->Response)){
-            return null;
-        }
+	public function getPlayer($membershipType, $displayName)
+	{
+		$searchDestinyPlayerCurl = $this->_SearchDestinyPlayer($membershipType, $displayName);
 
-        $this->player = $searchDestinyPlayerCurl->Response[0];
+		if (!isset($searchDestinyPlayerCurl->Response) || !array_key_exists(0, $searchDestinyPlayerCurl->Response)) {
+			return null;
+		}
 
-        return $this->player;
-    }
+		$this->player = $searchDestinyPlayerCurl->Response[0];
 
-    public function getAccount($membershipType,$destinyMembershipId){
-        return $this->_Account($membershipType,$destinyMembershipId);
-    }
+		return $this->player;
+	}
 
-    public function getCharacters($membershipType,$displayName){
+	public function getAccount($membershipType, $destinyMembershipId)
+	{
+		return $this->_Account($membershipType, $destinyMembershipId);
+	}
 
-        $player = $this->getPlayer($membershipType,$displayName);
-        if($player === null){
-            return null;
-        }
-        $account = $this->_Account($membershipType,$player->membershipId);
+	public function getCharacters($membershipType, $displayName)
+	{
 
-        return $this->formatCharacters($account,$displayName);
-    }
+		$player = $this->getPlayer($membershipType, $displayName);
+		if ($player === null) {
+			return null;
+		}
+		$account = $this->_Account($membershipType, $player->membershipId);
 
-    public function formatCharacters($account,$displayName){
-        $clanName = '';
+		return $this->formatCharacters($account, $displayName);
+	}
 
-        if(isset($account->Response->data->clanName)){
-            $clanName = $account->Response->data->clanName;
-        }
-        $characters = $account->Response->data->characters;
+	public function formatCharacters($account, $displayName)
+	{
+		$clanName = '';
 
-        $this->characters = [];
-        foreach($characters as $key => $value){
+		if (isset($account->Response->data->clanName)) {
+			$clanName = $account->Response->data->clanName;
+		}
+		$characters = $account->Response->data->characters;
 
-            $this->characters[] = array(
-                'gamerTag' => $displayName,
-                'level' => $value->characterLevel,
-                'class' => $this->classMapping[$value->characterBase->classType],
-                'clan' => $clanName,
-                'backgroundPath' => self::BUNGIE_URL.$value->backgroundPath,
-                'emblemPath' => self::BUNGIE_URL.$value->emblemPath,
-                'characterId' => $value->characterBase->characterId
-            );
-        }
+		$this->characters = [];
+		foreach ($characters as $key => $value) {
 
-        return $this->characters;
-    }
+			$this->characters[] = array(
+				'gamerTag' => $displayName,
+				'level' => $value->characterLevel,
+				'class' => $this->classMapping[$value->characterBase->classType],
+				'clan' => $clanName,
+				'backgroundPath' => self::BUNGIE_URL . $value->backgroundPath,
+				'emblemPath' => self::BUNGIE_URL . $value->emblemPath,
+				'characterId' => $value->characterBase->characterId
+			);
+		}
 
-    public function getDoctrine(){
-        return $this->doctrine;
-    }
+		return $this->characters;
+	}
 
-    /**
-     * @param $character
-     * @param \Acme\EsBattleBundle\Entity\User $user
-     */
-    public function saveGameUserInfo($character,$user = null,$plaform = null,$game = null){
-        /**
-         * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
-         */
-        $userGame = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:UserGame')
-            ->findOneBy(
-                array('ext_id' => $character['characterId'],'user' => $user)
-            );
+	public function getDoctrine()
+	{
+		return $this->doctrine;
+	}
 
-        if($userGame === null){
-            $userGame = new UserGame();
-        }
+	/**
+	 * @param $character
+	 * @param \Acme\EsBattleBundle\Entity\User $user
+	 */
+	public function saveGameUserInfo($character, $user = null, $plaform = null, $game = null)
+	{
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
+		 */
+		$userGame = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:UserGame')
+			->findOneBy(
+				array('ext_id' => $character['characterId'], 'user' => $user)
+			);
 
-        $userGame->setGameProfilName($character['class'].' '.$character['level']);
-        $userGame->setGameUsername($character['gamerTag']);
-        $userGame->setData1($character['class']);
-        $userGame->setData2($character['level']);
-        $userGame->setData3($character['clan']);
-        $userGame->setData4($character['backgroundPath']);
-        $userGame->setData5($character['emblemPath']);
-        $userGame->setExtId($character['characterId']);
-        $userGame->setUser($user);
-        $userGame->setPlateform($plaform);
-        $userGame->setGame($game);
+		if ($userGame === null) {
+			$userGame = new UserGame();
+		}
 
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($userGame);
-        $em->flush();
+		$userGame->setGameProfilName($character['class'] . ' ' . $character['level']);
+		$userGame->setGameUsername($character['gamerTag']);
+		$userGame->setData1($character['class']);
+		$userGame->setData2($character['level']);
+		$userGame->setData3($character['clan']);
+		$userGame->setData4($character['backgroundPath']);
+		$userGame->setData5($character['emblemPath']);
+		$userGame->setExtId($character['characterId']);
+		$userGame->setUser($user);
+		$userGame->setPlateform($plaform);
+		$userGame->setGame($game);
 
-        return $userGame;
-    }
+		$em = $this->getDoctrine()->getManager();
+		$em->persist($userGame);
+		$em->flush();
 
-    /*
-     * Returns a list of Destiny memberships given a full Gamertag or PSN ID.
-     */
-    private function _SearchDestinyPlayer($membershipType,$displayName){
+		return $userGame;
+	}
 
-        $url = '/SearchDestinyPlayer/'.$membershipType.'/'.$displayName.'/';
+	/*
+	 * Returns a list of Destiny memberships given a full Gamertag or PSN ID.
+	 */
+	private function _SearchDestinyPlayer($membershipType, $displayName)
+	{
 
-        return $this->_curl($url);
-    }
+		$url = '/SearchDestinyPlayer/' . $membershipType . '/' . $displayName . '/';
 
-    private function _Account($membershipType,$destinyMembershipId){
-        $url = $membershipType.'/Account/'.$destinyMembershipId.'/';
+		return $this->_curl($url);
+	}
 
-        return $this->_curl($url);
-    }
+	private function _Account($membershipType, $destinyMembershipId)
+	{
+		$url = $membershipType . '/Account/' . $destinyMembershipId . '/';
+
+		return $this->_curl($url);
+	}
+
+	public function sortCharacters($characters){
+		return $this->_array_sort($characters,'level',SORT_DESC);
+	}
+
+	private function _array_sort($array, $on, $order = SORT_ASC)
+	{
+		$new_array = array();
+		$sortable_array = array();
+
+		if (count($array) > 0) {
+			foreach ($array as $k => $v) {
+				if (is_array($v)) {
+					foreach ($v as $k2 => $v2) {
+						if ($k2 == $on) {
+							$sortable_array[$k] = $v2;
+						}
+					}
+				} else {
+					$sortable_array[$k] = $v;
+				}
+			}
+
+			switch ($order) {
+				case SORT_ASC:
+					asort($sortable_array);
+					break;
+				case SORT_DESC:
+					arsort($sortable_array);
+					break;
+			}
+
+			foreach ($sortable_array as $k => $v) {
+				$new_array[$k] = $array[$k];
+			}
+		}
+
+		return $new_array;
+	}
 }

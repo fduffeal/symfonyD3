@@ -14,21 +14,32 @@ class JeuxVideo
 
     const INDEX_MESSAGE_START = 7;
 
+    const MAX_ESSAI = 2;
+
     public $tag = [];
+    public $plateform = null;
+    public $plateformBungie = null;
+
+    public $ps3PlaformId = 1;
+    public $ps4PlaformId = 2;
+    public $xbox360PlaformId = 3;
+    public $xboxOnePlaformId = 4;
+
+    public $plateformBungieXboxLive = 1;
+    public $plateformBungiePSN = 2;
+
+    public $methode = null;
 
     public function __construct()
     {
         $this->tag = ['caveau','cropta','atheon','raid','assaut','30','26','nuit','noire','épique','epique','semaine'];
     }
 
-
     private function _curl($url){
         // initialisation de la session
         $ch = curl_init();
 
-//        var_dump(self::URL.$url.'.html');die();
-        // configuration des options
-        curl_setopt($ch, CURLOPT_URL,  self::URL.$url.'.htm');
+        curl_setopt($ch, CURLOPT_URL,  $url);
 
         $headers = [];
 
@@ -42,6 +53,14 @@ class JeuxVideo
 
         // fermeture des ressources
         curl_close($ch);
+
+        return $return;
+    }
+
+
+    private function _getPost($url){
+
+        $return = $this->_curl(self::URL.$url.'.htm');
 
         $dom = new \DOMDocument();
         @$dom->loadHTML($return);
@@ -69,15 +88,7 @@ class JeuxVideo
 
                 $nodes = $element->childNodes;
                 foreach ($nodes as $node) {
-//                    if($node->nodeValue){
-//                        continue;
-//                    }
-//                    echo "VALUE:".$node->nodeValue. "<br/>";
-//
                     $aPost[] = $this->_createObj($node);
-//                    var_dump($obj);
-
-
                 }
             }
         }
@@ -86,7 +97,9 @@ class JeuxVideo
     }
 
     public function getPage($url){
-        return $this->_curl($url);
+
+        $this->findPlateform($url);
+        return $this->_getPost($url);
     }
 
     private function _trimUltime($chaine){
@@ -97,6 +110,7 @@ class JeuxVideo
     }
 
     private function _findClass($message){
+        $message = strtolower($message);
         if(preg_match('/arca/',$message)){
             return 'warlock';
         }
@@ -132,6 +146,123 @@ class JeuxVideo
         return implode(' ',$aTag);
     }
 
+    private function _findGamerTagPSN($comment,$essai){
+        $gamerTag = null;
+        $testPSN = preg_match('/psn/i',$comment, $matches, PREG_OFFSET_CAPTURE);
+
+        if($testPSN === 1){
+//            var_dump($matches[0][1]);die();
+            $subComment = substr($comment,$matches[0][1]);
+
+            $subComment = str_replace(":"," ",$subComment);
+            $subComment = $this->_trimUltime($subComment);
+            $aSubComment = explode(' ',$subComment);
+
+            $gamerTag = $aSubComment[$essai];
+//            var_dump($gamerTag);die();
+            $this->methode = 2;
+        }
+
+        return $gamerTag;
+    }
+
+    private function _findGamerTagXbox($comment,$essai){
+        $gamerTag = null;
+        $testId = preg_match('/gt/i',$comment, $matches, PREG_OFFSET_CAPTURE);
+
+        if($testId === 1){
+//            var_dump($matches[0][1]);die();
+            $subComment = substr($comment,$matches[0][1]);
+
+            $subComment = str_replace(":"," ",$subComment);
+            $subComment = $this->_trimUltime($subComment);
+            $aSubComment = explode(' ',$subComment);
+
+            $sizeOfSubComment = sizeof($aSubComment);
+
+            $aGamerTag = [];
+            for($i = 1; $i < $essai+1 && $i<$sizeOfSubComment; $i++){
+                $aGamerTag[] = $aSubComment[$i];
+            }
+            $gamerTag = implode(' ',$aGamerTag);
+//            var_dump($gamerTag);die();
+            $this->methode = 3;
+        }
+
+        return $gamerTag;
+    }
+
+    private function _findTagAtEnd($aComment,$aCommentSize,$essai){
+
+        $aGamerTag = [];
+
+        for($i = $essai; $i > 0; $i--){
+            $aGamerTag[] =  $aComment[$aCommentSize-$i];
+        }
+        $gamerTag = implode(' ',$aGamerTag);
+
+        $this->methode = 1;
+
+        return $gamerTag;
+    }
+
+    private function _findGamerTag($aComment,$aCommentSize,$essai){
+
+        $gamerTag = null;
+        $comment = implode(' ',$aComment);
+
+        if(($this->plateform === $this->ps4PlaformId || $this->plateform === $this->ps3PlaformId) && $gamerTag === null){
+            $gamerTag = $this->_findGamerTagPSN($comment,$essai);
+        }
+
+        if(($this->plateform === $this->xbox360PlaformId || $this->plateform === $this->xboxOnePlaformId) && $gamerTag === null){
+            $gamerTag = $this->_findGamerTagXbox($comment,$essai);
+        }
+
+        if($gamerTag === null){
+            $gamerTag = $this->_findTagAtEnd($aComment,$aCommentSize,$essai);
+        }
+
+
+
+//        if($gamerTag !== null){
+//            $gamerTagUrl = str_replace(' ','%20',$gamerTag);
+//            $urlVerif = 'http://'.$_SERVER['HTTP_HOST'].'/bungie/characters/'.$this->plateform.'/'.$this->plateformBungie.'/'.$gamerTagUrl.'/null/null';
+//            $result = $this->_curl($urlVerif);
+//
+//            if($result === '{"msg":"characters not found"}' && $essai < self::MAX_ESSAI){
+//                $essai++;
+//                $gamerTag = $this->_findGamerTag($aComment,$aCommentSize,$essai);
+//            }
+//        }
+
+        return $gamerTag;
+    }
+
+    public function findPlateform($url){
+        $testPS3 = preg_match('/ps3/',$url, $matches, PREG_OFFSET_CAPTURE);
+        if($testPS3 === 1){
+            $this->plateform = $this->ps3PlaformId;
+            $this->plateformBungie = $this->plateformBungiePSN;
+        }
+        $testPS4 = preg_match('/ps4/',$url, $matches, PREG_OFFSET_CAPTURE);
+        if($testPS4 === 1){
+            $this->plateform = $this->ps4PlaformId;
+            $this->plateformBungie = $this->plateformBungiePSN;
+        }
+        $test360 = preg_match('/-360-/',$url, $matches, PREG_OFFSET_CAPTURE);
+        if($test360 === 1){
+            $this->plateform = $this->xbox360PlaformId;
+            $this->plateformBungie = $this->plateformBungieXboxLive;
+        }
+
+        $testOne = preg_match('/one/',$url, $matches, PREG_OFFSET_CAPTURE);
+        if($testOne === 1){
+            $this->plateform = $this->xboxOnePlaformId;
+            $this->plateformBungie = $this->plateformBungieXboxLive;
+        }
+    }
+
     private function _createObj($node){
         $comment = $this->_trimUltime($node->nodeValue);
 
@@ -149,7 +280,7 @@ class JeuxVideo
             $obj->message = $this->_formatMessage($aComment,$aCommentSize);
             $obj->class = $this->_findClass($obj->message);
             $obj->tags = $this->_findTag($aComment,$aCommentSize);
-            $obj->gamerTag = $aComment[$aCommentSize-1];
+            $obj->gamerTag = $this->_findGamerTag($aComment,$aCommentSize,1);
         }catch (Exception $e ){
 
         }
