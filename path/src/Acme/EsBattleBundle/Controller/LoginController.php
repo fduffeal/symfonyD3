@@ -11,6 +11,39 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LoginController extends Controller
 {
+
+    private function _updateDestinyCharacter($user){
+        $bungie = $this->get('acme_es_battle.bungie');
+        $userGameCollection = $user->getUsergames();
+        $aGamerTag = [];
+        /**
+         * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
+         */
+        foreach($userGameCollection as $userGame){
+            $gamerTag = $userGame->getGameUsername();
+            $gamerTagLower = strtolower($gamerTag);
+            if(in_array($gamerTagLower,$aGamerTag)){
+                continue;
+            }
+            $aGamerTag[] = $gamerTagLower;
+
+            /**
+             * @var \Acme\EsBattleBundle\Entity\Plateform $plateform
+             */
+            $plateform = $userGame->getPlateform();
+            $game = $userGame->getGame();
+
+            $characters = $bungie->getCharacters($plateform->getBungiePlateformId(),$gamerTag);
+
+            if($characters !== null){
+                foreach($characters as $key => $character){
+                    $userGame = $bungie->saveGameUserInfo($character,$user,$plateform,$game);
+                }
+            }
+        }
+        return $user;
+    }
+
     public function indexAction($username,$password)
     {
 
@@ -30,6 +63,8 @@ class LoginController extends Controller
 	    if($user->isPasswordOk($password)){
 
             $user->setApikey($user->createApiKey());
+
+            $this->_updateDestinyCharacter($user);
 
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);
