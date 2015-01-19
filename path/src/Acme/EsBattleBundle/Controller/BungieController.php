@@ -14,14 +14,26 @@ class BungieController extends Controller
 
     public function indexAction(){
 
+        $membershipType = 2;
+        $destinyMembershipId = '4611686018430647711';
+        $characterId = "2305843009215026244";
+
         $bungie = $this->get('acme_es_battle.bungie');
         //$player = $bungie->getPlayer(2,'Fifoukiller84');
 
 //        $test = $bungie->getPlayer(2,'Fifoukiller84');
-        $test = $bungie->getAccount(2,'4611686018430647711');
 //        $test = $bungie->getCharacters(2,'Fifoukiller84');
 
 //        var_dump($player,$characters);
+
+
+//        $test = $bungie->getAccount(2,$destinyMembershipId);
+
+//        $test = $bungie->getCharacter(2,$destinyMembershipId,$characterId);
+
+//        $test = $bungie->getItems();
+
+        $test = $bungie->getCharacterInventory($membershipType,$destinyMembershipId,$characterId);
 
         echo json_encode($test);
         die();

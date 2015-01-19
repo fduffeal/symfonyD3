@@ -178,6 +178,50 @@ class Bungie
 		return $this->_curl($url);
 	}
 
+	public function getCharacter($membershipType,$destinyMembershipId,$characterId){
+		return $this->_Character($membershipType,$destinyMembershipId,$characterId);
+	}
+
+	/**
+	 * @desc Returns a character summary for the supplied membership.
+	 * @param $membershipType
+	 * @param $destinyMembershipId
+	 * @param $characterId
+	 * @return mixed
+	 */
+	private function _Character($membershipType,$destinyMembershipId,$characterId){
+		$url = '/'.$membershipType.'/Account/'.$destinyMembershipId.'/Character/'.$characterId.'/';
+		return $this->_curl($url);
+	}
+
+	public function getCharacterInventory($membershipType,$destinyMembershipId,$characterId){
+		return $this->_CharacterInventory($membershipType,$destinyMembershipId,$characterId);
+	}
+
+	/**
+	 * Retrieve the details of a Destiny Item.
+	 * @param $membershipType
+	 * @param $destinyMembershipId
+	 * @param $characterId
+	 * @param $itemInstanceId
+	 */
+	private function _CharacterInventory($membershipType,$destinyMembershipId,$characterId){
+		$url = '/'.$membershipType.'/Account/'.$destinyMembershipId.'/Character/'.$characterId.'/Inventory/';
+		return $this->_curl($url);
+	}
+
+	public function getItems(){
+		return $this->_Items();
+	}
+	/**
+	 * Gets a page list of Destiny items.
+	 * @return mixed
+	 */
+	private function _Items(){
+		$url = '/Explorer/Items/';
+		return $this->_curl($url);
+	}
+
 	public function sortCharacters($characters){
 		return $this->_array_sort($characters,'level',SORT_DESC);
 	}
