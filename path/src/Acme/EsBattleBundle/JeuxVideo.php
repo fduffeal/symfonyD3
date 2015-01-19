@@ -57,10 +57,51 @@ class JeuxVideo
         return $return;
     }
 
+    private function _getLast($url){
+
+        $aUrl = explode('-',$url);
+
+        $return = $this->_curl(self::URL.$url);
+
+        $dom = new \DOMDocument();
+        @$dom->loadHTML($return);
+
+        $xpath = new \DOMXpath($dom);
+
+        $elements = $xpath->query('//*[@href]');
+
+        $lastUrl = null;
+        $lastPageNum = 0;
+        foreach($elements as $element){
+
+
+            $urlTemp = $element->getAttribute("href");
+            $aUrlTemp = explode('/',$urlTemp);
+
+            $urlTemp = $aUrlTemp[sizeof($aUrlTemp)-1];
+            $aUrlTemp = explode('-',$urlTemp);
+
+            if($aUrlTemp[0] == $aUrl[0] && $aUrlTemp[1] == $aUrl[1] && $aUrlTemp[2] == $aUrl[2]){
+                $currentPageIndex = intval($aUrlTemp[3]);
+                if($lastPageNum < $currentPageIndex){
+                    $lastUrl = $urlTemp;
+                    $lastPageNum = $currentPageIndex;
+                }
+            }
+        }
+
+        return $lastUrl;
+    }
+
+    public function getLastPage($url){
+
+        return $this->_getLast($url);
+    }
+
 
     private function _getPost($url){
 
-        $return = $this->_curl(self::URL.$url.'.htm');
+        $return = $this->_curl(self::URL.$url);
 
         $dom = new \DOMDocument();
         @$dom->loadHTML($return);
@@ -88,7 +129,7 @@ class JeuxVideo
 
                 $nodes = $element->childNodes;
                 foreach ($nodes as $node) {
-                    $aPost[] = $this->_createObj($node);
+                    $aPost[] = $this->_createObj($node,$element->getAttribute('id'));
                 }
             }
         }
@@ -239,6 +280,35 @@ class JeuxVideo
         return $gamerTag;
     }
 
+    private function _getFrenchMonth($mois){
+        $arrayMois = [
+            'janvier' => 1,
+            'février' => 2,
+            'mars' => 3,
+            'avril' => 4,
+            'mai' => 5,
+            'juin' => 6,
+            'juillet' => 7,
+            'août' => 8,
+            'septembre' => 9,
+            'octobre' => 10,
+            'novembre' => 11,
+            'décembre' => 12,
+        ];
+
+        return $arrayMois[strtolower($mois)];
+    }
+
+    private function _formatDate($aComment){
+
+        $day = $aComment[2];
+        $month = $this->_getFrenchMonth($aComment[3]);
+        $year = $aComment[4];
+        $aHeure = explode(':',$aComment[6]);
+
+        return mktime($aHeure[0],$aHeure[1],$aHeure[2],$month,$day,$year);
+    }
+
     public function findPlateform($url){
         $testPS3 = preg_match('/ps3/',$url, $matches, PREG_OFFSET_CAPTURE);
         if($testPS3 === 1){
@@ -263,7 +333,11 @@ class JeuxVideo
         }
     }
 
-    private function _createObj($node){
+    private function _formatId($id){
+        return str_replace('post_','',$id);
+    }
+
+    private function _createObj($node,$id){
         $comment = $this->_trimUltime($node->nodeValue);
 
         $aComment = preg_split('/[\s,]+/',$comment);
@@ -275,12 +349,13 @@ class JeuxVideo
         try{
             $obj = new \stdClass();
             $obj->author = $aComment[0];
-            $obj->date = $aComment[2].' '.$aComment[3].' '.$aComment[4];
+            $obj->date = $this->_formatDate($aComment);
             $obj->heure = $aComment[6];
             $obj->message = $this->_formatMessage($aComment,$aCommentSize);
             $obj->class = $this->_findClass($obj->message);
             $obj->tags = $this->_findTag($aComment,$aCommentSize);
             $obj->gamerTag = $this->_findGamerTag($aComment,$aCommentSize,1);
+            $obj->id = $this->_formatId($id);
         }catch (Exception $e ){
 
         }
