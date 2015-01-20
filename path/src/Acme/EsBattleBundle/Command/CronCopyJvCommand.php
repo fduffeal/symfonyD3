@@ -57,14 +57,15 @@ class CronCopyJvCommand extends ContainerAwareCommand
 
 		$lastIdSave = $this->_copyJeuxVideoAction($lastPage,$soft,$output,$previousLastIdSave);
 
-		$crontask->setOutput($lastIdSave);
-		$crontask->setLastrun(new \DateTime());
+		if($lastIdSave !== null){
+			$crontask->setOutput($lastIdSave);
+			$crontask->setLastrun(new \DateTime());
 
-		if(!$soft){
-			$em->persist($crontask);
-			$em->flush();
+			if(!$soft){
+				$em->persist($crontask);
+				$em->flush();
+			}
 		}
-
 
 		$output->writeln('--END --');
 	}
@@ -115,7 +116,7 @@ class CronCopyJvCommand extends ContainerAwareCommand
 				continue;
 			}
 
-			if($post->id < $previousLastIdSave){
+			if($post->id <= $previousLastIdSave){
 				$output->writeln($post->id." inférieur au dernier post sauvegardé");
 				continue;
 			}
