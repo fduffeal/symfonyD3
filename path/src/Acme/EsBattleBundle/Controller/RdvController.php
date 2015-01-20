@@ -20,15 +20,19 @@ use Acme\EsBattleBundle\Entity\Appointment;
 use Acme\EsBattleBundle\Entity\Notification;
 use Acme\EsBattleBundle\Entity\Tag;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
+
 class RdvController extends Controller
 {
     public function indexAction()
     {
         $em = $this->getDoctrine()->getManager();
         $query = $em->createQuery(
-            'SELECT rdv
+            'SELECT rdv, usersGame, tags, usersGameInQueue
             FROM AcmeEsBattleBundle:Appointment rdv
-            JOIN rdv.usersGame usersGame'
+            JOIN rdv.usersGame usersGame
+            JOIN rdv.tags tags
+            LEFT JOIN rdv.usersGameInQueue usersGameInQueue'
         );
 
         $collection = $query->getResult();
@@ -47,6 +51,8 @@ class RdvController extends Controller
         $response->setMaxAge(30);
         $response->setSharedMaxAge(30);
         $response->setContent($json);
+
+//        throw new Exception();
 
         return $response;
     }

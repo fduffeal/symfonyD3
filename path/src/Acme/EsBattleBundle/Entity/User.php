@@ -270,6 +270,13 @@ class User
 		);
 	}
 
+    public function _toArrayShort(){
+        return array(
+            'id' => $this->getId(),
+            'username' => $this->getUsername()
+        );
+    }
+
     /**
      * Serializes the user private.
      *
