@@ -263,7 +263,13 @@ class Annonce
         $plateform = $this->getPlateform();
         $game = $this->getGame();
 
+        /**
+         * @var \Acme\EsBattleBundle\Entity\UserGame $author
+         */
         $author = $this->getAuthor();
+
+        $user = $author->getUser();
+
         $created = $this->getCreated();
 
         return array(
@@ -273,7 +279,8 @@ class Annonce
             'tags' => $aTags,
             'plateform' => ($plateform)?$plateform->_toArray():null,
             'game' => ($game)?$game->_toArray():null,
-            'created' => ($created)?$created->getTimestamp():null
+            'created' => ($created)?$created->getTimestamp():null,
+            'user' => ($user)?$user->_toArrayShort():null,
         );
     }
 

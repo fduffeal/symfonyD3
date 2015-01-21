@@ -9,6 +9,7 @@ use Acme\EsBattleBundle\Entity\User as User;
 use Acme\EsBattleBundle\Entity\Annonce as Annonce;
 use Acme\EsBattleBundle\Entity\Tag;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Response;
 
 class AnnonceController extends Controller
@@ -97,19 +98,26 @@ class AnnonceController extends Controller
     public function indexAction(){
         $em = $this->getDoctrine()->getManager();
         $query = $em->createQuery(
-            'SELECT annonce
+            'SELECT annonce, author, plateform, game, user, tags
             FROM AcmeEsBattleBundle:Annonce annonce
             JOIN annonce.author author
             JOIN annonce.plateform plateform
             JOIN annonce.game game
+            JOIN annonce.tags tags
+            LEFT JOIN author.user user
             ORDER BY annonce.created DESC'
-        )->setMaxResults(70);
+        )->setMaxResults(100);
 
         $result = $query->getResult();
         $aResult = [];
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Annonce $annonce
+         */
         foreach($result as $annonce){
             $aResult[] = $annonce->_toArray();
         }
+
+//        throw new Exception();
 
         $json = json_encode($aResult);
         $response = new Response();
@@ -117,6 +125,7 @@ class AnnonceController extends Controller
         $response->setMaxAge(30);
         $response->setSharedMaxAge(30);
         $response->setContent($json);
+
         return $response;
     }
 }

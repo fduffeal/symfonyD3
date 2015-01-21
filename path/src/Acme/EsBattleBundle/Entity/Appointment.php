@@ -92,19 +92,19 @@ class Appointment
 
 
     /**
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="users")
+     * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
     protected $leader;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Game", inversedBy="games")
+     * @ORM\ManyToOne(targetEntity="Game")
      * @ORM\JoinColumn(name="game_id", referencedColumnName="id")
      */
     protected $game;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Plateform", inversedBy="plateform")
+     * @ORM\ManyToOne(targetEntity="Plateform")
      * @ORM\JoinColumn(name="plateform_id", referencedColumnName="id")
      */
     protected $plateform;
@@ -118,7 +118,7 @@ class Appointment
 	protected $updated;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Matchmaking", inversedBy="matchmaking")
+     * @ORM\ManyToOne(targetEntity="Matchmaking")
      * @ORM\JoinColumn(name="matchmaking_id", referencedColumnName="id")
      */
     protected $matchmaking;
@@ -311,11 +311,17 @@ class Appointment
         $users = $this->getUsersGame();
         $aUsers = array();
 	    if($users !== null){
-		    foreach($users as $user){
-                $userAccount = $user->getUser();
-                $user = $user->_toArray();
-                $user['user'] = $userAccount->_toArray();
-			    $aUsers[] = $user;
+            /**
+             * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
+             */
+		    foreach($users as $userGame){
+                /**
+                 * @var \Acme\EsBattleBundle\Entity\User $user
+                 */
+                $user = $userGame->getUser();
+                $aUserGame = $userGame->_toArray();
+                $aUserGame['user'] = $user->_toArrayShort();
+			    $aUsers[] = $aUserGame;
 		    }
 	    }
 
@@ -323,11 +329,16 @@ class Appointment
         $aUsersInQueue = array();
 
 	    if($usersInQueue !== null){
-		    foreach($usersInQueue as $userInQueue){
-                $userAccount = $userInQueue->getUser();
-
-                $userInQueue = $userInQueue->_toArray();
-                $userInQueue['user'] = $userAccount->_toArray();
+            /**
+             * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
+             */
+		    foreach($usersInQueue as $userGame){
+                /**
+                 * @var \Acme\EsBattleBundle\Entity\User $user
+                 */
+                $user = $userGame->getUser();
+                $userInQueue = $userGame->_toArray();
+                $userInQueue['user'] = $user->_toArrayShort();
 
 			    $aUsersInQueue[] = $userInQueue;
 		    }
@@ -350,6 +361,81 @@ class Appointment
             'usersInQueue' => $aUsersInQueue,
             'lastUpdate' => $this->getUpdated()->getTimestamp(),
             'matchmaking' => ($this->getMatchmaking())?$this->getMatchmaking()->_toArray():''
+
+        );
+    }
+
+    /*
+    * Serializes appointment.
+    *
+    * The serialized data have to contain the fields used by the equals method and the username.
+    *
+    * @return string
+    */
+    public function _toArrayShort()
+    {
+
+        $tags = $this->getTags();
+        $aTags = array();
+        foreach($tags as $tag){
+            $aTags[] = $tag->_toArray();
+        }
+
+        $plateform = $this->getPlateform();
+        $game = $this->getGame();
+
+        $users = $this->getUsersGame();
+        $aUsers = array();
+        if($users !== null){
+            /**
+             * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
+             */
+            foreach($users as $userGame){
+                /**
+                 * @var \Acme\EsBattleBundle\Entity\User $user
+                 */
+                $user = $userGame->getUser();
+                $aUserGame = $userGame->_toArray();
+                $aUserGame['user'] = $user->_toArrayShort();
+                $aUsers[] = $aUserGame;
+            }
+        }
+
+        $usersInQueue = $this->getUsersGameInQueue();
+        $aUsersInQueue = array();
+
+        if($usersInQueue !== null){
+            /**
+             * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
+             */
+            foreach($usersInQueue as $userGame){
+                /**
+                 * @var \Acme\EsBattleBundle\Entity\User $user
+                 */
+                $user = $userGame->getUser();
+                $userInQueue = $userGame->_toArray();
+                $userInQueue['user'] = $user->_toArrayShort();
+
+                $aUsersInQueue[] = $userInQueue;
+            }
+        }
+
+        $leader = $this->getLeader();
+
+        return array(
+            'id' => $this->getId(),
+            'description' => $this->getDescription(),
+            'start' => $this->getStart()->getTimestamp(),
+            'end' => $this->getEnd()->getTimestamp(),
+            'duree' => $this->getDuree(),
+            'nbParticipant' => $this->getNbParticipant(),
+            'leader' => ($leader)?$leader->_toArrayShort():null,
+            'tags' => $aTags,
+            'plateform' => ($plateform)?$plateform->_toArray():null,
+            'game' => ($game)?$game->_toArray():null,
+            'users' => $aUsers,
+            'usersInQueue' => $aUsersInQueue,
+            'lastUpdate' => $this->getUpdated()->getTimestamp()
 
         );
     }

@@ -88,6 +88,33 @@ class CronCopyJvCommand extends ContainerAwareCommand
 			}
 			$aPost[] = $post;
 		}
+
+		$nbPost = sizeof($aPost);
+		$output->writeln('--'.$nbPost.' POST--');
+		/**
+		 * check previous page
+		 */
+		if($nbPost === 0){
+			$aUrl = explode('-',$url);
+
+			$aUrl[3] = intval($aUrl[3])-1;
+
+			$url = implode('-',$aUrl);
+
+			$pagePost = $jeuxvideo->getPage($url);
+
+			$aPost =[];
+			foreach($pagePost as $post) {
+				if ($post === null) {
+					continue;
+				}
+				$aPost[] = $post;
+			}
+
+			$nbPost = sizeof($aPost);
+			$output->writeln('--'.$nbPost.' POST PREVIOUS PAGE--');
+		}
+
 //        echo 'NB POST :'. sizeof($aPost).'<br/>';
 
 		$plateformId = $jeuxvideo->plateform;//PS4

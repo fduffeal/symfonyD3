@@ -130,7 +130,11 @@ acme_es_battle_annonce:
 #    path:     /francis/delete
 #    defaults: { _controller: AcmeEsBattleBundle:Admin:deleteOldUserGame }
 
-acme_es_battle_admin_copy_ps4:
-    path:     /francis/copy/{url}
-    defaults: { _controller: AcmeEsBattleBundle:Admin:copyJeuxVideo }
+#acme_es_battle_admin_copy_ps4:
+#    path:     /francis/copy/{url}
+#    defaults: { _controller: AcmeEsBattleBundle:Admin:copyJeuxVideo }
 
+
+acme_es_battle_forum_topic_get_all:
+    path:     /forum
+    defaults: { _controller: AcmeEsBattleBundle:Forum:getAllTopic }
