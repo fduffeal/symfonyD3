@@ -28,21 +28,31 @@ class RdvController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $query = $em->createQuery(
-            'SELECT rdv, usersGame, tags, usersGameInQueue
+            'SELECT rdv,usersGame, tags, plateform, game, user, leader,usersGameInQueue,userInQueue
             FROM AcmeEsBattleBundle:Appointment rdv
             JOIN rdv.usersGame usersGame
+            JOIN usersGame.user user
+            JOIN rdv.plateform plateform
+            JOIN rdv.game game
             JOIN rdv.tags tags
-            LEFT JOIN rdv.usersGameInQueue usersGameInQueue'
+            JOIN rdv.leader leader
+            LEFT JOIN rdv.usersGameInQueue usersGameInQueue
+            LEFT JOIN usersGameInQueue.user userInQueue'
         );
 
         $collection = $query->getResult();
 
         $aResult = [];
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
+         */
         foreach($collection as $appointment){
-            $aResult[] = $appointment->_toArray();
+            $aResult[] = $appointment->_toArrayShort();
         }
 
         $json = json_encode($aResult);
+
+//        throw new Exception();
 
 	    $response = new Response();
 
@@ -52,7 +62,6 @@ class RdvController extends Controller
         $response->setSharedMaxAge(30);
         $response->setContent($json);
 
-//        throw new Exception();
 
         return $response;
     }
