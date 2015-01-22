@@ -44,6 +44,12 @@ class Game
 
 
     /**
+     * @ORM\OneToMany(targetEntity="UserGame",mappedBy="game")
+     */
+    protected $usergames;
+
+
+    /**
      * Get id
      *
      * @return integer 

@@ -45,6 +45,11 @@ class Plateform {
     private $bungiePlateformId;
 
     /**
+     * @ORM\OneToMany(targetEntity="UserGame",mappedBy="plateform")
+     */
+    protected $usergames;
+
+    /**
      * Get id
      *
      * @return integer 

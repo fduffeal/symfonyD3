@@ -259,4 +259,29 @@ class Topic
     {
         return $this->position;
     }
+
+    public function getNbMessages(){
+        return sizeof($this->getMessages());
+    }
+
+    public function _toJson(){
+        $topic = $this->_toArray();
+
+        $encoders = array(new XmlEncoder(), new JsonEncoder());
+        $normalizers = array(new GetSetMethodNormalizer());
+
+        $serializer = new Serializer($normalizers, $encoders);
+
+        return $serializer->serialize($topic, 'json');
+    }
+
+    public function _toArrayShort(){
+        return array(
+            'id' => $this->getId(),
+            'titre' => $this->getTitre(),
+            'created' => $this->getCreated()->getTimestamp(),
+            'user' => $this->getUser()->_toArrayShort(),
+            'nbMessages' => $this->getNbMessages()
+        );
+    }
 }

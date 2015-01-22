@@ -43,7 +43,7 @@ class Message
 	protected $created;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Topic")
+     * @ORM\ManyToOne(targetEntity="Topic",inversedBy="messages")
      * @ORM\JoinColumn(name="topic_id", referencedColumnName="id")
      */
     protected $topic;

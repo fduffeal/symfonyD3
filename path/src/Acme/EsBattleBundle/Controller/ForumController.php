@@ -2,174 +2,100 @@
 
 namespace Acme\EsBattleBundle\Controller;
 
+use Acme\EsBattleBundle\Entity\Message;
 use Acme\EsBattleBundle\Entity\UserGame;
+use Acme\EsBattleBundle\Entity\Topic;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Acme\EsBattleBundle\Entity\User as User;
 
+use \Doctrine\ORM\Tools\Pagination\Paginator;
+
 use Symfony\Component\HttpFoundation\Response;
+
+use Symfony\Component\Config\Definition\Exception\Exception;
+
 
 class ForumController extends Controller
 {
 
     public function getAllTopicAction(){
         $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
 
         $em = $this->getDoctrine()->getManager();
         $query = $em->createQuery(
-            'SELECT topic
+            'SELECT topic, messages, user
             FROM AcmeEsBattleBundle:Topic topic
             JOIN topic.user user
-            WHERE topic.visible = :visible'
+            JOIN topic.messages messages
+            WHERE topic.visible = :visible
+            ORDER BY topic.position ASC'
         )->setParameter('visible', true);
 
         $topicCollection = $query->getResult();
 
+        $aTopic = [];
 
         /**
          * @var \Acme\EsBattleBundle\Entity\Topic $topic
          */
         foreach($topicCollection as $topic){
-            echo $topic->getTitre().'<br/>';
+            $aTopic[] = $topic->_toArrayShort();
         }
 
+        $json = json_encode($aTopic);
+        $response->setContent($json);
+        $response->setPublic();
+        // définit l'âge max des caches privés ou des caches partagés
+        $response->setMaxAge(60);
+        $response->setSharedMaxAge(60);
+
+//        throw new Exception();
+
         return $response;
-
-
     }
-    public function addFriendAction($friendUsername,$username,$apikey){
+
+    public function createTopicAction($title,$texte,$username,$token)
+    {
         $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+
         /**
          * @var \Acme\EsBattleBundle\Entity\User $user
          */
         $user = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:User')
             ->findOneBy(
-                array('username' => $username,'apikey' => $apikey)
+                array('username' => $username,'apikey' => $token)
             );
 
         if($user === null){
+            $response = new Response();
             $response->setStatusCode(401);
             return $response;
         }
 
-        /**
-         * @var \Acme\EsBattleBundle\Entity\User $friend
-         */
-        $friend = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:User')
-            ->findOneBy(
-                array('username' => $friendUsername)
-            );
-
-        if($user === null){
-            $response->setStatusCode(404);
-            $content = array('msg'=> 'friend not found');
-            $response->setContent(json_encode($content));
-            return $response;
-        }
-
-        $user->addFriend($friend);
         $em = $this->getDoctrine()->getManager();
-        $em->persist($user);
-        $em->flush();
-    }
-
-    public function removeFriendAction($friendUsername,$username,$apikey){
-        $response = new Response();
-        /**
-         * @var \Acme\EsBattleBundle\Entity\User $user
-         */
-        $user = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:User')
-            ->findOneBy(
-                array('username' => $username,'apikey' => $apikey)
-            );
-
-        if($user === null){
-            $response->setStatusCode(401);
-            return $response;
-        }
 
         /**
-         * @var \Acme\EsBattleBundle\Entity\User $friend
+         * @var \Acme\EsBattleBundle\Entity\Message $message
          */
-        $friend = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:User')
-            ->findOneBy(
-                array('username' => $friendUsername)
-            );
+        $message = new Message();
+        $message->setTexte($texte);
 
-        if($user === null){
-            $response->setStatusCode(404);
-            $content = array('msg'=> 'friend not found');
-            $response->setContent(json_encode($content));
-            return $response;
-        }
-
-        $user->removeFriend($friend);
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($user);
-        $em->flush();
-    }
-
-    public function getUsersAction(){
-
-        $response = new Response();
-
-
-        $stop_date = date('Y-m-d H:i:s', strtotime('-1 day', time()));
-
-        $em = $this->getDoctrine()->getManager();
-        $query = $em->createQuery(
-            'SELECT user
-            FROM AcmeEsBattleBundle:User user
-            WHERE user.onlineTime > :now'
-        )->setParameter('now', $stop_date);
-
-        $collection = $query->getResult();
-
-
-        $aResult = [];
         /**
-         * @var \Acme\EsBattleBundle\Entity\User $user
+         * @var \Acme\EsBattleBundle\Entity\Topic $topic
          */
-        foreach($collection as $user){
-            $aResult[] = $user->_toArray();
-        }
+        $topic = new Topic();
+        $topic->setTitre($title);
+        $topic->addMessage($message);
 
-        $json = json_encode($aResult);
+        $em->persist($topic);
 
-
-
-        $response->setPublic();
-        // définit l'âge max des caches privés ou des caches partagés
-        $response->setMaxAge(30);
-        $response->setSharedMaxAge(30);
-        $response->setContent($json);
+        $response->setContent($topic->_toJson());
 
         return $response;
-    }
 
-    public function getDestinyUsersGameAction($membershipType,$displayName){
-
-        $response = new Response();
-
-        $bungie = $this->get('acme_es_battle.bungie');
-
-        $player = $bungie->getPlayer($membershipType,$displayName);
-        if($player === null){
-            return null;
-        }
-        $account = $bungie->getAccount($membershipType,$player->membershipId);
-
-        $json= json_encode($account);
-        $response->setPublic();
-        // définit l'âge max des caches privés ou des caches partagés
-        $response->setMaxAge(86400);
-        $response->setSharedMaxAge(86400);
-        $response->setContent($json);
-
-        return $response;
     }
 }
