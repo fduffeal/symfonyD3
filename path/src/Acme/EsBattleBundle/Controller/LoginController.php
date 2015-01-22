@@ -301,6 +301,8 @@ class LoginController extends Controller
 
 	public function forgetPasswordAction($email){
 
+        $response = new Response();
+
 		$user = $this->getDoctrine()
 			->getRepository('AcmeEsBattleBundle:User')
 			->findOneBy(
@@ -309,8 +311,14 @@ class LoginController extends Controller
 
         $stop_date = strtotime('-1 hour', time());
 
+        if($user === null){
+            $response->setStatusCode(403);
+            $content = array('msg'=> 'user_not_found');
+            $response->setContent(json_encode($content));
+            return $response;
+        }
+
         if($user->getForgetTime() && $user->getForgetTime()->getTimestamp() > $stop_date){
-            $response = new Response();
             $response->setStatusCode(403);
             $content = array('msg'=> 'mail_already_send');
             $response->setContent(json_encode($content));
@@ -338,7 +346,7 @@ class LoginController extends Controller
 			->setBody($this->renderView('AcmeEsBattleBundle:Mail:forgetPassword.html.twig',array('username' => $username,'forgetKey'=>$forgetKey)));
 		$this->get('mailer')->send($message);
 
-        return new Response();
+        return $response;
 	}
 
     public function updateUserGameAction($plateformId,$gameId,$profilId,$profilName,$gameUsername,$data1,$data2,$data3,$data4,$username,$apikey){
