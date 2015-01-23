@@ -41,6 +41,12 @@ class Message
 	 * @ORM\Column(name="created", type="datetime")
 	 */
 	protected $created;
+	/**
+	 * @var \DateTime
+	 *
+	 * @ORM\Column(name="updated", type="datetime")
+	 */
+	protected $updated;
 
     /**
      * @ORM\ManyToOne(targetEntity="Topic",inversedBy="messages")
@@ -76,6 +82,15 @@ class Message
     public function setVisibleValue()
     {
         $this->visible = true;
+    }
+
+    /**
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedValue()
+    {
+        $this->updated = new \DateTime();
     }
 
     /**
@@ -201,5 +216,38 @@ class Message
         $this->visible = $visible;
 
         return $this;
+    }
+
+    public function _toArray(){
+        return array(
+            'id' => $this->getId(),
+            'texte' => $this->getTexte(),
+            'created' => $this->getCreated()->getTimestamp(),
+            'updated' => $this->getUpdated()->getTimestamp(),
+            'user' => $this->getUser()->_toArrayShort()
+        );
+    }
+
+    /**
+     * Set updated
+     *
+     * @param \DateTime $updated
+     * @return Message
+     */
+    public function setUpdated($updated)
+    {
+        $this->updated = $updated;
+
+        return $this;
+    }
+
+    /**
+     * Get updated
+     *
+     * @return \DateTime 
+     */
+    public function getUpdated()
+    {
+        return $this->updated;
     }
 }

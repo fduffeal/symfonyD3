@@ -138,3 +138,7 @@ acme_es_battle_annonce:
 acme_es_battle_forum_topic_get_all:
     path:     /forum
     defaults: { _controller: AcmeEsBattleBundle:Forum:getAllTopic }
+
+acme_es_battle_forum_topic_get_one:
+    path:     /forum/{id}/{page}/{nbResult}
+    defaults: { _controller: AcmeEsBattleBundle:Forum:getTopic }

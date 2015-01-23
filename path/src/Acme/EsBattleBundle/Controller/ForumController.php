@@ -41,7 +41,7 @@ class ForumController extends Controller
          * @var \Acme\EsBattleBundle\Entity\Topic $topic
          */
         foreach($topicCollection as $topic){
-            $aTopic[] = $topic->_toArrayShort();
+            $aTopic[] = $topic->_toArray();
         }
 
         $json = json_encode($aTopic);
@@ -95,6 +95,110 @@ class ForumController extends Controller
 
         $response->setContent($topic->_toJson());
 
+        return $response;
+
+    }
+
+    public function getTopicAction($id,$page,$nbResult)
+    {
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+
+        $nbResult = intval($nbResult);
+
+        $start = (intval($page)-1)*$nbResult;
+
+
+        $em = $this->getDoctrine()->getManager();
+
+        $dql = "SELECT message
+            FROM AcmeEsBattleBundle:Message message
+            JOIN message.topic topic
+            WHERE topic.id = :id AND message.visible = :visible
+            ORDER BY message.updated DESC, message.created DESC";
+
+
+        $query = $em->createQuery($dql)
+            ->setParameter('visible', true)
+            ->setParameter('id', $id)
+            ->setFirstResult($start)
+            ->setMaxResults($nbResult);
+
+        $messageCollection = $query->getResult();
+
+        $aIdList = [];
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Message $message
+         */
+        foreach($messageCollection as $message){
+            $aIdList[] = $message->getId();
+        }
+
+        $nbMessageResponse = sizeof($aIdList);
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Message $lastMessage
+         */
+        $lastMessage = null;
+        $lastModifiedDate = null;
+        if($nbMessageResponse !== 0){
+            $lastMessage = $messageCollection[0];
+
+            $lastCreated = $lastMessage->getCreated();
+            $lastUpdated = $lastMessage->getUpdated();
+
+            $lastModifiedDate = $lastCreated;
+            if($lastUpdated > $lastCreated){
+                $lastModifiedDate = $lastUpdated;
+            }
+        }
+
+//        var_dump($aMessage);
+//        throw new Exception();
+        $response->setPublic();
+        $response->setETag('TOPIC_'.$id.'_'.$page.'_'.$nbResult.'_'.$nbMessageResponse.'_'.implode('_',$aIdList));
+        $response->setLastModified($lastModifiedDate);
+
+
+        // Vérifie que l'objet Response n'est pas modifié
+        // pour un objet Request donné
+        if ($response->isNotModified($this->getRequest())) {
+            // Retourne immédiatement un objet 304 Response
+            return $response;
+        }
+
+        $dql = "SELECT topic, message,messageUser
+            FROM AcmeEsBattleBundle:Message message
+            JOIN message.topic topic
+            JOIN message.user messageUser
+            WHERE topic.visible = :visible AND topic.id = :id AND message.visible = :visible
+            ORDER BY message.updated DESC, message.created DESC";
+
+        $query = $em->createQuery($dql)
+            ->setParameter('visible', true)
+            ->setParameter('id', $id)
+            ->setFirstResult($start)
+            ->setMaxResults($nbResult);
+
+        $messageCollection = $query->getResult();
+
+        $aMessage = [];
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Message $message
+         */
+        foreach($messageCollection as $message){
+            $aMessage[] = $message->_toArray();
+        }
+
+        $topic = [];
+        if($nbMessageResponse !== 0){
+            $topic = $messageCollection[0]->getTopic()->_toArray();
+        }
+
+        $data = array(
+            'topic'   => $topic,
+            'messages'  =>$aMessage);
+
+        $response->setContent(json_encode($data));
         return $response;
 
     }

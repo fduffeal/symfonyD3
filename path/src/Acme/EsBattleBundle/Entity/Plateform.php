@@ -123,4 +123,44 @@ class Plateform {
     {
         return $this->bungiePlateformId;
     }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->usergames = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add usergames
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserGame $usergames
+     * @return Plateform
+     */
+    public function addUsergame(\Acme\EsBattleBundle\Entity\UserGame $usergames)
+    {
+        $this->usergames[] = $usergames;
+
+        return $this;
+    }
+
+    /**
+     * Remove usergames
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserGame $usergames
+     */
+    public function removeUsergame(\Acme\EsBattleBundle\Entity\UserGame $usergames)
+    {
+        $this->usergames->removeElement($usergames);
+    }
+
+    /**
+     * Get usergames
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getUsergames()
+    {
+        return $this->usergames;
+    }
 }

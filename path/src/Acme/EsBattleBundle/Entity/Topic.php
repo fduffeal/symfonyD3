@@ -68,6 +68,19 @@ class Topic
      */
     protected $user;
 
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="nbMessages", type="integer")
+     */
+    protected $nbMessages;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="updated", type="datetime")
+     */
+    protected $updated;
 
 
     /**
@@ -93,6 +106,24 @@ class Topic
     {
         $this->visible = true;
     }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function setNbMessageValue()
+    {
+        $this->nbMessages = sizeof($this->getMessages());
+    }
+
+    /**
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedValue()
+    {
+        $this->updated = new \DateTime();
+    }
+
     /**
      * Constructor
      */
@@ -260,12 +291,30 @@ class Topic
         return $this->position;
     }
 
-    public function getNbMessages(){
-        return sizeof($this->getMessages());
-    }
 
     public function _toJson(){
         $topic = $this->_toArray();
+
+        $encoders = array(new XmlEncoder(), new JsonEncoder());
+        $normalizers = array(new GetSetMethodNormalizer());
+
+        $serializer = new Serializer($normalizers, $encoders);
+
+        return $serializer->serialize($topic, 'json');
+    }
+
+    public function _toArray(){
+        return array(
+            'id' => $this->getId(),
+            'titre' => $this->getTitre(),
+            'created' => $this->getCreated()->getTimestamp(),
+            'user' => $this->getUser()->_toArrayShort(),
+            'nbMessages' => $this->getNbMessages()
+        );
+    }
+
+    public function _toJsonShort(){
+        $topic = $this->_toArrayShort();
 
         $encoders = array(new XmlEncoder(), new JsonEncoder());
         $normalizers = array(new GetSetMethodNormalizer());
@@ -280,8 +329,53 @@ class Topic
             'id' => $this->getId(),
             'titre' => $this->getTitre(),
             'created' => $this->getCreated()->getTimestamp(),
-            'user' => $this->getUser()->_toArrayShort(),
-            'nbMessages' => $this->getNbMessages()
+            'user' => $this->getUser()->_toArrayShort()
         );
+    }
+
+    /**
+     * Set nbMessages
+     *
+     * @param integer $nbMessages
+     * @return Topic
+     */
+    public function setNbMessages($nbMessages)
+    {
+        $this->nbMessages = $nbMessages;
+
+        return $this;
+    }
+
+    /**
+     * Set updated
+     *
+     * @param \DateTime $updated
+     * @return Topic
+     */
+    public function setUpdated($updated)
+    {
+        $this->updated = $updated;
+
+        return $this;
+    }
+
+    /**
+     * Get updated
+     *
+     * @return \DateTime 
+     */
+    public function getUpdated()
+    {
+        return $this->updated;
+    }
+
+    /**
+     * Get nbMessages
+     *
+     * @return integer 
+     */
+    public function getNbMessages()
+    {
+        return $this->nbMessages;
     }
 }
