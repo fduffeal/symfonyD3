@@ -112,7 +112,12 @@ class Topic
      */
     public function setNbMessageValue()
     {
-        $this->nbMessages = sizeof($this->getMessages());
+        $messageVisible = $this->getMessages()->filter(
+            function($entry)  {
+                return ($entry->getVisible() === true);
+            }
+        );
+        $this->nbMessages = sizeof($messageVisible);
     }
 
     /**
@@ -308,8 +313,10 @@ class Topic
             'id' => $this->getId(),
             'titre' => $this->getTitre(),
             'created' => $this->getCreated()->getTimestamp(),
+            'updated' => $this->getUpdated()->getTimestamp(),
             'user' => $this->getUser()->_toArrayShort(),
-            'nbMessages' => $this->getNbMessages()
+            'nbMessages' => $this->getNbMessages(),
+            'position' => $this->getPosition()
         );
     }
 
@@ -329,7 +336,10 @@ class Topic
             'id' => $this->getId(),
             'titre' => $this->getTitre(),
             'created' => $this->getCreated()->getTimestamp(),
-            'user' => $this->getUser()->_toArrayShort()
+            'updated' => $this->getUpdated()->getTimestamp(),
+            'user' => $this->getUser()->_toArrayShort(),
+            'nbMessages' => $this->getNbMessages(),
+            'position' => $this->getPosition()
         );
     }
 

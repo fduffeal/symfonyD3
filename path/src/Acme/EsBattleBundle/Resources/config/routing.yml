@@ -140,5 +140,21 @@ acme_es_battle_forum_topic_get_all:
     defaults: { _controller: AcmeEsBattleBundle:Forum:getAllTopic }
 
 acme_es_battle_forum_topic_get_one:
-    path:     /forum/{id}/{page}/{nbResult}
+    path:     /forum/topic/{id}/{page}/{nbResult}
     defaults: { _controller: AcmeEsBattleBundle:Forum:getTopic }
+
+acme_es_battle_forum_topic_create:
+    path:     /forum/topic/create/{title}/{texte}/{username}/{token}
+    defaults: { _controller: AcmeEsBattleBundle:Forum:createTopic }
+
+acme_es_battle_forum_topic_message_create:
+    path:     /forum/topic/message/{topicId}/{page}/{nbResult}/{username}/{token}
+    defaults: { _controller: AcmeEsBattleBundle:Forum:createMessage }
+
+acme_es_battle_forum_topic_message_update:
+    path:     /forum/topic/message/update/{messageId}/{page}/{nbResult}/{username}/{token}
+    defaults: { _controller: AcmeEsBattleBundle:Forum:updateMessage }
+
+acme_es_battle_forum_topic_message_delete:
+    path:     /forum/topic/message/delete/{messageId}/{page}/{nbResult}/{username}/{token}
+    defaults: { _controller: AcmeEsBattleBundle:Forum:deleteMessage }
