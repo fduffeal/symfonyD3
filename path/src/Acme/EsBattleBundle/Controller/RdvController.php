@@ -28,6 +28,34 @@ class RdvController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $query = $em->createQuery(
+            'SELECT rdv
+            FROM AcmeEsBattleBundle:Appointment rdv
+            ORDER BY rdv.updated DESC'
+        );
+
+        $collection = $query->getResult();
+
+        $response = new Response();
+        $response->setPublic();
+        // définit l'âge max des caches privés ou des caches partagés
+        $response->setMaxAge(30);
+        $response->setSharedMaxAge(30);
+
+        if(!$collection[0]){
+            return $response;
+        }
+
+        $response->setLastModified($collection[0]->getUpdated());
+
+        // Vérifie que l'objet Response n'est pas modifié
+        // pour un objet Request donné
+        if ($response->isNotModified($this->getRequest())) {
+            // Retourne immédiatement un objet 304 Response
+            return $response;
+        }
+
+
+        $query = $em->createQuery(
             'SELECT rdv,usersGame, tags, plateform, game, user, leader,usersGameInQueue,userInQueue
             FROM AcmeEsBattleBundle:Appointment rdv
             JOIN rdv.usersGame usersGame
@@ -42,6 +70,7 @@ class RdvController extends Controller
 
         $collection = $query->getResult();
 
+
         $aResult = [];
         /**
          * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
@@ -54,12 +83,6 @@ class RdvController extends Controller
 
 //        throw new Exception();
 
-	    $response = new Response();
-
-        $response->setPublic();
-        // définit l'âge max des caches privés ou des caches partagés
-        $response->setMaxAge(30);
-        $response->setSharedMaxAge(30);
         $response->setContent($json);
 
 
