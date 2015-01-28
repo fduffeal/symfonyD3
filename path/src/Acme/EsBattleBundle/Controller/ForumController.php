@@ -25,6 +25,31 @@ class ForumController extends Controller
         $response->headers->set('Content-Type', 'application/json');
 
         $em = $this->getDoctrine()->getManager();
+
+        $query = $em->createQuery(
+            'SELECT topic
+            FROM AcmeEsBattleBundle:Topic topic
+            WHERE topic.visible = :visible
+            ORDER BY topic.updated DESC'
+        )->setParameter('visible', true);
+
+        $topicCollection = $query->getResult();
+
+        if(!$topicCollection[0]){
+            return $response;
+        }
+
+        $response->setPublic();
+        $response->setLastModified($topicCollection[0]->getUpdated());
+
+        // Vérifie que l'objet Response n'est pas modifié
+        // pour un objet Request donné
+        if ($response->isNotModified($this->getRequest())) {
+            // Retourne immédiatement un objet 304 Response
+            return $response;
+        }
+
+
         $query = $em->createQuery(
             'SELECT topic, messages, user
             FROM AcmeEsBattleBundle:Topic topic
@@ -47,10 +72,6 @@ class ForumController extends Controller
 
         $json = json_encode($aTopic);
         $response->setContent($json);
-        $response->setPublic();
-        // définit l'âge max des caches privés ou des caches partagés
-        $response->setMaxAge(60);
-        $response->setSharedMaxAge(60);
 
 //        throw new Exception();
 
