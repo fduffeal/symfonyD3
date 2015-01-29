@@ -224,7 +224,7 @@ class Message
             'texte' => $this->getTexte(),
             'created' => $this->getCreated()->getTimestamp(),
             'updated' => $this->getUpdated()->getTimestamp(),
-            'user' => $this->getUser()->_toArrayShort()
+            'user' => $this->getUser()->_toArray()
         );
     }
 

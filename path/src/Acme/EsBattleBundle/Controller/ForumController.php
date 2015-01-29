@@ -119,7 +119,7 @@ class ForumController extends Controller
         $topic = new Topic();
         $topic->setTitre($title);
         $topic->setUser($user);
-        $topic->setPosition(2);
+        $topic->setPosition(1);
 
 
         /**
