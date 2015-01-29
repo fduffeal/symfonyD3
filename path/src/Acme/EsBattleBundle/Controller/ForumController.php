@@ -78,8 +78,20 @@ class ForumController extends Controller
         return $response;
     }
 
-    public function createTopicAction($title,$texte,$username,$token)
+    public function createTopicAction($username,$token)
     {
+
+        $request = $this->getRequest();
+
+        $requestContent = json_decode($request->getContent());
+        if($requestContent === null){
+            $response = new Response();
+            $response->setStatusCode(401);
+            return $response;
+        }
+        $title = $requestContent->title;
+        $texte = $requestContent->texte;
+
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
 
@@ -100,20 +112,29 @@ class ForumController extends Controller
 
         $em = $this->getDoctrine()->getManager();
 
-        /**
-         * @var \Acme\EsBattleBundle\Entity\Message $message
-         */
-        $message = new Message();
-        $message->setTexte($texte);
 
         /**
          * @var \Acme\EsBattleBundle\Entity\Topic $topic
          */
         $topic = new Topic();
         $topic->setTitre($title);
-        $topic->addMessage($message);
+        $topic->setUser($user);
+        $topic->setPosition(2);
 
+
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Message $message
+         */
+        $message = new Message();
+        $message->setTexte($texte);
+        $message->setUser($user);
+        $message->setTopic($topic);
+
+        $topic->addMessage($message);
+        $em->persist($message);
         $em->persist($topic);
+
+        $em->flush();
 
         $response->setContent($topic->_toJson());
 

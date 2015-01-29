@@ -109,6 +109,7 @@ class Topic
 
     /**
      * @ORM\PreUpdate
+     * @ORM\PrePersist
      */
     public function setNbMessageValue()
     {

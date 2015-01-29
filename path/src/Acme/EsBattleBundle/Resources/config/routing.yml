@@ -140,11 +140,11 @@ acme_es_battle_forum_topic_get_all:
     defaults: { _controller: AcmeEsBattleBundle:Forum:getAllTopic }
 
 acme_es_battle_forum_topic_get_one:
-    path:     /forum/topic/{id}/{page}/{nbResult}
+    path:     /forum/topic/get/{id}/{page}/{nbResult}
     defaults: { _controller: AcmeEsBattleBundle:Forum:getTopic }
 
 acme_es_battle_forum_topic_create:
-    path:     /forum/topic/create/{title}/{texte}/{username}/{token}
+    path:     /forum/topic/create/{username}/{token}
     defaults: { _controller: AcmeEsBattleBundle:Forum:createTopic }
 
 acme_es_battle_forum_topic_message_create:
