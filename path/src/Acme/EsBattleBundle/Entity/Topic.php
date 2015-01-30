@@ -35,6 +35,13 @@ class Topic
      */
     private $titre;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="status", type="string", length=255)
+     */
+    private $status;
+
 
     /**
      * @ORM\OneToMany(targetEntity="Message",mappedBy="topic")
@@ -105,6 +112,14 @@ class Topic
     public function setVisibleValue()
     {
         $this->visible = true;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function setStatusValue()
+    {
+        $this->status = 'normal';
     }
 
     /**
@@ -317,7 +332,8 @@ class Topic
             'updated' => $this->getUpdated()->getTimestamp(),
             'user' => $this->getUser()->_toArrayShort(),
             'nbMessages' => $this->getNbMessages(),
-            'position' => $this->getPosition()
+            'position' => $this->getPosition(),
+            'status' => $this->getStatus()
         );
     }
 
@@ -340,7 +356,8 @@ class Topic
             'updated' => $this->getUpdated()->getTimestamp(),
             'user' => $this->getUser()->_toArrayShort(),
             'nbMessages' => $this->getNbMessages(),
-            'position' => $this->getPosition()
+            'position' => $this->getPosition(),
+            'status' => $this->getStatus()
         );
     }
 
@@ -388,5 +405,28 @@ class Topic
     public function getNbMessages()
     {
         return $this->nbMessages;
+    }
+
+    /**
+     * Set status
+     *
+     * @param string $status
+     * @return Topic
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * Get status
+     *
+     * @return string 
+     */
+    public function getStatus()
+    {
+        return $this->status;
     }
 }
