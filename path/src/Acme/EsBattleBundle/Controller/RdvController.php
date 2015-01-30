@@ -28,6 +28,34 @@ class RdvController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $query = $em->createQuery(
+            'SELECT rdv
+            FROM AcmeEsBattleBundle:Appointment rdv
+            ORDER BY rdv.updated DESC'
+        )->setMaxResults(1);
+
+        $collection = $query->getResult();
+
+        $response = new Response();
+        $response->setPublic();
+        // définit l'âge max des caches privés ou des caches partagés
+        $response->setMaxAge(30);
+        $response->setSharedMaxAge(30);
+
+        if(!$collection[0]){
+            return $response;
+        }
+
+        $response->setLastModified($collection[0]->getUpdated());
+
+        // Vérifie que l'objet Response n'est pas modifié
+        // pour un objet Request donné
+        if ($response->isNotModified($this->getRequest())) {
+            // Retourne immédiatement un objet 304 Response
+            return $response;
+        }
+
+
+        $query = $em->createQuery(
             'SELECT rdv,usersGame, tags, plateform, game, user, leader,usersGameInQueue,userInQueue
             FROM AcmeEsBattleBundle:Appointment rdv
             JOIN rdv.usersGame usersGame
@@ -42,6 +70,7 @@ class RdvController extends Controller
 
         $collection = $query->getResult();
 
+
         $aResult = [];
         /**
          * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
@@ -54,12 +83,6 @@ class RdvController extends Controller
 
 //        throw new Exception();
 
-	    $response = new Response();
-
-        $response->setPublic();
-        // définit l'âge max des caches privés ou des caches partagés
-        $response->setMaxAge(30);
-        $response->setSharedMaxAge(30);
         $response->setContent($json);
 
 
@@ -526,11 +549,45 @@ class RdvController extends Controller
 	 * @return Response
 	 */
 	public function getNotificationsAction(){
-		$stop_date = date('Y-m-d H:i:s', strtotime('-5 hour', time()));
+
+        $stop_date = date('Y-m-d H:i:s', strtotime('-5 hour', time()));
+        $aNotification = array();
+
+        $response = new Response();
+        $response->setPublic();
+        // définit l'âge max des caches privés ou des caches partagés
+        $response->setMaxAge(20);
+        $response->setSharedMaxAge(20);
+
+        $em = $this->getDoctrine()->getManager();
+
+        $query = $em->createQuery(
+            'SELECT notifications
+            FROM AcmeEsBattleBundle:Notification notifications
+            WHERE notifications.created > :stop_date'
+        )->setParameter('stop_date', $stop_date)->setMaxResults(1);
+
+        $result = $query->getResult();
+
+        if(!$result){
+            $date = new \DateTime();
+            $response->setLastModified($date);
+            $response->setContent(json_encode($aNotification));
+            return $response;
+        }
+
+        $response->setLastModified($result[0]->getCreated());
+
+        // Vérifie que l'objet Response n'est pas modifié
+        // pour un objet Request donné
+        if ($response->isNotModified($this->getRequest())) {
+            // Retourne immédiatement un objet 304 Response
+            return $response;
+        }
 
 		$em = $this->getDoctrine()->getManager();
 		$query = $em->createQuery(
-			'SELECT notifications
+			'SELECT notifications, expediteur, destinataire
             FROM AcmeEsBattleBundle:Notification notifications
             JOIN notifications.expediteur expediteur
             JOIN notifications.destinataire destinataire
@@ -539,17 +596,12 @@ class RdvController extends Controller
 
 		$collection = $query->getResult();
 
-        $aNotification = array();
+
         foreach($collection as $key => $notification){
             $aNotification[$key] = $notification->_toArray();
         }
 
-		$response = new Response();
-		$response->setContent(json_encode($aNotification));
-		$response->setPublic();
-		// définit l'âge max des caches privés ou des caches partagés
-		$response->setMaxAge(20);
-		$response->setSharedMaxAge(20);
+        $response->setContent(json_encode($aNotification));
 
 		return $response;
 	}

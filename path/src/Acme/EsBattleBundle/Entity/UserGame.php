@@ -32,14 +32,14 @@ class UserGame {
     protected $user;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Game", inversedBy="games")
+     * @ORM\ManyToOne(targetEntity="Game", inversedBy="usergames")
      * @ORM\JoinColumn(name="game_id", referencedColumnName="id")
      */
     protected $game;
 
 
     /**
-     * @ORM\ManyToOne(targetEntity="Plateform", inversedBy="plateforms")
+     * @ORM\ManyToOne(targetEntity="Plateform", inversedBy="usergames")
      * @ORM\JoinColumn(name="plateform_id", referencedColumnName="id")
      */
     protected $plateform;

@@ -96,7 +96,34 @@ class AnnonceController extends Controller
     }
 
     public function indexAction(){
+        $response = new Response();
+        $response->setPublic();
+        $response->setMaxAge(30);
+        $response->setSharedMaxAge(30);
+
         $em = $this->getDoctrine()->getManager();
+
+        $query = $em->createQuery(
+            'SELECT annonce
+            FROM AcmeEsBattleBundle:Annonce annonce
+            ORDER BY annonce.created DESC'
+        )->setMaxResults(1);
+
+        $result = $query->getResult();
+
+        if(!$result[0]){
+            return $response;
+        }
+
+        $response->setLastModified($result[0]->getCreated());
+
+        // Vérifie que l'objet Response n'est pas modifié
+        // pour un objet Request donné
+        if ($response->isNotModified($this->getRequest())) {
+            // Retourne immédiatement un objet 304 Response
+            return $response;
+        }
+
         $query = $em->createQuery(
             'SELECT annonce, author, plateform, game, user, tags
             FROM AcmeEsBattleBundle:Annonce annonce
@@ -120,10 +147,7 @@ class AnnonceController extends Controller
 //        throw new Exception();
 
         $json = json_encode($aResult);
-        $response = new Response();
-        $response->setPublic();
-        $response->setMaxAge(30);
-        $response->setSharedMaxAge(30);
+
         $response->setContent($json);
 
         return $response;

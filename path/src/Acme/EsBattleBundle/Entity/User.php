@@ -105,9 +105,28 @@ class User
     private $clans;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="role", type="string",nullable=true)
+     */
+    protected  $role;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="created", type="datetime")
+     */
+    protected $created;
+
+    /**
      * @ORM\OneToMany(targetEntity="UserGame",mappedBy="user")
      */
     protected $usergames;
+
+    /**
+     * @ORM\OneToMany(targetEntity="UserStats",mappedBy="stat")
+     */
+    protected $userstats;
 
     public function __construct() {
 	    $this->salt = base_convert(sha1(uniqid(mt_rand(), true)), 16, 36);
@@ -266,14 +285,16 @@ class User
             'id' => $this->getId(),
             'username' => $this->getUsername(),
             'userGame'=> $aUserGameCollection,
-            'onlineTime' => ($online!==null)?$this->getOnlineTime()->getTimestamp():''
+            'onlineTime' => ($online!==null)?$this->getOnlineTime()->getTimestamp():'',
+            'role' => $this->getRole()
 		);
 	}
 
     public function _toArrayShort(){
         return array(
             'id' => $this->getId(),
-            'username' => $this->getUsername()
+            'username' => $this->getUsername(),
+            'role' => $this->getRole()
         );
     }
 
@@ -686,5 +707,92 @@ class User
     public function getBlacklistedUser()
     {
         return $this->blacklistedUser;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function setCreatedValue()
+    {
+        $this->created = new \DateTime();
+    }
+
+    /**
+     * Set role
+     *
+     * @param string $role
+     * @return User
+     */
+    public function setRole($role)
+    {
+        $this->role = $role;
+
+        return $this;
+    }
+
+    /**
+     * Get role
+     *
+     * @return string 
+     */
+    public function getRole()
+    {
+        return $this->role;
+    }
+
+    /**
+     * Set created
+     *
+     * @param \DateTime $created
+     * @return User
+     */
+    public function setCreated($created)
+    {
+        $this->created = $created;
+
+        return $this;
+    }
+
+    /**
+     * Get created
+     *
+     * @return \DateTime 
+     */
+    public function getCreated()
+    {
+        return $this->created;
+    }
+
+    /**
+     * Add userstats
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserStats $userstats
+     * @return User
+     */
+    public function addUserstat(\Acme\EsBattleBundle\Entity\UserStats $userstats)
+    {
+        $this->userstats[] = $userstats;
+
+        return $this;
+    }
+
+    /**
+     * Remove userstats
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserStats $userstats
+     */
+    public function removeUserstat(\Acme\EsBattleBundle\Entity\UserStats $userstats)
+    {
+        $this->userstats->removeElement($userstats);
+    }
+
+    /**
+     * Get userstats
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getUserstats()
+    {
+        return $this->userstats;
     }
 }

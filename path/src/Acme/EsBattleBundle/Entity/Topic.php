@@ -35,6 +35,13 @@ class Topic
      */
     private $titre;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="status", type="string", length=255)
+     */
+    private $status;
+
 
     /**
      * @ORM\OneToMany(targetEntity="Message",mappedBy="topic")
@@ -68,6 +75,19 @@ class Topic
      */
     protected $user;
 
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="nbMessages", type="integer")
+     */
+    protected $nbMessages;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="updated", type="datetime")
+     */
+    protected $updated;
 
 
     /**
@@ -93,6 +113,38 @@ class Topic
     {
         $this->visible = true;
     }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function setStatusValue()
+    {
+        $this->status = 'normal';
+    }
+
+    /**
+     * @ORM\PreUpdate
+     * @ORM\PrePersist
+     */
+    public function setNbMessageValue()
+    {
+        $messageVisible = $this->getMessages()->filter(
+            function($entry)  {
+                return ($entry->getVisible() === true);
+            }
+        );
+        $this->nbMessages = sizeof($messageVisible);
+    }
+
+    /**
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedValue()
+    {
+        $this->updated = new \DateTime();
+    }
+
     /**
      * Constructor
      */
@@ -258,5 +310,123 @@ class Topic
     public function getPosition()
     {
         return $this->position;
+    }
+
+
+    public function _toJson(){
+        $topic = $this->_toArray();
+
+        $encoders = array(new XmlEncoder(), new JsonEncoder());
+        $normalizers = array(new GetSetMethodNormalizer());
+
+        $serializer = new Serializer($normalizers, $encoders);
+
+        return $serializer->serialize($topic, 'json');
+    }
+
+    public function _toArray(){
+        return array(
+            'id' => $this->getId(),
+            'titre' => $this->getTitre(),
+            'created' => $this->getCreated()->getTimestamp(),
+            'updated' => $this->getUpdated()->getTimestamp(),
+            'user' => $this->getUser()->_toArrayShort(),
+            'nbMessages' => $this->getNbMessages(),
+            'position' => $this->getPosition(),
+            'status' => $this->getStatus()
+        );
+    }
+
+    public function _toJsonShort(){
+        $topic = $this->_toArrayShort();
+
+        $encoders = array(new XmlEncoder(), new JsonEncoder());
+        $normalizers = array(new GetSetMethodNormalizer());
+
+        $serializer = new Serializer($normalizers, $encoders);
+
+        return $serializer->serialize($topic, 'json');
+    }
+
+    public function _toArrayShort(){
+        return array(
+            'id' => $this->getId(),
+            'titre' => $this->getTitre(),
+            'created' => $this->getCreated()->getTimestamp(),
+            'updated' => $this->getUpdated()->getTimestamp(),
+            'user' => $this->getUser()->_toArrayShort(),
+            'nbMessages' => $this->getNbMessages(),
+            'position' => $this->getPosition(),
+            'status' => $this->getStatus()
+        );
+    }
+
+    /**
+     * Set nbMessages
+     *
+     * @param integer $nbMessages
+     * @return Topic
+     */
+    public function setNbMessages($nbMessages)
+    {
+        $this->nbMessages = $nbMessages;
+
+        return $this;
+    }
+
+    /**
+     * Set updated
+     *
+     * @param \DateTime $updated
+     * @return Topic
+     */
+    public function setUpdated($updated)
+    {
+        $this->updated = $updated;
+
+        return $this;
+    }
+
+    /**
+     * Get updated
+     *
+     * @return \DateTime 
+     */
+    public function getUpdated()
+    {
+        return $this->updated;
+    }
+
+    /**
+     * Get nbMessages
+     *
+     * @return integer 
+     */
+    public function getNbMessages()
+    {
+        return $this->nbMessages;
+    }
+
+    /**
+     * Set status
+     *
+     * @param string $status
+     * @return Topic
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * Get status
+     *
+     * @return string 
+     */
+    public function getStatus()
+    {
+        return $this->status;
     }
 }
