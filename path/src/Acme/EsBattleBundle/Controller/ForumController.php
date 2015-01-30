@@ -314,12 +314,23 @@ class ForumController extends Controller
             return $response;
         }
 
-        /**
-         * @var \Acme\EsBattleBundle\Entity\Message $message
-         */
-        $message = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:Message')
-            ->findOneBy(array('id'=>$messageId,'user'=>$user));
+        if($user->getRole() == 'modo') {
+            /**
+             * @var \Acme\EsBattleBundle\Entity\Message $message
+             */
+            $message = $this->getDoctrine()
+                ->getRepository('AcmeEsBattleBundle:Message')
+                ->find($messageId);
+        } else {
+            /**
+             * @var \Acme\EsBattleBundle\Entity\Message $message
+             */
+            $message = $this->getDoctrine()
+                ->getRepository('AcmeEsBattleBundle:Message')
+                ->findOneBy(array('id'=>$messageId,'user'=>$user));
+        }
+
+
 
         if($message === null){
             $response = new Response();
@@ -372,12 +383,23 @@ class ForumController extends Controller
             return $response;
         }
 
-        /**
-         * @var \Acme\EsBattleBundle\Entity\Message $message
-         */
-        $message = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:Message')
-            ->findOneBy(array('id'=>$messageId,'user'=>$user));
+        if($user->getRole() == 'modo'){
+            /**
+             * @var \Acme\EsBattleBundle\Entity\Message $message
+             */
+            $message = $this->getDoctrine()
+                ->getRepository('AcmeEsBattleBundle:Message')
+                ->find($messageId);
+        } else {
+            /**
+             * @var \Acme\EsBattleBundle\Entity\Message $message
+             */
+            $message = $this->getDoctrine()
+                ->getRepository('AcmeEsBattleBundle:Message')
+                ->findOneBy(array('id'=>$messageId,'user'=>$user));
+        }
+
+
 
         if($message === null){
             $response = new Response();
