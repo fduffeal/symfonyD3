@@ -269,7 +269,6 @@ class ForumController extends Controller
          */
         $topic->setUpdatedValue();
 
-        $em->persist($topic);
         $em->persist($message);
         $em->flush();
 
