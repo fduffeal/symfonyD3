@@ -118,8 +118,8 @@ class UserController extends Controller
 
         $response->setPublic();
         // définit l'âge max des caches privés ou des caches partagés
-        $response->setMaxAge(30);
-        $response->setSharedMaxAge(30);
+        $response->setMaxAge(60);
+        $response->setSharedMaxAge(60);
         $response->setContent($json);
 
         return $response;
