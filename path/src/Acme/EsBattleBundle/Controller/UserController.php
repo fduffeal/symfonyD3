@@ -90,16 +90,16 @@ class UserController extends Controller
     public function getUsersAction(){
 
         $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
 
-
-        $stop_date = date('Y-m-d H:i:s', strtotime('-1 day', time()));
 
         $em = $this->getDoctrine()->getManager();
         $query = $em->createQuery(
-            'SELECT user
+            'SELECT user,usergames, plateform, game
             FROM AcmeEsBattleBundle:User user
-            WHERE user.onlineTime > :now'
-        )->setParameter('now', $stop_date);
+            JOIN user.usergames usergames
+            JOIN usergames.plateform plateform
+            JOIN usergames.game game');
 
         $collection = $query->getResult();
 
