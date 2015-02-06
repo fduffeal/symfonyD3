@@ -11,6 +11,35 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
 {
+
+    public function getFriendAction($username,$apikey){
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+
+        /**
+         * @var \Acme\EsBattleBundle\Entity\User $user
+         */
+        $user = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:User')
+            ->findOneBy(
+                array('username' => $username,'apikey' => $apikey)
+            );
+
+        $friends = $user->getFriends();
+
+        $aData = [];
+        /**
+         * @var \Acme\EsBattleBundle\Entity\User $friend
+         */
+        foreach($friends as $key => $friend){
+            $aData[] = $friend->_toArray();
+        }
+
+        $response->setContent(json_encode($aData));
+
+        return $response;
+    }
+
     public function addFriendAction($friendUsername,$username,$apikey){
         $response = new Response();
         /**
