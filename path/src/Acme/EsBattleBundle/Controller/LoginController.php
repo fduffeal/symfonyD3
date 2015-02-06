@@ -47,6 +47,9 @@ class LoginController extends Controller
     public function indexAction($username,$password)
     {
 
+        /**
+         * @var \Acme\EsBattleBundle\Entity\User $user
+         */
         $user = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:User')
             ->findOneBy(
@@ -54,6 +57,7 @@ class LoginController extends Controller
             );
 
         $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
 
         if($user === null){
             $response->setStatusCode(401);

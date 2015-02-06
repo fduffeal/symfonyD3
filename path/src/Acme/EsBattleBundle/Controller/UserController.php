@@ -25,6 +25,11 @@ class UserController extends Controller
                 array('username' => $username,'apikey' => $apikey)
             );
 
+        if($user === null){
+            $response->setStatusCode(401);
+            return $response;
+        }
+
         $friends = $user->getFriends();
 
         $aData = [];
@@ -65,17 +70,40 @@ class UserController extends Controller
                 array('username' => $friendUsername)
             );
 
-        if($user === null){
+        if($friend === null){
             $response->setStatusCode(404);
             $content = array('msg'=> 'friend not found');
             $response->setContent(json_encode($content));
             return $response;
         }
 
-        $user->addFriend($friend);
         $em = $this->getDoctrine()->getManager();
-        $em->persist($user);
-        $em->flush();
+
+        $dql = "SELECT user,friends
+            FROM AcmeEsBattleBundle:User user
+            JOIN user.friends friends
+            WHERE friends.id = :friendId AND user.id = :userId";
+
+        $query = $em->createQuery($dql)
+            ->setParameter('friendId', $friend->getId())
+            ->setParameter('userId', $user->getId());
+
+        $alreadyFriend = $query->getResult();
+        if($alreadyFriend !== null){
+            $user->addFriend($friend);
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($user);
+            $em->flush();
+        }
+
+
+        $response->headers->set('Content-Type', 'application/json');
+        $response = $this->forward('AcmeEsBattleBundle:User:getFriend', array(
+            'username'  => $username,
+            'apikey'  => $apikey
+        ));
+
+        return $response;
     }
 
     public function removeFriendAction($friendUsername,$username,$apikey){
@@ -114,6 +142,14 @@ class UserController extends Controller
         $em = $this->getDoctrine()->getManager();
         $em->persist($user);
         $em->flush();
+
+        $response->headers->set('Content-Type', 'application/json');
+        $response = $this->forward('AcmeEsBattleBundle:User:getFriend', array(
+            'username'  => $username,
+            'apikey'  => $apikey
+        ));
+
+        return $response;
     }
 
     public function getUsersAction(){

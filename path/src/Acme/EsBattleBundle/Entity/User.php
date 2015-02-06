@@ -312,7 +312,6 @@ class User
 
         $aUserPublic['token'] = $this->getApikey();
         $aUserPublic['email'] = $this->getEmail();
-        $aUserPublic['friends'] = $this->getFriends()->toArray();
 
         return $aUserPublic;
     }
