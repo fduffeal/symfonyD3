@@ -103,7 +103,7 @@ class AnnonceController extends Controller
 
         $em = $this->getDoctrine()->getManager();
 
-        $query = $em->createQuery(
+        /*$query = $em->createQuery(
             'SELECT annonce
             FROM AcmeEsBattleBundle:Annonce annonce
             ORDER BY annonce.created DESC'
@@ -122,7 +122,7 @@ class AnnonceController extends Controller
         if ($response->isNotModified($this->getRequest())) {
             // Retourne immédiatement un objet 304 Response
             return $response;
-        }
+        }*/
 
         $query = $em->createQuery(
             'SELECT annonce, author, plateform, game, user, tags
@@ -133,7 +133,7 @@ class AnnonceController extends Controller
             JOIN annonce.tags tags
             LEFT JOIN author.user user
             ORDER BY annonce.created DESC'
-        )->setMaxResults(100);
+        )->setMaxResults(70);
 
         $result = $query->getResult();
         $aResult = [];
