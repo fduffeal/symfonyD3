@@ -124,7 +124,7 @@ class AnnonceController extends Controller
             return $response;
         }*/
 
-        $query = $em->createQuery(
+        /*$query = $em->createQuery(
             'SELECT annonce, author, plateform, game, user, tags
             FROM AcmeEsBattleBundle:Annonce annonce
             JOIN annonce.author author
@@ -132,6 +132,17 @@ class AnnonceController extends Controller
             JOIN annonce.game game
             JOIN annonce.tags tags
             LEFT JOIN author.user user
+            ORDER BY annonce.created DESC'
+        )->setMaxResults(70);*/
+
+
+        $query = $em->createQuery(
+            'SELECT annonce, author, plateform, game, tags
+            FROM AcmeEsBattleBundle:Annonce annonce
+            JOIN annonce.author author
+            JOIN annonce.plateform plateform
+            JOIN annonce.game game
+            JOIN annonce.tags tags
             ORDER BY annonce.created DESC'
         )->setMaxResults(70);
 
