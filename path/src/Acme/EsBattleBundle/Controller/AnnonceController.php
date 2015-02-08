@@ -98,8 +98,8 @@ class AnnonceController extends Controller
     public function indexAction(){
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge(30);
-        $response->setSharedMaxAge(30);
+        $response->setMaxAge(60);
+        $response->setSharedMaxAge(60);
 
         $em = $this->getDoctrine()->getManager();
 
