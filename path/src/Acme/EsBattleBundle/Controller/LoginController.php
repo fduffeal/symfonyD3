@@ -96,6 +96,7 @@ class LoginController extends Controller
             );
 
         $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
 
         if($user){
 
@@ -119,7 +120,7 @@ class LoginController extends Controller
     public function setOnlineAction($username,$token){
 
         $response = new Response();
-
+        $response->headers->set('Content-Type', 'application/json');
         if($username === 'null' && $token === 'null'){
             $response->setStatusCode(403);
         } else {
@@ -153,7 +154,7 @@ class LoginController extends Controller
 	{
 
         $response = new Response();
-
+        $response->headers->set('Content-Type', 'application/json');
 		$user = $this->getDoctrine()
 			->getRepository('AcmeEsBattleBundle:User')
 			->findOneBy(
@@ -183,7 +184,7 @@ class LoginController extends Controller
 	{
 
         $response = new Response();
-
+        $response->headers->set('Content-Type', 'application/json');
         $bungie = $this->get('acme_es_battle.bungie');
 
         $error = array();
@@ -279,7 +280,7 @@ class LoginController extends Controller
     {
 
         $response = new Response();
-
+        $response->headers->set('Content-Type', 'application/json');
         $user = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:User')
             ->findOneBy(
@@ -306,7 +307,7 @@ class LoginController extends Controller
 	public function forgetPasswordAction($email){
 
         $response = new Response();
-
+        $response->headers->set('Content-Type', 'application/json');
 		$user = $this->getDoctrine()
 			->getRepository('AcmeEsBattleBundle:User')
 			->findOneBy(
@@ -412,6 +413,7 @@ class LoginController extends Controller
         $json = $user->_toJsonPrivate();
 
 	    $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
 	    $response->setContent($json);
 	    return $response;
 
@@ -420,7 +422,7 @@ class LoginController extends Controller
     public function createUserGameAction($plateformId,$gameId,$profilName,$gameUsername,$data1,$data2,$data3,$data4,$username,$apikey){
 
         $response = new Response();
-
+        $response->headers->set('Content-Type', 'application/json');
         $user = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:User')
             ->findOneBy(
@@ -472,7 +474,7 @@ class LoginController extends Controller
     public function getUsersAction(){
 
         $response = new Response();
-
+        $response->headers->set('Content-Type', 'application/json');
 
         $stop_date = date('Y-m-d H:i:s', strtotime('-1 day', time()));
 

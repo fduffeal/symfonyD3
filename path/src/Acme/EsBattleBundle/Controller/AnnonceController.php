@@ -91,6 +91,7 @@ class AnnonceController extends Controller
 
         $response = new Response();
         $response->setContent($json);
+        $response->headers->set('Content-Type', 'application/json');
         return $response;
 
     }
@@ -149,6 +150,7 @@ class AnnonceController extends Controller
         $json = json_encode($aResult);
 
         $response->setContent($json);
+        $response->headers->set('Content-Type', 'application/json');
 
         return $response;
     }

@@ -208,6 +208,8 @@ class UserController extends Controller
         $response->setMaxAge(86400);
         $response->setSharedMaxAge(86400);
         $response->setContent($json);
+        $response->headers->set('Content-Type', 'application/json');
+
 
         return $response;
     }

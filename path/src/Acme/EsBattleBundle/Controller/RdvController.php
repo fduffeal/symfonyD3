@@ -40,6 +40,7 @@ class RdvController extends Controller
         // définit l'âge max des caches privés ou des caches partagés
         $response->setMaxAge(30);
         $response->setSharedMaxAge(30);
+        $response->headers->set('Content-Type', 'application/json');
 
         if(!$collection[0]){
             return $response;
@@ -183,6 +184,7 @@ class RdvController extends Controller
 
 
 		$response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
 		$response->setContent($json);
         return $response;
 
@@ -193,6 +195,7 @@ class RdvController extends Controller
         $response = new Response();
         // Définit la réponse comme publique. Sinon elle sera privée par défaut.
         $response->setPublic();
+        $response->headers->set('Content-Type', 'application/json');
 
 		/**
 		 * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
@@ -393,6 +396,7 @@ class RdvController extends Controller
 
         $json = $appointment->_toJson();
         $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
         $response->setContent($json);
         return $response;
     }
@@ -436,6 +440,8 @@ class RdvController extends Controller
     public function leaveRdvAction($rdvId,$userGameId,$username,$apikey){
 	    $response = new Response();
 
+        $response->headers->set('Content-Type', 'application/json');
+
         $appointment = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:Appointment')
             ->findOneBy(array('id'=>$rdvId));
@@ -457,7 +463,8 @@ class RdvController extends Controller
         $user = $userGame->getUser();
 
         if($user->getUsername() !== $username || $user->getApikey() !== $apikey){
-            return new Response(null, 401, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+            $response->setStatusCode(401);
+            return $response;
         }
         $leader = $appointment->getLeader();
 	    $hasNewLeader = false;
@@ -469,7 +476,8 @@ class RdvController extends Controller
                 $em->remove($appointment);
                 $em->flush();
 
-                return new Response(null, 308, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+                $response->setStatusCode(308);
+                return $response;
 
             }
         }
@@ -504,6 +512,8 @@ class RdvController extends Controller
     }
 
     public function promoteRdvAction($rdvId,$userGameId,$username,$apikey){
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
 
         $appointment = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:Appointment')
@@ -518,7 +528,8 @@ class RdvController extends Controller
         $oldLeader = $appointment->getLeader();
 
         if($oldLeader->getUsername() !== $username || $oldLeader->getApikey() !== $apikey){
-            return new Response(null, 401, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+            $response->setStatusCode(401);
+            return $response;
         }
 
         $appointment->setLeader($newLeader);
@@ -538,7 +549,6 @@ class RdvController extends Controller
 
 	    $json = $appointment->_toJson();
 
-	    $response = new Response();
 	    $response->setContent($json);
         return $response;
 
@@ -554,6 +564,8 @@ class RdvController extends Controller
         $aNotification = array();
 
         $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+
         $response->setPublic();
         // définit l'âge max des caches privés ou des caches partagés
         $response->setMaxAge(20);
@@ -653,6 +665,8 @@ class RdvController extends Controller
         // définit l'âge max des caches privés ou des caches partagés
         $response->setMaxAge(600);
         $response->setSharedMaxAge(600);
+        $response->headers->set('Content-Type', 'application/json');
+
 
         return $response;
     }
@@ -694,6 +708,8 @@ class RdvController extends Controller
 
         $json = $appointment->_toJson();
         $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+
         $response->setContent($json);
         return $response;
 

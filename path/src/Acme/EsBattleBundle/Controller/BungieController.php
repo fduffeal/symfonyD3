@@ -102,6 +102,7 @@ class BungieController extends Controller
         $response->setSharedMaxAge(30);
         //$response->setContent(json_encode($characters));
         $response->setContent(json_encode($aUserGame));
+        $response->headers->set('Content-Type', 'application/json');
 
         return $response;
 
