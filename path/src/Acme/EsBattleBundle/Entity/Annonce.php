@@ -10,9 +10,9 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 
 /**
- * Appointment
+ * Annonce
  *
- * @ORM\Table()
+ * @ORM\Table(name="Annonce",indexes={@ORM\Index(name="created_idx", columns={"created"})})
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
  */
@@ -281,6 +281,45 @@ class Annonce
             'game' => ($game)?$game->_toArray():null,
             'created' => ($created)?$created->getTimestamp():null,
             'user' => ($user)?$user->_toArrayShort():null,
+        );
+    }
+
+    /*
+   * Serializes appointment.
+   *
+   * The serialized data have to contain the fields used by the equals method and the username.
+   *
+   * @return string
+   */
+    public function _toArrayShort()
+    {
+
+        $tags = $this->getTags();
+        $aTags = array();
+        foreach($tags as $tag){
+            $aTags[] = $tag->_toArray();
+        }
+
+        $plateform = $this->getPlateform();
+        $game = $this->getGame();
+
+        /**
+         * @var \Acme\EsBattleBundle\Entity\UserGame $author
+         */
+        $author = $this->getAuthor();
+
+        $user = $author->getUser();
+
+        $created = $this->getCreated();
+
+        return array(
+            'id' => $this->getId(),
+            'description' => $this->getDescription(),
+            'author' => ($author)?$author->_toArray():null,
+            'tags' => $aTags,
+            'plateform' => ($plateform)?$plateform->_toArray():null,
+            'game' => ($game)?$game->_toArray():null,
+            'created' => ($created)?$created->getTimestamp():null
         );
     }
 

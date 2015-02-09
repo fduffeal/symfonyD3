@@ -156,7 +156,33 @@ class UserController extends Controller
 
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
+        $response->setPublic();
+        // définit l'âge max des caches privés ou des caches partagés
+        $response->setMaxAge(600);
+        $response->setSharedMaxAge(600);
 
+        $em = $this->getDoctrine()->getManager();
+
+        $query = $em->createQuery(
+            'SELECT user
+            FROM AcmeEsBattleBundle:User user
+            ORDER BY user.created DESC')
+            ->setMaxResults(1);
+
+        $result = $query->getResult();
+
+        if(!$result[0]){
+            return $response;
+        }
+
+        $response->setLastModified($result[0]->getCreated());
+
+        // Vérifie que l'objet Response n'est pas modifié
+        // pour un objet Request donné
+        if ($response->isNotModified($this->getRequest())) {
+            // Retourne immédiatement un objet 304 Response
+            return $response;
+        }
 
         $em = $this->getDoctrine()->getManager();
         $query = $em->createQuery(
@@ -168,7 +194,6 @@ class UserController extends Controller
 
         $collection = $query->getResult();
 
-
         $aResult = [];
         /**
          * @var \Acme\EsBattleBundle\Entity\User $user
@@ -178,13 +203,6 @@ class UserController extends Controller
         }
 
         $json = json_encode($aResult);
-
-
-
-        $response->setPublic();
-        // définit l'âge max des caches privés ou des caches partagés
-        $response->setMaxAge(60);
-        $response->setSharedMaxAge(60);
         $response->setContent($json);
 
         return $response;

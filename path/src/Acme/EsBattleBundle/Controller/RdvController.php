@@ -55,9 +55,10 @@ class RdvController extends Controller
             return $response;
         }
 
+        $now = date('Y-m-d H:i:s');
 
         $query = $em->createQuery(
-            'SELECT rdv,usersGame, tags, plateform, game, user, leader,usersGameInQueue,userInQueue
+            'SELECT rdv,usersGame, tags, plateform, game, user, leader
             FROM AcmeEsBattleBundle:Appointment rdv
             JOIN rdv.usersGame usersGame
             JOIN usersGame.user user
@@ -65,9 +66,8 @@ class RdvController extends Controller
             JOIN rdv.game game
             JOIN rdv.tags tags
             JOIN rdv.leader leader
-            LEFT JOIN rdv.usersGameInQueue usersGameInQueue
-            LEFT JOIN usersGameInQueue.user userInQueue'
-        );
+            where rdv.end > :now'
+        )->setParameter('now', $now);
 
         $collection = $query->getResult();
 

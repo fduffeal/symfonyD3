@@ -12,7 +12,7 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 /**
  * Appointment
  *
- * @ORM\Table()
+ * @ORM\Table(name="Appointment",indexes={@ORM\Index(name="updated_idx", columns={"updated"}),@ORM\Index(name="end_idx", columns={"end"})})
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
  */
@@ -401,25 +401,6 @@ class Appointment
             }
         }
 
-        $usersInQueue = $this->getUsersGameInQueue();
-        $aUsersInQueue = array();
-
-        if($usersInQueue !== null){
-            /**
-             * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
-             */
-            foreach($usersInQueue as $userGame){
-                /**
-                 * @var \Acme\EsBattleBundle\Entity\User $user
-                 */
-                $user = $userGame->getUser();
-                $userInQueue = $userGame->_toArray();
-                $userInQueue['user'] = $user->_toArrayShort();
-
-                $aUsersInQueue[] = $userInQueue;
-            }
-        }
-
         $leader = $this->getLeader();
 
         return array(
@@ -434,7 +415,6 @@ class Appointment
             'plateform' => ($plateform)?$plateform->_toArray():null,
             'game' => ($game)?$game->_toArray():null,
             'users' => $aUsers,
-            'usersInQueue' => $aUsersInQueue,
             'lastUpdate' => $this->getUpdated()->getTimestamp()
 
         );

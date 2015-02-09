@@ -126,13 +126,12 @@ class AnnonceController extends Controller
         }
 
         $query = $em->createQuery(
-            'SELECT annonce, author, plateform, game, user, tags
+            'SELECT annonce, author, plateform, game, tags
             FROM AcmeEsBattleBundle:Annonce annonce
             JOIN annonce.author author
             JOIN annonce.plateform plateform
             JOIN annonce.game game
             JOIN annonce.tags tags
-            LEFT JOIN author.user user
             ORDER BY annonce.created DESC'
         )->setMaxResults(100);
 
@@ -142,10 +141,8 @@ class AnnonceController extends Controller
          * @var \Acme\EsBattleBundle\Entity\Annonce $annonce
          */
         foreach($result as $annonce){
-            $aResult[] = $annonce->_toArray();
+            $aResult[] = $annonce->_toArrayShort();
         }
-
-//        throw new Exception();
 
         $json = json_encode($aResult);
 
