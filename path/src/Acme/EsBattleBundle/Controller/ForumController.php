@@ -31,7 +31,7 @@ class ForumController extends Controller
             FROM AcmeEsBattleBundle:Topic topic
             WHERE topic.visible = :visible
             ORDER BY topic.updated DESC'
-        )->setParameter('visible', true);
+        )->setParameter('visible', true)->setMaxResults(1);
 
         $topicCollection = $query->getResult();
 
