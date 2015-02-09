@@ -114,6 +114,10 @@ acme_es_battle_bungie_characters:
     path:     /bungie/characters/{plateformId}/{plateformBungie}/{gamerTag}/{username}/{apikey}
     defaults: { _controller: AcmeEsBattleBundle:Bungie:getCharacters }
 
+acme_es_battle_bungie_player:
+    path:     /bungie/player/{membershipType}/{displayName}
+    defaults: { _controller: AcmeEsBattleBundle:Bungie:getPlayer }
+
 acme_es_battle_annonce_create:
     path:     /annonce/create/{tags}/{description}/{userGameId}
     defaults: { _controller: AcmeEsBattleBundle:Annonce:create }
