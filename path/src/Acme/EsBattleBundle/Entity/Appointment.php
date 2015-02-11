@@ -90,6 +90,15 @@ class Appointment
 	 **/
 	private $usersGameInQueue;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="UserGame")
+     * @ORM\JoinTable(name="appointment_user_game_invite",
+     *      joinColumns={@ORM\JoinColumn(name="appointment_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="user_game_id", referencedColumnName="id")}
+     *      )
+     **/
+    private $usersGameInvite;
+
 
     /**
      * @ORM\ManyToOne(targetEntity="User")
@@ -344,6 +353,26 @@ class Appointment
 		    }
 	    }
 
+        $usersInvite = $this->getUsersGameInvite();
+        $aUsersInvite = array();
+
+        if($usersInvite !== null){
+            /**
+             * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
+             */
+            foreach($usersInvite as $userGame){
+                /**
+                 * @var \Acme\EsBattleBundle\Entity\User $user
+                 */
+                $user = $userGame->getUser();
+                $userInvite = $userGame->_toArray();
+                $userInvite['user'] = $user->_toArrayShort();
+
+                $aUsersInvite[] = $userInvite;
+            }
+        }
+
+
         $leader = $this->getLeader();
 
         return array(
@@ -359,6 +388,7 @@ class Appointment
             'game' => ($game)?$game->_toArray():null,
             'users' => $aUsers,
             'usersInQueue' => $aUsersInQueue,
+            'usersInvite' => $aUsersInvite,
             'lastUpdate' => $this->getUpdated()->getTimestamp(),
             'matchmaking' => ($this->getMatchmaking())?$this->getMatchmaking()->_toArray():''
 
@@ -415,6 +445,40 @@ class Appointment
             'plateform' => ($plateform)?$plateform->_toArray():null,
             'game' => ($game)?$game->_toArray():null,
             'users' => $aUsers,
+            'lastUpdate' => $this->getUpdated()->getTimestamp()
+
+        );
+    }
+
+    /*
+    * Serializes appointment.
+    *
+    * The serialized data have to contain the fields used by the equals method and the username.
+    *
+    * @return string
+    */
+    public function _toArrayMini()
+    {
+
+        $tags = $this->getTags();
+        $aTags = array();
+        foreach($tags as $tag){
+            $aTags[] = $tag->_toArray();
+        }
+
+        $plateform = $this->getPlateform();
+        $game = $this->getGame();
+
+        return array(
+            'id' => $this->getId(),
+            'description' => $this->getDescription(),
+            'start' => $this->getStart()->getTimestamp(),
+            'end' => $this->getEnd()->getTimestamp(),
+            'duree' => $this->getDuree(),
+            'nbParticipant' => $this->getNbParticipant(),
+            'tags' => $aTags,
+            'plateform' => ($plateform)?$plateform->_toArray():null,
+            'game' => ($game)?$game->_toArray():null,
             'lastUpdate' => $this->getUpdated()->getTimestamp()
 
         );
@@ -654,5 +718,38 @@ class Appointment
     public function getMatchmaking()
     {
         return $this->matchmaking;
+    }
+
+    /**
+     * Add usersGameInvite
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserGame $usersGameInvite
+     * @return Appointment
+     */
+    public function addUsersGameInvite(\Acme\EsBattleBundle\Entity\UserGame $usersGameInvite)
+    {
+        $this->usersGameInvite[] = $usersGameInvite;
+
+        return $this;
+    }
+
+    /**
+     * Remove usersGameInvite
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserGame $usersGameInvite
+     */
+    public function removeUsersGameInvite(\Acme\EsBattleBundle\Entity\UserGame $usersGameInvite)
+    {
+        $this->usersGameInvite->removeElement($usersGameInvite);
+    }
+
+    /**
+     * Get usersGameInvite
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getUsersGameInvite()
+    {
+        return $this->usersGameInvite;
     }
 }

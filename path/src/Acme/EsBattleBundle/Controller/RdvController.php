@@ -815,4 +815,96 @@ class RdvController extends Controller
 
         return $hasNewLeader;
     }
+
+    public function inviteAction($userId,$rdvId,$username,$apikey){
+
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+
+        /**
+         * @var \Acme\EsBattleBundle\Entity\User $user
+         */
+        $user = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:User')
+            ->findOneBy(array('username'=>$username,'apikey'=>$apikey));
+
+        if($user === null){
+            $response->setStatusCode(401);
+            return $response;
+        }
+
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
+         */
+        $appointment = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Appointment')
+            ->findOneBy(array('id'=>$rdvId));
+
+        if($appointment === null){
+            $response->setStatusCode(401);
+            return $response;
+        }
+
+
+
+        $em = $this->getDoctrine()->getManager();
+        $query = $em->createQuery('
+            SELECT account, usergames FROM AcmeEsBattleBundle:User account
+            JOIN account.usergames usergames
+            WHERE account.id = :userId'
+        )->setParameters(array('userId'=> $userId));
+
+
+        $collection = $query->getResult();
+        if($collection === null){
+            $response->setStatusCode(401);
+            return $response;
+        }
+        /**
+         * @var \Acme\EsBattleBundle\Entity\User $userToInvite
+         */
+        $userToInvite = $collection[0];
+
+        $aUsergames = $userToInvite->getUsergames();
+
+        $maxLevel = 0;
+        $userGameToInvite = null;
+        /**
+         * @var \Acme\EsBattleBundle\Entity\UserGame $usergame
+         */
+        foreach($aUsergames as $usergame){
+            $currentLevel = $usergame->getData2();
+            if($currentLevel > $maxLevel){
+                $maxLevel = $currentLevel;
+                $userGameToInvite = $usergame;
+            }
+        }
+
+        $appointment->addUsersGameInvite($userGameToInvite);
+        $em->flush();
+
+
+        $notification = new Notification();
+        $notification->setCode($notification::NEW_INVITATION);
+        $notification->setDestinataire($userToInvite);
+        $notification->setExpediteur($user);
+        $notification->setAppointment($appointment);
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($notification);
+        $em->flush();
+
+        $url = 'http://www.esbattle.com/fr/party/waiting/'.$appointment->getId();
+
+
+        $message = \Swift_Message::newInstance()
+            ->setContentType('text/html')
+            ->setSubject('Welcome to Esbattle.com')
+            ->setFrom('contact.esbattle@gmail.com')
+            ->setTo($userToInvite->getEmail())
+            ->setBody($this->renderView('AcmeEsBattleBundle:Mail:invite.html.twig',array('username' => $userToInvite->getUsername(),'from'=>$user->getUsername(),'url'=>$url)));
+        $this->get('mailer')->send($message);
+
+        return $response;
+
+    }
 }

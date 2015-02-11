@@ -10,9 +10,9 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 
 /**
- * Appointment
+ * Notification
  *
- * @ORM\Table()
+ * @ORM\Table(name="Notification",indexes={@ORM\Index(name="created_idx", columns={"created"})})
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
  */
@@ -24,6 +24,7 @@ class Notification
 	const LEADER_LEAVE_YOU_ARE_NEW_LEADER = "leader_leave_you_are_new_leader";
 	const YOU_HAVE_BEEN_PROMOTED = "you_have_been_promoted";
 	const ONE_USER_LEAVE = "one_user_leave";
+	const NEW_INVITATION = "new_invitation";
     /**
      * @var integer
      *
@@ -64,6 +65,13 @@ class Notification
 	 * @ORM\JoinColumn(name="appointment_id", referencedColumnName="id",nullable=true,onDelete="CASCADE")
 	 */
 	protected $appointment;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="new", type="boolean")
+     */
+    protected $new;
 
 
     /**
@@ -227,10 +235,33 @@ class Notification
         return array(
             'id' => $this->getId(),
             'code' => $this->getCode(),
+            'new' => ($this->getNew() !== false),
             'created_at' => $this->getCreated()->getTimestamp(),
             'expediteur' => $this->getExpediteur()->_toArray(),
-            'destinataire' => $this->getDestinataire()->_toArray(),
-            'rdv' => $this->getAppointment()->_toArray()
+            'rdv' => $this->getAppointment()->_toArrayMini()
         );
+    }
+
+    /**
+     * Set new
+     *
+     * @param boolean $new
+     * @return Notification
+     */
+    public function setNew($new)
+    {
+        $this->new = $new;
+
+        return $this;
+    }
+
+    /**
+     * Get new
+     *
+     * @return boolean 
+     */
+    public function getNew()
+    {
+        return $this->new;
     }
 }

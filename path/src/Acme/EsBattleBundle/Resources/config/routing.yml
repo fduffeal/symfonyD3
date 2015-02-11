@@ -43,8 +43,8 @@ acme_es_battle_rdv_accept_user:
     defaults: { _controller: AcmeEsBattleBundle:Rdv:acceptUser }
 
 acme_es_battle_rdv_notification:
-    path:     /notifications/
-    defaults: { _controller: AcmeEsBattleBundle:Rdv:getNotifications }
+    path:     /notifications/{userId}
+    defaults: { _controller: AcmeEsBattleBundle:Notification:index }
 
 acme_es_battle_rdv_kick_user:
     path:     /rdv/kick_user/{userGameId}/{rdvId}/{username}/{apikey}
@@ -57,6 +57,10 @@ acme_es_battle_rdv_leave:
 acme_es_battle_rdv_promote:
     path:     /rdv/promote/{rdvId}/{userGameId}/{username}/{apikey}
     defaults: { _controller: AcmeEsBattleBundle:Rdv:promoteRdv }
+
+acme_es_battle_rdv_invite:
+    path:     /rdv/invite/{userId}/{rdvId}/{username}/{apikey}
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:invite }
 
 acme_es_battle_rdv_form_info:
     path:     /rdv/form_info
