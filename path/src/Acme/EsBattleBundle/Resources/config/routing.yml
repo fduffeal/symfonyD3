@@ -46,6 +46,10 @@ acme_es_battle_rdv_notification:
     path:     /notifications/{userId}
     defaults: { _controller: AcmeEsBattleBundle:Notification:index }
 
+acme_es_battle_rdv_notification_mark_read:
+    path:     /notifications/read/{userId}/{notificationsId}
+    defaults: { _controller: AcmeEsBattleBundle:Notification:markAllAsRead }
+
 acme_es_battle_rdv_kick_user:
     path:     /rdv/kick_user/{userGameId}/{rdvId}/{username}/{apikey}
     defaults: { _controller: AcmeEsBattleBundle:Rdv:kickUser }

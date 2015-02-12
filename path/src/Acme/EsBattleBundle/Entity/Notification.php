@@ -12,7 +12,7 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 /**
  * Notification
  *
- * @ORM\Table(name="Notification",indexes={@ORM\Index(name="created_idx", columns={"created"})})
+ * @ORM\Table(name="Notification",indexes={@ORM\Index(name="created_idx", columns={"created"}),@ORM\Index(name="updated_idx", columns={"updated"})})
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
  */
@@ -53,6 +53,13 @@ class Notification
 	 */
 	protected $created;
 
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="updated", type="datetime")
+     */
+    protected $updated;
+
 	/**
 	 * @var \DateTime
 	 *
@@ -89,6 +96,15 @@ class Notification
     public function setNewValue()
     {
         $this->new = true;
+    }
+
+    /**
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedValue()
+    {
+        $this->updated = new \DateTime();
     }
 
 
@@ -271,5 +287,28 @@ class Notification
     public function getNew()
     {
         return $this->new;
+    }
+
+    /**
+     * Set updated
+     *
+     * @param \DateTime $updated
+     * @return Notification
+     */
+    public function setUpdated($updated)
+    {
+        $this->updated = $updated;
+
+        return $this;
+    }
+
+    /**
+     * Get updated
+     *
+     * @return \DateTime 
+     */
+    public function getUpdated()
+    {
+        return $this->updated;
     }
 }

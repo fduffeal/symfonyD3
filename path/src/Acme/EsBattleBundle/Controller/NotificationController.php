@@ -46,8 +46,11 @@ class NotificationController extends Controller
         }
 
 
-
-        $response->setLastModified($result[0]->getCreated());
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Notification $lastNotif
+         */
+        $lastNotif = $result[0];
+        $response->setLastModified($lastNotif->getUpdated());
 
         // Vérifie que l'objet Response n'est pas modifié
         // pour un objet Request donné
@@ -77,4 +80,48 @@ class NotificationController extends Controller
 
 		return $response;
 	}
+
+    /**
+     * @return Response
+     */
+    public function markAllAsReadAction($userId,$notificationsId){
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+
+
+        $aNotificationsId = explode('-',$notificationsId);
+        foreach($aNotificationsId as $key => $id){
+            $aNotificationsId[$key] = intval($id);
+        }
+
+//        var_dump($aNotificationsId);return $response;
+
+        $aNotification = array();
+
+
+        $response->setPrivate();
+        // définit l'âge max des caches privés ou des caches partagés
+        $response->setMaxAge(30);
+
+        $em = $this->getDoctrine()->getManager();
+        $query = $em->createQuery(
+            'SELECT notifications
+            FROM AcmeEsBattleBundle:Notification notifications
+            JOIN notifications.destinataire destinataire
+            WHERE notifications.id IN (:arrayId) and destinataire.id  = :userId'
+        )->setParameter('arrayId',$aNotificationsId)->setParameter('userId',$userId);
+
+        $collection = $query->getResult();
+
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Notification $notification
+         */
+        foreach($collection as $key => $notification){
+            $aNotification[$key] = $notification->setNew(false);
+        }
+
+        $em->flush();
+
+        return $response;
+    }
 }
