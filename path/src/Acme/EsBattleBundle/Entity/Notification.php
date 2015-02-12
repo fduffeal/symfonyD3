@@ -83,6 +83,14 @@ class Notification
 	    $this->created = new \DateTime();
     }
 
+    /**
+     * @ORM\PrePersist
+     */
+    public function setNewValue()
+    {
+        $this->new = true;
+    }
+
 
     /**
      * Get id

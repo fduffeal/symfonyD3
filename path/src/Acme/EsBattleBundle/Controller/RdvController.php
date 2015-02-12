@@ -471,15 +471,15 @@ class RdvController extends Controller
         if($user === $leader){
             $hasNewLeader = $this->setNewLeader($appointment);
 
-            if($hasNewLeader === false){
-                $em = $this->getDoctrine()->getManager();
-                $em->remove($appointment);
-                $em->flush();
-
-                $response->setStatusCode(308);
-                return $response;
-
-            }
+//            if($hasNewLeader === false){
+//                $em = $this->getDoctrine()->getManager();
+//                $em->remove($appointment);
+//                $em->flush();
+//
+//                $response->setStatusCode(308);
+//                return $response;
+//
+//            }
         }
 
         $appointment->removeUsersGame($userGame);
