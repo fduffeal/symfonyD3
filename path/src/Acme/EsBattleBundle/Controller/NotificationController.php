@@ -33,7 +33,7 @@ class NotificationController extends Controller
             'SELECT notifications
             FROM AcmeEsBattleBundle:Notification notifications
             JOIN notifications.destinataire destinataire
-            WHERE destinataire.id = :userId ORDER BY notifications.created DESC'
+            WHERE destinataire.id = :userId ORDER BY notifications.updated DESC'
         )->setParameter('userId',$userId)->setMaxResults(1);
 
         $result = $query->getResult();
@@ -67,8 +67,8 @@ class NotificationController extends Controller
             JOIN notifications.destinataire destinataire
             JOIN notifications.appointment appointment
             JOIN appointment.tags tags
-            WHERE notifications.created > :stop_date and destinataire.id = :userId ORDER BY notifications.created DESC'
-		)->setParameters(array('stop_date'=>$stop_date,'userId'=>$userId));
+            WHERE notifications.created > :stop_date and destinataire.id = :userId and notifications.new = :new ORDER BY notifications.created DESC'
+		)->setParameters(array('stop_date'=>$stop_date,'userId'=>$userId,'new'=>true));
 
 		$collection = $query->getResult();
 
@@ -121,6 +121,10 @@ class NotificationController extends Controller
         }
 
         $em->flush();
+
+        $response = $this->forward('AcmeEsBattleBundle:Notification:index', array(
+            'userId'  => $userId
+        ));
 
         return $response;
     }
