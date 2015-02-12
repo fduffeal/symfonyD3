@@ -901,7 +901,7 @@ class RdvController extends Controller
             ->setSubject('Welcome to Esbattle.com')
             ->setFrom('contact.esbattle@gmail.com')
             ->setTo($userToInvite->getEmail())
-            ->setBody($this->renderView('AcmeEsBattleBundle:Mail:invite.html.twig',array('username' => $userToInvite->getUsername(),'from'=>$user->getUsername(),'url'=>$url)));
+            ->setBody($this->renderView('AcmeEsBattleBundle:Mail:invite-party.html.twig',array('username' => $userToInvite->getUsername(),'from'=>$user->getUsername(),'url'=>$url)));
         $this->get('mailer')->send($message);
 
         return $response;
