@@ -30,7 +30,83 @@ class UserController extends Controller
             return $response;
         }
 
-        $friends = $user->getFriends();
+
+        $em = $this->getDoctrine()->getManager();
+        $query = $em->createQuery(
+            'SELECT friends
+            FROM AcmeEsBattleBundle:User friends
+            JOIN friends.friendsWithMe user
+            JOIN friends.friends user2
+            WHERE user.id = :userId and user2.id = :userId'
+        )->setParameter('userId',$user->getId());
+
+        $collection = $query->getResult();
+
+        $friends = $collection;
+
+        $aData = [];
+        /**
+         * @var \Acme\EsBattleBundle\Entity\User $friend
+         */
+        foreach($friends as $key => $friend){
+            $aData[] = $friend->_toArray();
+        }
+
+        $response->setContent(json_encode($aData));
+
+        return $response;
+    }
+
+    public function getMyFriendRequestAction($userId){
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+
+        $em = $this->getDoctrine()->getManager();
+        $query = $em->createQuery(
+            'SELECT friends
+            FROM AcmeEsBattleBundle:User friends
+            JOIN friends.friendsWithMe user
+            WHERE user.id  = :userId and friends.id NOT IN (
+              SELECT myfriends.id FROM AcmeEsBattleBundle:User myfriends
+              JOIN myfriends.friends me where me.id = :userId
+            )'
+        )->setParameter('userId',$userId);
+
+        $collection = $query->getResult();
+
+        $friends = $collection;
+
+        $aData = [];
+        /**
+         * @var \Acme\EsBattleBundle\Entity\User $friend
+         */
+        foreach($friends as $key => $friend){
+            $aData[] = $friend->_toArray();
+        }
+
+        $response->setContent(json_encode($aData));
+
+        return $response;
+    }
+
+    public function getFriendRequestAction($userId){
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+
+        $em = $this->getDoctrine()->getManager();
+        $query = $em->createQuery(
+            'SELECT friends
+            FROM AcmeEsBattleBundle:User friends
+            JOIN friends.friends user
+            WHERE user.id  = :userId and friends.id NOT IN (
+              SELECT myfriends.id FROM AcmeEsBattleBundle:User myfriends
+              JOIN myfriends.friendsWithMe me where me.id = :userId
+            )'
+        )->setParameter('userId',$userId);
+
+        $collection = $query->getResult();
+
+        $friends = $collection;
 
         $aData = [];
         /**
