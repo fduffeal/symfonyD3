@@ -37,6 +37,14 @@ class CronCopyJvCommand extends ContainerAwareCommand
 		 */
 		$crontask = $em->getRepository('AcmeEsBattleBundle:CronTask')->find($cronId);
 
+		if($crontask->getLock() === true){
+			$output->writeln('CRON ID '.$cronId.' LOCKED ---- bye bye ---');
+		}
+
+		$crontask->setLock(true);
+		$em->flush();
+
+
 		$url = $crontask->getCommands();
 		$output->writeln('Copie de '.$url);
 		$previousLastIdSave = intval($crontask->getOutput());
@@ -62,6 +70,7 @@ class CronCopyJvCommand extends ContainerAwareCommand
 			$crontask->setLastrun(new \DateTime());
 
 			if(!$soft){
+				$crontask->setLock(false);
 				$em->persist($crontask);
 				$em->flush();
 			}
