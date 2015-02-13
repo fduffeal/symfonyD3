@@ -40,9 +40,7 @@ class UserController extends Controller
             WHERE user.id = :userId and user2.id = :userId'
         )->setParameter('userId',$user->getId());
 
-        $collection = $query->getResult();
-
-        $friends = $collection;
+        $friends = $query->getResult();
 
         $aData = [];
         /**
@@ -72,16 +70,14 @@ class UserController extends Controller
             )'
         )->setParameter('userId',$userId);
 
-        $collection = $query->getResult();
-
-        $friends = $collection;
+        $friends = $query->getResult();
 
         $aData = [];
         /**
          * @var \Acme\EsBattleBundle\Entity\User $friend
          */
         foreach($friends as $key => $friend){
-            $aData[] = $friend->_toArray();
+            $aData[] = $friend->_toArrayShort();
         }
 
         $response->setContent(json_encode($aData));
@@ -104,16 +100,14 @@ class UserController extends Controller
             )'
         )->setParameter('userId',$userId);
 
-        $collection = $query->getResult();
-
-        $friends = $collection;
+        $friends = $query->getResult();
 
         $aData = [];
         /**
          * @var \Acme\EsBattleBundle\Entity\User $friend
          */
         foreach($friends as $key => $friend){
-            $aData[] = $friend->_toArray();
+            $aData[] = $friend->_toArrayShort();
         }
 
         $response->setContent(json_encode($aData));
