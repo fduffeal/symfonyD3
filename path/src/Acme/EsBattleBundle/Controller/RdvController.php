@@ -721,16 +721,26 @@ class RdvController extends Controller
      * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
      */
     public function removeUserGameInAllOtherGameInSameTime($userGame,$appointment){
+
+        $user = $userGame->getUser();
+
+        $userGameCollection = $user->getUsergames();
+
+
         $em = $this->getDoctrine()->getManager();
 
         $query = $em->createQuery('
-            SELECT appointment FROM AcmeEsBattleBundle:Appointment appointment
+            SELECT appointment, usersGameInQueue FROM AcmeEsBattleBundle:Appointment appointment
             JOIN appointment.usersGameInQueue usersGameInQueue
             WHERE (appointment.start >= :myStart AND appointment.start <= :myEnd)
             OR (appointment.end >= :myStart AND appointment.end <= :myEnd)
             OR (appointment.start <= :myStart AND appointment.end >= :myEnd)
-            AND (usersGameInQueue = :currentUserGame)'
-        )->setParameters(array('myStart'=> $appointment->getStart(),'myEnd'=>$appointment->getEnd(),'currentUserGame'=>$userGame));
+            AND usersGameInQueue IN (
+              SELECT userGames FROM  AcmeEsBattleBundle:UserGame userGames
+              JOIN userGames.user user
+              WHERE user = :user
+              )'
+        )->setParameters(array('myStart'=> $appointment->getStart(),'myEnd'=>$appointment->getEnd(),'user'=>$user));
 
         $collectionInQueue = $query->getResult();
 
@@ -738,10 +748,35 @@ class RdvController extends Controller
          * @var \Acme\EsBattleBundle\Entity\Appointment $appointmentConflict
          */
         foreach($collectionInQueue as $appointmentConflict){
-            $appointmentConflict->removeUsersGameInQueue($userGame);
 
-            $em->persist($appointmentConflict);
-            $em->flush();
+            foreach($userGameCollection as $userGame){
+                $appointmentConflict->removeUsersGameInQueue($userGame);
+            }
+        }
+
+        $query = $em->createQuery('
+            SELECT appointment,usersGameInvite FROM AcmeEsBattleBundle:Appointment appointment
+            JOIN appointment.usersGameInvite usersGameInvite
+            WHERE (appointment.start >= :myStart AND appointment.start <= :myEnd)
+            OR (appointment.end >= :myStart AND appointment.end <= :myEnd)
+            OR (appointment.start <= :myStart AND appointment.end >= :myEnd)
+            AND usersGameInvite IN (
+              SELECT userGames FROM  AcmeEsBattleBundle:UserGame userGames
+              JOIN userGames.user user
+              WHERE user = :user
+              )'
+        )->setParameters(array('myStart'=> $appointment->getStart(),'myEnd'=>$appointment->getEnd(),'user'=>$user));
+
+        $collectionInQueue = $query->getResult();
+
+//        var_dump(sizeof($collectionInQueue));
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Appointment $appointmentConflict
+         */
+        foreach($collectionInQueue as $appointmentConflict){
+            foreach($userGameCollection as $userGame){
+                $appointmentConflict->removeUsersGameInvite($userGame);
+            }
         }
 
 
@@ -751,8 +786,12 @@ class RdvController extends Controller
             WHERE (appointment.start >= :myStart AND appointment.start <= :myEnd)
             OR (appointment.end >= :myStart AND appointment.end <= :myEnd)
             OR (appointment.start <= :myStart AND appointment.end >= :myEnd)
-            AND (usersGame = :currentUserGame)'
-        )->setParameters(array('myStart'=> $appointment->getStart(),'myEnd'=>$appointment->getEnd(),'currentUserGame'=>$userGame));
+            AND usersGame IN (
+              SELECT userGames FROM  AcmeEsBattleBundle:UserGame userGames
+              JOIN userGames.user user
+              WHERE user = :user
+              )'
+        )->setParameters(array('myStart'=> $appointment->getStart(),'myEnd'=>$appointment->getEnd(),'user'=>$user));
 
 
         $collection = $query->getResult();
@@ -761,26 +800,26 @@ class RdvController extends Controller
          * @var \Acme\EsBattleBundle\Entity\Appointment $appointmentConflict
          */
         foreach($collection as $appointmentConflict){
-            $userToRemove = $userGame->getUser();
-            $appointmentConflict->removeUsersGame($userGame);
 
-            $leader = $appointmentConflict->getLeader();
-            if($userToRemove === $leader){
-                $hasNewLeader = $this->setNewLeader($appointmentConflict);
+            foreach($userGameCollection as $userGame){
+                $userToRemove = $userGame->getUser();
+                $appointmentConflict->removeUsersGame($userGame);
 
-                if($hasNewLeader === false){
-                    $em = $this->getDoctrine()->getManager();
-                    $em->remove($appointmentConflict);
-                    $em->flush();
-                    continue;
+                $leader = $appointmentConflict->getLeader();
+                if($userToRemove === $leader){
+                    $hasNewLeader = $this->setNewLeader($appointmentConflict);
+
+//                    if($hasNewLeader === false){
+//                        $em = $this->getDoctrine()->getManager();
+//                        $em->remove($appointmentConflict);
+//                        $em->flush();
+//                        continue;
+//                    }
                 }
             }
-
-
-            $em->persist($appointmentConflict);
-            $em->flush();
         }
 
+        $em->flush();
     }
 
     /**
