@@ -65,8 +65,8 @@ class NotificationController extends Controller
             FROM AcmeEsBattleBundle:Notification notifications
             JOIN notifications.expediteur expediteur
             JOIN notifications.destinataire destinataire
-            JOIN notifications.appointment appointment
-            JOIN appointment.tags tags
+            LEFT JOIN notifications.appointment appointment
+            LEFT JOIN appointment.tags tags
             WHERE notifications.created > :stop_date and destinataire.id = :userId and notifications.new = :new ORDER BY notifications.created DESC'
 		)->setParameters(array('stop_date'=>$stop_date,'userId'=>$userId,'new'=>true));
 

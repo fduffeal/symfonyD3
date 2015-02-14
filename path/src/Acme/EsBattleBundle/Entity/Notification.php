@@ -25,6 +25,7 @@ class Notification
 	const YOU_HAVE_BEEN_PROMOTED = "you_have_been_promoted";
 	const ONE_USER_LEAVE = "one_user_leave";
 	const NEW_INVITATION = "new_invitation";
+	const ADD_FRIEND = "add_friend";
     /**
      * @var integer
      *
@@ -262,7 +263,7 @@ class Notification
             'new' => ($this->getNew() !== false),
             'created_at' => $this->getCreated()->getTimestamp(),
             'expediteur' => $this->getExpediteur()->_toArray(),
-            'rdv' => $this->getAppointment()->_toArrayMini()
+            'rdv' => ($this->getAppointment())?$this->getAppointment()->_toArrayMini():null
         );
     }
 

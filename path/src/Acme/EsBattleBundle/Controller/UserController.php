@@ -6,6 +6,7 @@ use Acme\EsBattleBundle\Entity\UserGame;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Acme\EsBattleBundle\Entity\User as User;
+use Acme\EsBattleBundle\Entity\Notification;
 
 use Symfony\Component\HttpFoundation\Response;
 
@@ -172,6 +173,14 @@ class UserController extends Controller
             'username'  => $username,
             'apikey'  => $apikey
         ));
+
+        $notification = new Notification();
+        $notification->setCode($notification::ADD_FRIEND);
+        $notification->setDestinataire($friend);
+        $notification->setExpediteur($user);
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($notification);
+        $em->flush();
 
         return $response;
     }
