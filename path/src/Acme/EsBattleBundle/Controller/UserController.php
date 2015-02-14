@@ -278,6 +278,225 @@ class UserController extends Controller
         return $response;
     }
 
+    public function getUsersByPageAction($page,$nbResult){
+
+
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setPublic();
+        // définit l'âge max des caches privés ou des caches partagés
+        $response->setMaxAge(600);
+        $response->setSharedMaxAge(600);
+
+        $em = $this->getDoctrine()->getManager();
+
+        $query = $em->createQuery(
+            'SELECT user
+            FROM AcmeEsBattleBundle:User user
+            ORDER BY user.created DESC')
+            ->setMaxResults(1);
+
+        $result = $query->getResult();
+
+        if(!$result[0]){
+            return $response;
+        }
+
+        $response->setLastModified($result[0]->getCreated());
+
+        // Vérifie que l'objet Response n'est pas modifié
+        // pour un objet Request donné
+        if ($response->isNotModified($this->getRequest())) {
+            // Retourne immédiatement un objet 304 Response
+            return $response;
+        }
+
+        $nbResult = intval($nbResult);
+
+        $start = (intval($page)-1)*$nbResult;
+
+
+        $em = $this->getDoctrine()->getManager();
+        $query = $em->createQuery(
+            'SELECT user,usergames, plateform, game
+            FROM AcmeEsBattleBundle:User user
+            JOIN user.usergames usergames
+            JOIN usergames.plateform plateform
+            JOIN usergames.game game')
+            ->setFirstResult($start)
+            ->setMaxResults($nbResult);
+
+        $collection = $query->getResult();
+
+        $aResult = [];
+        /**
+         * @var \Acme\EsBattleBundle\Entity\User $user
+         */
+        foreach($collection as $user){
+            $aResult[] = $user->_toArray();
+        }
+
+        $json = json_encode($aResult);
+        $response->setContent($json);
+
+        return $response;
+    }
+
+    public function getUsersByPlateformAction($plateformId,$page,$nbResult){
+
+
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setPublic();
+        // définit l'âge max des caches privés ou des caches partagés
+        $response->setMaxAge(600);
+        $response->setSharedMaxAge(600);
+
+        $em = $this->getDoctrine()->getManager();
+
+        $query = $em->createQuery(
+            'SELECT user
+            FROM AcmeEsBattleBundle:User user
+            ORDER BY user.created DESC')
+            ->setMaxResults(1);
+
+        $result = $query->getResult();
+
+        if(!$result[0]){
+            return $response;
+        }
+
+        $response->setLastModified($result[0]->getCreated());
+
+        // Vérifie que l'objet Response n'est pas modifié
+        // pour un objet Request donné
+        if ($response->isNotModified($this->getRequest())) {
+            // Retourne immédiatement un objet 304 Response
+            return $response;
+        }
+
+        $nbResult = intval($nbResult);
+
+        $start = (intval($page)-1)*$nbResult;
+
+
+        $em = $this->getDoctrine()->getManager();
+        $query = $em->createQuery(
+            'SELECT user,usergames, plateform, game
+            FROM AcmeEsBattleBundle:User user
+            JOIN user.usergames usergames
+            JOIN usergames.plateform plateform
+            JOIN usergames.game game
+            WHERE plateform.id = :plateformId')
+            ->setParameter('plateformId',$plateformId)
+            ->setFirstResult($start)
+            ->setMaxResults($nbResult);
+
+        $collection = $query->getResult();
+
+        $aResult = [];
+        /**
+         * @var \Acme\EsBattleBundle\Entity\User $user
+         */
+        foreach($collection as $user){
+            $aResult[] = $user->_toArray();
+        }
+
+        $json = json_encode($aResult);
+        $response->setContent($json);
+
+        return $response;
+    }
+
+    public function searchUserAction($username,$plateformId,$page,$nbResult){
+
+
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setPublic();
+        // définit l'âge max des caches privés ou des caches partagés
+        $response->setSharedMaxAge(600);
+
+        $em = $this->getDoctrine()->getManager();
+
+        $query = $em->createQuery(
+            'SELECT user
+            FROM AcmeEsBattleBundle:User user
+            ORDER BY user.created DESC')
+            ->setMaxResults(1);
+
+        $result = $query->getResult();
+
+        if(!$result[0]){
+            return $response;
+        }
+
+        $response->setLastModified($result[0]->getCreated());
+
+        // Vérifie que l'objet Response n'est pas modifié
+        // pour un objet Request donné
+        if ($response->isNotModified($this->getRequest())) {
+            // Retourne immédiatement un objet 304 Response
+            return $response;
+        }
+
+        $nbResult = intval($nbResult);
+
+        $start = (intval($page)-1)*$nbResult;
+
+        $em = $this->getDoctrine()->getManager();
+
+        if($plateformId !== 'null' && $username !== 'null'){
+            $query = $em->createQuery(
+                'SELECT user,usergames, plateform, game
+            FROM AcmeEsBattleBundle:User user
+            JOIN user.usergames usergames
+            JOIN usergames.plateform plateform
+            JOIN usergames.game game
+            WHERE plateform.id = :plateformId and usergames.game_username LIKE :usernameSearch')
+                ->setParameter('plateformId',$plateformId)
+                ->setParameter('usernameSearch','%'.$username.'%')
+                ->setFirstResult($start)
+                ->setMaxResults($nbResult);
+        } else if ($plateformId !== 'null'){
+            $query = $em->createQuery(
+                'SELECT user,usergames, plateform, game
+            FROM AcmeEsBattleBundle:User user
+            JOIN user.usergames usergames
+            JOIN usergames.plateform plateform
+            JOIN usergames.game game
+            WHERE plateform.id = :plateformId')
+                ->setParameter('plateformId',$plateformId)
+                ->setFirstResult($start)
+                ->setMaxResults($nbResult);
+        } else {
+            $query = $em->createQuery(
+                'SELECT user,usergames, plateform, game
+            FROM AcmeEsBattleBundle:User user
+            JOIN user.usergames usergames
+            JOIN usergames.plateform plateform
+            JOIN usergames.game game')
+                ->setFirstResult($start)
+                ->setMaxResults($nbResult);
+        }
+
+
+        $collection = $query->getResult();
+
+        $aResult = [];
+        /**
+         * @var \Acme\EsBattleBundle\Entity\User $user
+         */
+        foreach($collection as $user){
+            $aResult[] = $user->_toArray();
+        }
+
+        $json = json_encode($aResult);
+        $response->setContent($json);
+
+        return $response;
+    }
+
     public function getDestinyUsersGameAction($membershipType,$displayName){
 
         $response = new Response();

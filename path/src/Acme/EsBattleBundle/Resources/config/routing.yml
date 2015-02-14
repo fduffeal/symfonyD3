@@ -98,6 +98,19 @@ acme_es_battle_users_list:
     path:     /users/
     defaults: { _controller: AcmeEsBattleBundle:User:getUsers }
 
+acme_es_battle_users_list_page:
+    path:     /users/page/{page}/{nbResult}
+    defaults: { _controller: AcmeEsBattleBundle:User:getUsersByPage }
+
+acme_es_battle_users_list_by_plateform:
+    path:     /users/plateform/{plateformId}/{page}/{nbResult}
+    defaults: { _controller: AcmeEsBattleBundle:User:getUsersByPlateform }
+
+
+acme_es_battle_users_search:
+    path:     /users/search/{username}/{plateformId}/{page}/{nbResult}
+    defaults: { _controller: AcmeEsBattleBundle:User:searchUser }
+
 acme_es_battle_user_get_friend:
     path:     /user/friend/get/{username}/{apikey}
     defaults: { _controller: AcmeEsBattleBundle:User:getFriend }
