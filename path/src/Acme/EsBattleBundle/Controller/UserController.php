@@ -431,7 +431,7 @@ class UserController extends Controller
         $query = $em->createQuery(
             'SELECT user
             FROM AcmeEsBattleBundle:User user
-            ORDER BY user.created DESC')
+            ORDER BY user.onlineTime DESC')
             ->setMaxResults(1);
 
         $result = $query->getResult();
@@ -440,7 +440,7 @@ class UserController extends Controller
             return $response;
         }
 
-        $response->setLastModified($result[0]->getCreated());
+        $response->setLastModified($result[0]->getOnlineTime());
 
         // Vérifie que l'objet Response n'est pas modifié
         // pour un objet Request donné
@@ -462,7 +462,8 @@ class UserController extends Controller
             JOIN user.usergames usergames
             JOIN usergames.plateform plateform
             JOIN usergames.game game
-            WHERE plateform.id = :plateformId and usergames.game_username LIKE :usernameSearch')
+            WHERE plateform.id = :plateformId and usergames.game_username LIKE :usernameSearch
+            ORDER BY user.onlineTime DESC')
                 ->setParameter('plateformId',$plateformId)
                 ->setParameter('usernameSearch','%'.$username.'%')
                 ->setFirstResult($start)
@@ -474,7 +475,8 @@ class UserController extends Controller
             JOIN user.usergames usergames
             JOIN usergames.plateform plateform
             JOIN usergames.game game
-            WHERE plateform.id = :plateformId')
+            WHERE plateform.id = :plateformId
+            ORDER BY user.onlineTime DESC')
                 ->setParameter('plateformId',$plateformId)
                 ->setFirstResult($start)
                 ->setMaxResults($nbResult);
@@ -484,7 +486,8 @@ class UserController extends Controller
             FROM AcmeEsBattleBundle:User user
             JOIN user.usergames usergames
             JOIN usergames.plateform plateform
-            JOIN usergames.game game')
+            JOIN usergames.game game
+            ORDER BY user.onlineTime DESC')
                 ->setFirstResult($start)
                 ->setMaxResults($nbResult);
         }
