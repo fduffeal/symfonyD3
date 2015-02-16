@@ -166,6 +166,7 @@ class Bungie
 	private function _SearchDestinyPlayer($membershipType, $displayName)
 	{
 
+		$displayName = str_replace(' ','',$displayName);
 		$url = '/SearchDestinyPlayer/' . $membershipType . '/' . $displayName . '/';
 
 		return $this->_curl($url);
