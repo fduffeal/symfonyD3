@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 /**
  * User
  *
- * @ORM\Table(name="user",indexes={@ORM\Index(name="login_idx", columns={"username","apikey"}),@ORM\Index(name="created_idx", columns={"created"})})
+ * @ORM\Table(name="user",indexes={@ORM\Index(name="login_idx", columns={"username","apikey"}),@ORM\Index(name="created_idx", columns={"created"}),@ORM\Index(name="onlineTime_idx", columns={"onlineTime"})})
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
  */

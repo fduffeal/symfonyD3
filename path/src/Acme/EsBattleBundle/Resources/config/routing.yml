@@ -46,6 +46,10 @@ acme_es_battle_rdv_notification:
     path:     /notifications/{userId}
     defaults: { _controller: AcmeEsBattleBundle:Notification:index }
 
+acme_es_battle_rdv_notification_all:
+    path:     /notifications/all/{userId}
+    defaults: { _controller: AcmeEsBattleBundle:Notification:getAll }
+
 acme_es_battle_rdv_notification_mark_read:
     path:     /notifications/read/{userId}/{notificationsId}
     defaults: { _controller: AcmeEsBattleBundle:Notification:markAllAsRead }

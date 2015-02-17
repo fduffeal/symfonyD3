@@ -128,4 +128,72 @@ class NotificationController extends Controller
 
         return $response;
     }
+
+	/**
+	 * @return Response
+	 */
+	public function getAllAction($userId){
+
+		$aNotification = array();
+
+		$response = new Response();
+		$response->headers->set('Content-Type', 'application/json');
+
+		$response->setPrivate();
+		// définit l'âge max des caches privés ou des caches partagés
+		$response->setMaxAge(300);
+
+		$em = $this->getDoctrine()->getManager();
+
+		$query = $em->createQuery(
+			'SELECT notifications
+            FROM AcmeEsBattleBundle:Notification notifications
+            JOIN notifications.destinataire destinataire
+            WHERE destinataire.id = :userId ORDER BY notifications.updated DESC'
+		)->setParameter('userId',$userId)->setMaxResults(1);
+
+		$result = $query->getResult();
+
+		if(!$result){
+			$date = new \DateTime();
+			$response->setLastModified($date);
+			$response->setContent(json_encode($aNotification));
+			return $response;
+		}
+
+
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\Notification $lastNotif
+		 */
+		$lastNotif = $result[0];
+		$response->setLastModified($lastNotif->getUpdated());
+
+		// Vérifie que l'objet Response n'est pas modifié
+		// pour un objet Request donné
+		if ($response->isNotModified($this->getRequest())) {
+			// Retourne immédiatement un objet 304 Response
+			return $response;
+		}
+
+		$em = $this->getDoctrine()->getManager();
+		$query = $em->createQuery(
+			'SELECT notifications, expediteur, destinataire,appointment,tags
+            FROM AcmeEsBattleBundle:Notification notifications
+            JOIN notifications.expediteur expediteur
+            JOIN notifications.destinataire destinataire
+            LEFT JOIN notifications.appointment appointment
+            LEFT JOIN appointment.tags tags
+            WHERE destinataire.id = :userId  ORDER BY notifications.created DESC'
+		)->setParameters(array('userId'=>$userId))->setMaxResults(20);
+
+		$collection = $query->getResult();
+
+		foreach($collection as $key => $notification){
+			$aNotification[$key] = $notification->_toArray();
+		}
+
+		$response->setContent(json_encode($aNotification));
+
+		return $response;
+	}
 }
