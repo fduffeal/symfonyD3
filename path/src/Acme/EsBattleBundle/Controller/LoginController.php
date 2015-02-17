@@ -268,7 +268,7 @@ class LoginController extends Controller
 
 		$message = \Swift_Message::newInstance()
 			->setContentType('text/html')
-			->setSubject('Welcome to Esbattle.com')
+			->setSubject('Bienvenue sur Esbattle.com')
 			->setFrom('contact.esbattle@gmail.com')
 			->setTo($email)
 			->setBody($this->renderView('AcmeEsBattleBundle:Mail:register.html.twig',array('username' => $username)));
@@ -356,7 +356,7 @@ class LoginController extends Controller
 
 		$message = \Swift_Message::newInstance()
 			->setContentType('text/html')
-			->setSubject('Esbattle.com password lost ?')
+			->setSubject('Mot de passe Esbattle perdu ?')
 			->setFrom('contact.esbattle@gmail.com')
 			->setTo($email)
 			->setBody($this->renderView('AcmeEsBattleBundle:Mail:forgetPassword.html.twig',array('username' => $username,'forgetKey'=>$forgetKey)));

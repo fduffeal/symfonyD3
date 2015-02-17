@@ -937,7 +937,7 @@ class RdvController extends Controller
 
         $message = \Swift_Message::newInstance()
             ->setContentType('text/html')
-            ->setSubject('Welcome to Esbattle.com')
+            ->setSubject('Invitation de partie sur Esbattle.com')
             ->setFrom('contact.esbattle@gmail.com')
             ->setTo($userToInvite->getEmail())
             ->setBody($this->renderView('AcmeEsBattleBundle:Mail:invite-party.html.twig',array('username' => $userToInvite->getUsername(),'from'=>$user->getUsername(),'url'=>$url)));
