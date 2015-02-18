@@ -133,7 +133,7 @@ class AnnonceController extends Controller
             JOIN annonce.plateform plateform
             JOIN annonce.game game
             JOIN annonce.tags tags
-            ORDER BY annonce.created DESC'
+            ORDER BY annonce.id DESC'
         )->setMaxResults(70);
 
         $result = $query->getResult();
