@@ -16,6 +16,7 @@ class AnnonceController extends Controller
 {
     public function createAction($tags,$description,$userGameId){
         $response = new Response();
+	    $response->headers->set('Content-Type', 'application/json');
 
         $em = $this->getDoctrine()->getManager();
         $query = $em->createQuery(
@@ -91,16 +92,16 @@ class AnnonceController extends Controller
 
         $response = new Response();
         $response->setContent($json);
-        $response->headers->set('Content-Type', 'application/json');
         return $response;
 
     }
 
     public function indexAction(){
         $response = new Response();
+	    $response->headers->set('Content-Type', 'application/json');
         $response->setPublic();
-        $response->setMaxAge(30);
-        $response->setSharedMaxAge(30);
+        $response->setMaxAge(60);
+        $response->setSharedMaxAge(60);
 
         $em = $this->getDoctrine()->getManager();
 
@@ -133,7 +134,7 @@ class AnnonceController extends Controller
             JOIN annonce.game game
             JOIN annonce.tags tags
             ORDER BY annonce.created DESC'
-        )->setMaxResults(100);
+        )->setMaxResults(70);
 
         $result = $query->getResult();
         $aResult = [];
@@ -141,13 +142,12 @@ class AnnonceController extends Controller
          * @var \Acme\EsBattleBundle\Entity\Annonce $annonce
          */
         foreach($result as $annonce){
-            $aResult[] = $annonce->_toArrayShort();
+            $aResult[] = $annonce->_toArray();
         }
 
         $json = json_encode($aResult);
 
         $response->setContent($json);
-        $response->headers->set('Content-Type', 'application/json');
 
         return $response;
     }
