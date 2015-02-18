@@ -263,7 +263,7 @@ class UserController extends Controller
 //        }
 
         $query = $em->createQuery(
-            'SELECT user,usergames, plateform, game
+            'SELECT user
             FROM AcmeEsBattleBundle:User user
             JOIN user.usergames usergames
             JOIN usergames.plateform plateform
