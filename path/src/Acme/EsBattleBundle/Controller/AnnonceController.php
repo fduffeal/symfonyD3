@@ -16,6 +16,7 @@ class AnnonceController extends Controller
 {
     public function createAction($tags,$description,$userGameId){
         $response = new Response();
+	    $response->headers->set('Content-Type', 'application/json');
 
         $em = $this->getDoctrine()->getManager();
         $query = $em->createQuery(
@@ -97,13 +98,14 @@ class AnnonceController extends Controller
 
     public function indexAction(){
         $response = new Response();
+	    $response->headers->set('Content-Type', 'application/json');
         $response->setPublic();
         $response->setMaxAge(60);
         $response->setSharedMaxAge(60);
 
         $em = $this->getDoctrine()->getManager();
 
-        /*$query = $em->createQuery(
+        $query = $em->createQuery(
             'SELECT annonce
             FROM AcmeEsBattleBundle:Annonce annonce
             ORDER BY annonce.created DESC'
@@ -122,19 +124,7 @@ class AnnonceController extends Controller
         if ($response->isNotModified($this->getRequest())) {
             // Retourne immédiatement un objet 304 Response
             return $response;
-        }*/
-
-        /*$query = $em->createQuery(
-            'SELECT annonce, author, plateform, game, user, tags
-            FROM AcmeEsBattleBundle:Annonce annonce
-            JOIN annonce.author author
-            JOIN annonce.plateform plateform
-            JOIN annonce.game game
-            JOIN annonce.tags tags
-            LEFT JOIN author.user user
-            ORDER BY annonce.created DESC'
-        )->setMaxResults(70);*/
-
+        }
 
         $query = $em->createQuery(
             'SELECT annonce, author, plateform, game, tags
@@ -154,8 +144,6 @@ class AnnonceController extends Controller
         foreach($result as $annonce){
             $aResult[] = $annonce->_toArray();
         }
-
-//        throw new Exception();
 
         $json = json_encode($aResult);
 
