@@ -100,30 +100,30 @@ class AnnonceController extends Controller
         $response = new Response();
 	    $response->headers->set('Content-Type', 'application/json');
         $response->setPublic();
-        $response->setSharedMaxAge(60);
+//        $response->setSharedMaxAge(60);
 
         $em = $this->getDoctrine()->getManager();
 
-        $query = $em->createQuery(
-            'SELECT annonce
-            FROM AcmeEsBattleBundle:Annonce annonce
-            ORDER BY annonce.id DESC'
-        )->setMaxResults(1);
-
-        $result = $query->getResult();
-
-        if(!$result[0]){
-            return $response;
-        }
-
-        $response->setLastModified($result[0]->getCreated());
-
-        // Vérifie que l'objet Response n'est pas modifié
-        // pour un objet Request donné
-        if ($response->isNotModified($this->getRequest())) {
-            // Retourne immédiatement un objet 304 Response
-            return $response;
-        }
+//        $query = $em->createQuery(
+//            'SELECT annonce
+//            FROM AcmeEsBattleBundle:Annonce annonce
+//            ORDER BY annonce.id DESC'
+//        )->setMaxResults(1);
+//
+//        $result = $query->getResult();
+//
+//        if(!$result[0]){
+//            return $response;
+//        }
+//
+//        $response->setLastModified($result[0]->getCreated());
+//
+//        // Vérifie que l'objet Response n'est pas modifié
+//        // pour un objet Request donné
+//        if ($response->isNotModified($this->getRequest())) {
+//            // Retourne immédiatement un objet 304 Response
+//            return $response;
+//        }
 
         $query = $em->createQuery(
             'SELECT annonce, author, plateform, game, tags
@@ -131,8 +131,7 @@ class AnnonceController extends Controller
             JOIN annonce.author author
             JOIN annonce.plateform plateform
             JOIN annonce.game game
-            JOIN annonce.tags tags
-            ORDER BY annonce.id DESC'
+            JOIN annonce.tags tags'
         )->setMaxResults(40);
 
         $result = $query->getResult();
