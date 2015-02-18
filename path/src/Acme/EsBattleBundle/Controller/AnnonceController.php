@@ -100,7 +100,7 @@ class AnnonceController extends Controller
         $response = new Response();
 	    $response->headers->set('Content-Type', 'application/json');
         $response->setPublic();
-//        $response->setSharedMaxAge(60);
+        $response->setSharedMaxAge(60);
 
         $em = $this->getDoctrine()->getManager();
 
