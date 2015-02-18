@@ -98,9 +98,8 @@ class AnnonceController extends Controller
 
     public function indexAction(){
         $response = new Response();
-	    $response->headers->set('Content-Type', 'application/json');
+
         $response->setPublic();
-        $response->setMaxAge(60);
         $response->setSharedMaxAge(60);
 
         $em = $this->getDoctrine()->getManager();
@@ -149,6 +148,7 @@ class AnnonceController extends Controller
 
         $response->setContent($json);
 
+	    $response->headers->set('Content-Type', 'application/json');
         return $response;
     }
 }
