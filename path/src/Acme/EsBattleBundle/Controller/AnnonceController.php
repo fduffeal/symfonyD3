@@ -108,7 +108,7 @@ class AnnonceController extends Controller
         $query = $em->createQuery(
             'SELECT annonce
             FROM AcmeEsBattleBundle:Annonce annonce
-            ORDER BY annonce.created DESC'
+            ORDER BY annonce.id DESC'
         )->setMaxResults(1);
 
         $result = $query->getResult();
