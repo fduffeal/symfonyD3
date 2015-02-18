@@ -141,7 +141,7 @@ class AnnonceController extends Controller
          * @var \Acme\EsBattleBundle\Entity\Annonce $annonce
          */
         foreach($result as $annonce){
-            $aResult[] = $annonce->_toArray();
+            $aResult[] = $annonce->_toArrayShort();
         }
 
         $json = json_encode($aResult);
