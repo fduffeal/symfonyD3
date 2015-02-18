@@ -10,9 +10,9 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 
 /**
- * Appointment
+ * Notification
  *
- * @ORM\Table()
+ * @ORM\Table(name="Notification",indexes={@ORM\Index(name="created_idx", columns={"created"}),@ORM\Index(name="updated_idx", columns={"updated"})})
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
  */
@@ -24,6 +24,8 @@ class Notification
 	const LEADER_LEAVE_YOU_ARE_NEW_LEADER = "leader_leave_you_are_new_leader";
 	const YOU_HAVE_BEEN_PROMOTED = "you_have_been_promoted";
 	const ONE_USER_LEAVE = "one_user_leave";
+	const NEW_INVITATION = "new_invitation";
+	const ADD_FRIEND = "add_friend";
     /**
      * @var integer
      *
@@ -52,6 +54,13 @@ class Notification
 	 */
 	protected $created;
 
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="updated", type="datetime")
+     */
+    protected $updated;
+
 	/**
 	 * @var \DateTime
 	 *
@@ -65,6 +74,13 @@ class Notification
 	 */
 	protected $appointment;
 
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="new", type="boolean")
+     */
+    protected $new;
+
 
     /**
      * Constructor
@@ -73,6 +89,23 @@ class Notification
     {
         $this->tags = new \Doctrine\Common\Collections\ArrayCollection();
 	    $this->created = new \DateTime();
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function setNewValue()
+    {
+        $this->new = true;
+    }
+
+    /**
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedValue()
+    {
+        $this->updated = new \DateTime();
     }
 
 
@@ -227,10 +260,56 @@ class Notification
         return array(
             'id' => $this->getId(),
             'code' => $this->getCode(),
+            'new' => ($this->getNew() !== false),
             'created_at' => $this->getCreated()->getTimestamp(),
             'expediteur' => $this->getExpediteur()->_toArray(),
-            'destinataire' => $this->getDestinataire()->_toArray(),
-            'rdv' => $this->getAppointment()->_toArray()
+            'rdv' => ($this->getAppointment())?$this->getAppointment()->_toArrayMini():null
         );
+    }
+
+    /**
+     * Set new
+     *
+     * @param boolean $new
+     * @return Notification
+     */
+    public function setNew($new)
+    {
+        $this->new = $new;
+
+        return $this;
+    }
+
+    /**
+     * Get new
+     *
+     * @return boolean 
+     */
+    public function getNew()
+    {
+        return $this->new;
+    }
+
+    /**
+     * Set updated
+     *
+     * @param \DateTime $updated
+     * @return Notification
+     */
+    public function setUpdated($updated)
+    {
+        $this->updated = $updated;
+
+        return $this;
+    }
+
+    /**
+     * Get updated
+     *
+     * @return \DateTime 
+     */
+    public function getUpdated()
+    {
+        return $this->updated;
     }
 }

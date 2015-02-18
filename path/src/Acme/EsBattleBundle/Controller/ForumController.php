@@ -31,7 +31,7 @@ class ForumController extends Controller
             FROM AcmeEsBattleBundle:Topic topic
             WHERE topic.visible = :visible
             ORDER BY topic.updated DESC'
-        )->setParameter('visible', true);
+        )->setParameter('visible', true)->setMaxResults(1);
 
         $topicCollection = $query->getResult();
 
@@ -75,6 +75,7 @@ class ForumController extends Controller
 
 //        throw new Exception();
 
+        $response->headers->set('Content-Type', 'application/json');
         return $response;
     }
 
@@ -225,6 +226,7 @@ class ForumController extends Controller
         $texte = $requestContent->texte;
 
         $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
 
         /**
          * @var \Acme\EsBattleBundle\Entity\User $user
@@ -272,7 +274,6 @@ class ForumController extends Controller
         $em->persist($message);
         $em->flush();
 
-        $response->headers->set('Content-Type', 'application/json');
         $response = $this->forward('AcmeEsBattleBundle:Forum:getTopic', array(
             'id'  => $topic->getId(),
             'page'  => $page,

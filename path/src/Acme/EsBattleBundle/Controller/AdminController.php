@@ -372,6 +372,7 @@ class AdminController extends Controller
         $response->setMaxAge(86400);
         $response->setSharedMaxAge(86400);
 
+        $response->headers->set('Content-Type', 'application/json');
         return $response;
     }
 }

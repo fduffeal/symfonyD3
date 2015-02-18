@@ -33,7 +33,16 @@ class LoginController extends Controller
             $plateform = $userGame->getPlateform();
             $game = $userGame->getGame();
 
-            $characters = $bungie->getCharacters($plateform->getBungiePlateformId(),$gamerTag);
+            /**
+             * @var \Symfony\Component\HttpFoundation\Response $response
+             */
+            $response = $this->forward('AcmeEsBattleBundle:Bungie:getPlayer', array(
+                'membershipType'  => $plateform->getBungiePlateformId(),
+                'displayName'  => $gamerTag
+            ));
+
+            $charactersJson = $response->getContent();
+            $characters = json_decode($charactersJson,TRUE);
 
             if($characters !== null){
                 foreach($characters as $key => $character){
@@ -47,6 +56,9 @@ class LoginController extends Controller
     public function indexAction($username,$password)
     {
 
+        /**
+         * @var \Acme\EsBattleBundle\Entity\User $user
+         */
         $user = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:User')
             ->findOneBy(
@@ -54,6 +66,9 @@ class LoginController extends Controller
             );
 
         $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setPublic();
+        $response->setSharedMaxAge(600);
 
         if($user === null){
             $response->setStatusCode(401);
@@ -92,6 +107,7 @@ class LoginController extends Controller
             );
 
         $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
 
         if($user){
 
@@ -115,7 +131,7 @@ class LoginController extends Controller
     public function setOnlineAction($username,$token){
 
         $response = new Response();
-
+        $response->headers->set('Content-Type', 'application/json');
         if($username === 'null' && $token === 'null'){
             $response->setStatusCode(403);
         } else {
@@ -149,7 +165,7 @@ class LoginController extends Controller
 	{
 
         $response = new Response();
-
+        $response->headers->set('Content-Type', 'application/json');
 		$user = $this->getDoctrine()
 			->getRepository('AcmeEsBattleBundle:User')
 			->findOneBy(
@@ -179,7 +195,7 @@ class LoginController extends Controller
 	{
 
         $response = new Response();
-
+        $response->headers->set('Content-Type', 'application/json');
         $bungie = $this->get('acme_es_battle.bungie');
 
         $error = array();
@@ -252,7 +268,7 @@ class LoginController extends Controller
 
 		$message = \Swift_Message::newInstance()
 			->setContentType('text/html')
-			->setSubject('Welcome to Esbattle.com')
+			->setSubject('Bienvenue sur Esbattle.com')
 			->setFrom('contact.esbattle@gmail.com')
 			->setTo($email)
 			->setBody($this->renderView('AcmeEsBattleBundle:Mail:register.html.twig',array('username' => $username)));
@@ -275,7 +291,7 @@ class LoginController extends Controller
     {
 
         $response = new Response();
-
+        $response->headers->set('Content-Type', 'application/json');
         $user = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:User')
             ->findOneBy(
@@ -302,7 +318,7 @@ class LoginController extends Controller
 	public function forgetPasswordAction($email){
 
         $response = new Response();
-
+        $response->headers->set('Content-Type', 'application/json');
 		$user = $this->getDoctrine()
 			->getRepository('AcmeEsBattleBundle:User')
 			->findOneBy(
@@ -340,7 +356,7 @@ class LoginController extends Controller
 
 		$message = \Swift_Message::newInstance()
 			->setContentType('text/html')
-			->setSubject('Esbattle.com password lost ?')
+			->setSubject('Mot de passe Esbattle perdu ?')
 			->setFrom('contact.esbattle@gmail.com')
 			->setTo($email)
 			->setBody($this->renderView('AcmeEsBattleBundle:Mail:forgetPassword.html.twig',array('username' => $username,'forgetKey'=>$forgetKey)));
@@ -408,6 +424,7 @@ class LoginController extends Controller
         $json = $user->_toJsonPrivate();
 
 	    $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
 	    $response->setContent($json);
 	    return $response;
 
@@ -416,7 +433,7 @@ class LoginController extends Controller
     public function createUserGameAction($plateformId,$gameId,$profilName,$gameUsername,$data1,$data2,$data3,$data4,$username,$apikey){
 
         $response = new Response();
-
+        $response->headers->set('Content-Type', 'application/json');
         $user = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:User')
             ->findOneBy(
@@ -463,43 +480,5 @@ class LoginController extends Controller
         $response->setContent($json);
         return $response;
 
-    }
-
-    public function getUsersAction(){
-
-        $response = new Response();
-
-
-        $stop_date = date('Y-m-d H:i:s', strtotime('-1 day', time()));
-
-        $em = $this->getDoctrine()->getManager();
-        $query = $em->createQuery(
-            'SELECT user
-            FROM AcmeEsBattleBundle:User user
-            WHERE user.onlineTime > :now'
-        )->setParameter('now', $stop_date);
-
-        $collection = $query->getResult();
-
-
-        $aResult = [];
-        /**
-         * @var \Acme\EsBattleBundle\Entity\User $user
-         */
-        foreach($collection as $user){
-            $aResult[] = $user->_toArray();
-        }
-
-        $json = json_encode($aResult);
-
-
-
-        $response->setPublic();
-        // définit l'âge max des caches privés ou des caches partagés
-        $response->setMaxAge(30);
-        $response->setSharedMaxAge(30);
-        $response->setContent($json);
-
-        return $response;
     }
 }

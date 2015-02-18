@@ -20,6 +20,7 @@ class MatchmakingController extends Controller
 	public function indexAction()
 	{
 		$response = new Response();
+		$response->headers->set('Content-Type', 'application/json');
 		$em = $this->getDoctrine()->getManager();
 		$query = $em->createQuery(
 			'SELECT matchmaking
@@ -46,6 +47,7 @@ class MatchmakingController extends Controller
 
     public function joinAction($matchmakingId,$profilId,$username,$apikey){
         $response = new Response();
+	    $response->headers->set('Content-Type', 'application/json');
 
         /**
          * @var \Acme\EsBattleBundle\Entity\User $user
@@ -139,7 +141,7 @@ class MatchmakingController extends Controller
      */
 	public function createAction($matchmakingId,$profilId,$username,$apikey){
 		$response = new Response();
-
+		$response->headers->set('Content-Type', 'application/json');
 		/**
 		 * @var \Acme\EsBattleBundle\Entity\User $user
 		 */

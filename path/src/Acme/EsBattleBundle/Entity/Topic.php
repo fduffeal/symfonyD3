@@ -12,7 +12,7 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 /**
  * Topic
  *
- * @ORM\Table()
+ * @ORM\Table(name="Topic",indexes={@ORM\Index(name="updated_idx", columns={"updated"}),@ORM\Index(name="visible_idx", columns={"visible"})})
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
  */

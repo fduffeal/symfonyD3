@@ -40,6 +40,7 @@ class RdvController extends Controller
         // définit l'âge max des caches privés ou des caches partagés
         $response->setMaxAge(30);
         $response->setSharedMaxAge(30);
+        $response->headers->set('Content-Type', 'application/json');
 
         if(!$collection[0]){
             return $response;
@@ -54,9 +55,10 @@ class RdvController extends Controller
             return $response;
         }
 
+        $now = date('Y-m-d H:i:s');
 
         $query = $em->createQuery(
-            'SELECT rdv,usersGame, tags, plateform, game, user, leader,usersGameInQueue,userInQueue
+            'SELECT rdv,usersGame, tags, plateform, game, user, leader
             FROM AcmeEsBattleBundle:Appointment rdv
             JOIN rdv.usersGame usersGame
             JOIN usersGame.user user
@@ -64,9 +66,8 @@ class RdvController extends Controller
             JOIN rdv.game game
             JOIN rdv.tags tags
             JOIN rdv.leader leader
-            LEFT JOIN rdv.usersGameInQueue usersGameInQueue
-            LEFT JOIN usersGameInQueue.user userInQueue'
-        );
+            where rdv.end > :now'
+        )->setParameter('now', $now);
 
         $collection = $query->getResult();
 
@@ -183,6 +184,7 @@ class RdvController extends Controller
 
 
 		$response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
 		$response->setContent($json);
         return $response;
 
@@ -193,6 +195,7 @@ class RdvController extends Controller
         $response = new Response();
         // Définit la réponse comme publique. Sinon elle sera privée par défaut.
         $response->setPublic();
+        $response->headers->set('Content-Type', 'application/json');
 
 		/**
 		 * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
@@ -393,6 +396,7 @@ class RdvController extends Controller
 
         $json = $appointment->_toJson();
         $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
         $response->setContent($json);
         return $response;
     }
@@ -436,6 +440,8 @@ class RdvController extends Controller
     public function leaveRdvAction($rdvId,$userGameId,$username,$apikey){
 	    $response = new Response();
 
+        $response->headers->set('Content-Type', 'application/json');
+
         $appointment = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:Appointment')
             ->findOneBy(array('id'=>$rdvId));
@@ -457,21 +463,23 @@ class RdvController extends Controller
         $user = $userGame->getUser();
 
         if($user->getUsername() !== $username || $user->getApikey() !== $apikey){
-            return new Response(null, 401, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+            $response->setStatusCode(401);
+            return $response;
         }
         $leader = $appointment->getLeader();
 	    $hasNewLeader = false;
         if($user === $leader){
             $hasNewLeader = $this->setNewLeader($appointment);
 
-            if($hasNewLeader === false){
-                $em = $this->getDoctrine()->getManager();
-                $em->remove($appointment);
-                $em->flush();
-
-                return new Response(null, 308, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
-
-            }
+//            if($hasNewLeader === false){
+//                $em = $this->getDoctrine()->getManager();
+//                $em->remove($appointment);
+//                $em->flush();
+//
+//                $response->setStatusCode(308);
+//                return $response;
+//
+//            }
         }
 
         $appointment->removeUsersGame($userGame);
@@ -504,6 +512,8 @@ class RdvController extends Controller
     }
 
     public function promoteRdvAction($rdvId,$userGameId,$username,$apikey){
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
 
         $appointment = $this->getDoctrine()
             ->getRepository('AcmeEsBattleBundle:Appointment')
@@ -518,7 +528,8 @@ class RdvController extends Controller
         $oldLeader = $appointment->getLeader();
 
         if($oldLeader->getUsername() !== $username || $oldLeader->getApikey() !== $apikey){
-            return new Response(null, 401, array('Access-Control-Allow-Origin' => 'http://localhost:8000', 'Content-Type' => 'application/json'));
+            $response->setStatusCode(401);
+            return $response;
         }
 
         $appointment->setLeader($newLeader);
@@ -538,7 +549,6 @@ class RdvController extends Controller
 
 	    $json = $appointment->_toJson();
 
-	    $response = new Response();
 	    $response->setContent($json);
         return $response;
 
@@ -554,6 +564,8 @@ class RdvController extends Controller
         $aNotification = array();
 
         $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+
         $response->setPublic();
         // définit l'âge max des caches privés ou des caches partagés
         $response->setMaxAge(20);
@@ -653,6 +665,8 @@ class RdvController extends Controller
         // définit l'âge max des caches privés ou des caches partagés
         $response->setMaxAge(600);
         $response->setSharedMaxAge(600);
+        $response->headers->set('Content-Type', 'application/json');
+
 
         return $response;
     }
@@ -694,6 +708,8 @@ class RdvController extends Controller
 
         $json = $appointment->_toJson();
         $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+
         $response->setContent($json);
         return $response;
 
@@ -705,16 +721,26 @@ class RdvController extends Controller
      * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
      */
     public function removeUserGameInAllOtherGameInSameTime($userGame,$appointment){
+
+        $user = $userGame->getUser();
+
+        $userGameCollection = $user->getUsergames();
+
+
         $em = $this->getDoctrine()->getManager();
 
         $query = $em->createQuery('
-            SELECT appointment FROM AcmeEsBattleBundle:Appointment appointment
+            SELECT appointment, usersGameInQueue FROM AcmeEsBattleBundle:Appointment appointment
             JOIN appointment.usersGameInQueue usersGameInQueue
             WHERE (appointment.start >= :myStart AND appointment.start <= :myEnd)
             OR (appointment.end >= :myStart AND appointment.end <= :myEnd)
             OR (appointment.start <= :myStart AND appointment.end >= :myEnd)
-            AND (usersGameInQueue = :currentUserGame)'
-        )->setParameters(array('myStart'=> $appointment->getStart(),'myEnd'=>$appointment->getEnd(),'currentUserGame'=>$userGame));
+            AND usersGameInQueue IN (
+              SELECT userGames FROM  AcmeEsBattleBundle:UserGame userGames
+              JOIN userGames.user user
+              WHERE user = :user
+              )'
+        )->setParameters(array('myStart'=> $appointment->getStart(),'myEnd'=>$appointment->getEnd(),'user'=>$user));
 
         $collectionInQueue = $query->getResult();
 
@@ -722,10 +748,35 @@ class RdvController extends Controller
          * @var \Acme\EsBattleBundle\Entity\Appointment $appointmentConflict
          */
         foreach($collectionInQueue as $appointmentConflict){
-            $appointmentConflict->removeUsersGameInQueue($userGame);
 
-            $em->persist($appointmentConflict);
-            $em->flush();
+            foreach($userGameCollection as $userGame){
+                $appointmentConflict->removeUsersGameInQueue($userGame);
+            }
+        }
+
+        $query = $em->createQuery('
+            SELECT appointment,usersGameInvite FROM AcmeEsBattleBundle:Appointment appointment
+            JOIN appointment.usersGameInvite usersGameInvite
+            WHERE (appointment.start >= :myStart AND appointment.start <= :myEnd)
+            OR (appointment.end >= :myStart AND appointment.end <= :myEnd)
+            OR (appointment.start <= :myStart AND appointment.end >= :myEnd)
+            AND usersGameInvite IN (
+              SELECT userGames FROM  AcmeEsBattleBundle:UserGame userGames
+              JOIN userGames.user user
+              WHERE user = :user
+              )'
+        )->setParameters(array('myStart'=> $appointment->getStart(),'myEnd'=>$appointment->getEnd(),'user'=>$user));
+
+        $collectionInQueue = $query->getResult();
+
+//        var_dump(sizeof($collectionInQueue));
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Appointment $appointmentConflict
+         */
+        foreach($collectionInQueue as $appointmentConflict){
+            foreach($userGameCollection as $userGame){
+                $appointmentConflict->removeUsersGameInvite($userGame);
+            }
         }
 
 
@@ -735,8 +786,12 @@ class RdvController extends Controller
             WHERE (appointment.start >= :myStart AND appointment.start <= :myEnd)
             OR (appointment.end >= :myStart AND appointment.end <= :myEnd)
             OR (appointment.start <= :myStart AND appointment.end >= :myEnd)
-            AND (usersGame = :currentUserGame)'
-        )->setParameters(array('myStart'=> $appointment->getStart(),'myEnd'=>$appointment->getEnd(),'currentUserGame'=>$userGame));
+            AND usersGame IN (
+              SELECT userGames FROM  AcmeEsBattleBundle:UserGame userGames
+              JOIN userGames.user user
+              WHERE user = :user
+              )'
+        )->setParameters(array('myStart'=> $appointment->getStart(),'myEnd'=>$appointment->getEnd(),'user'=>$user));
 
 
         $collection = $query->getResult();
@@ -745,26 +800,26 @@ class RdvController extends Controller
          * @var \Acme\EsBattleBundle\Entity\Appointment $appointmentConflict
          */
         foreach($collection as $appointmentConflict){
-            $userToRemove = $userGame->getUser();
-            $appointmentConflict->removeUsersGame($userGame);
 
-            $leader = $appointmentConflict->getLeader();
-            if($userToRemove === $leader){
-                $hasNewLeader = $this->setNewLeader($appointmentConflict);
+            foreach($userGameCollection as $userGame){
+                $userToRemove = $userGame->getUser();
+                $appointmentConflict->removeUsersGame($userGame);
 
-                if($hasNewLeader === false){
-                    $em = $this->getDoctrine()->getManager();
-                    $em->remove($appointmentConflict);
-                    $em->flush();
-                    continue;
+                $leader = $appointmentConflict->getLeader();
+                if($userToRemove === $leader){
+                    $hasNewLeader = $this->setNewLeader($appointmentConflict);
+
+//                    if($hasNewLeader === false){
+//                        $em = $this->getDoctrine()->getManager();
+//                        $em->remove($appointmentConflict);
+//                        $em->flush();
+//                        continue;
+//                    }
                 }
             }
-
-
-            $em->persist($appointmentConflict);
-            $em->flush();
         }
 
+        $em->flush();
     }
 
     /**
@@ -798,5 +853,97 @@ class RdvController extends Controller
         }
 
         return $hasNewLeader;
+    }
+
+    public function inviteAction($userId,$rdvId,$username,$apikey){
+
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+
+        /**
+         * @var \Acme\EsBattleBundle\Entity\User $user
+         */
+        $user = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:User')
+            ->findOneBy(array('username'=>$username,'apikey'=>$apikey));
+
+        if($user === null){
+            $response->setStatusCode(401);
+            return $response;
+        }
+
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
+         */
+        $appointment = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Appointment')
+            ->findOneBy(array('id'=>$rdvId));
+
+        if($appointment === null){
+            $response->setStatusCode(401);
+            return $response;
+        }
+
+
+
+        $em = $this->getDoctrine()->getManager();
+        $query = $em->createQuery('
+            SELECT account, usergames FROM AcmeEsBattleBundle:User account
+            JOIN account.usergames usergames
+            WHERE account.id = :userId'
+        )->setParameters(array('userId'=> $userId));
+
+
+        $collection = $query->getResult();
+        if($collection === null){
+            $response->setStatusCode(401);
+            return $response;
+        }
+        /**
+         * @var \Acme\EsBattleBundle\Entity\User $userToInvite
+         */
+        $userToInvite = $collection[0];
+
+        $aUsergames = $userToInvite->getUsergames();
+
+        $maxLevel = 0;
+        $userGameToInvite = null;
+        /**
+         * @var \Acme\EsBattleBundle\Entity\UserGame $usergame
+         */
+        foreach($aUsergames as $usergame){
+            $currentLevel = $usergame->getData2();
+            if($currentLevel > $maxLevel){
+                $maxLevel = $currentLevel;
+                $userGameToInvite = $usergame;
+            }
+        }
+
+        $appointment->addUsersGameInvite($userGameToInvite);
+        $em->flush();
+
+
+        $notification = new Notification();
+        $notification->setCode($notification::NEW_INVITATION);
+        $notification->setDestinataire($userToInvite);
+        $notification->setExpediteur($user);
+        $notification->setAppointment($appointment);
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($notification);
+        $em->flush();
+
+        $url = 'http://www.esbattle.com/fr/party/waiting/'.$appointment->getId();
+
+
+        $message = \Swift_Message::newInstance()
+            ->setContentType('text/html')
+            ->setSubject('Invitation de partie sur Esbattle.com')
+            ->setFrom('contact.esbattle@gmail.com')
+            ->setTo($userToInvite->getEmail())
+            ->setBody($this->renderView('AcmeEsBattleBundle:Mail:invite-party.html.twig',array('username' => $userToInvite->getUsername(),'from'=>$user->getUsername(),'url'=>$url)));
+        $this->get('mailer')->send($message);
+
+        return $response;
+
     }
 }

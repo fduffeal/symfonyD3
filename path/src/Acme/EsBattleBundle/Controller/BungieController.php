@@ -102,6 +102,31 @@ class BungieController extends Controller
         $response->setSharedMaxAge(30);
         //$response->setContent(json_encode($characters));
         $response->setContent(json_encode($aUserGame));
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
+
+    }
+
+    public function getPlayerAction($membershipType, $displayName){
+
+        $response = new Response();
+        $response->setPublic();
+        $response->setSharedMaxAge(600);
+        $response->headers->set('Content-Type', 'application/json');
+
+        $bungie = $this->get('acme_es_battle.bungie');
+
+        $player = $bungie->getPlayer($membershipType,$displayName);
+
+        if ($player === null) {
+            return null;
+        }
+        $account = $bungie->getAccount($membershipType, $player->membershipId);
+
+        $formatedCharacters = $bungie->formatCharacters($account, $displayName);
+
+        $response->setContent(json_encode($formatedCharacters));
 
         return $response;
 

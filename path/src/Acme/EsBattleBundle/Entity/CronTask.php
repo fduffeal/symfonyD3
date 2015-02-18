@@ -46,6 +46,11 @@ class CronTask
 	 */
 	private $output;
 
+	/**
+	 * @ORM\Column(type="boolean")
+	 */
+	private $locked;
+
 	public function getId()
 	{
 		return $this->id;
@@ -128,5 +133,28 @@ class CronTask
     public function getOutput()
     {
         return $this->output;
+    }
+
+    /**
+     * Set locked
+     *
+     * @param boolean $locked
+     * @return CronTask
+     */
+    public function setLocked($locked)
+    {
+        $this->locked = $locked;
+
+        return $this;
+    }
+
+    /**
+     * Get locked
+     *
+     * @return boolean 
+     */
+    public function getLocked()
+    {
+        return $this->locked;
     }
 }
