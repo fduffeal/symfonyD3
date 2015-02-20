@@ -55,7 +55,7 @@ class RdvController extends Controller
             return $response;
         }
 
-        $now = date('Y-m-d H:i:s',strtotime('-10 day', time()));
+        $now = date('Y-m-d H:i:s',strtotime('-2 day', time()));
 
         $query = $em->createQuery(
             'SELECT rdv,usersGame, tags, plateform, game, user, leader
