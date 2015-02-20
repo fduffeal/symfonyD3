@@ -165,6 +165,25 @@ class UserController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);
             $em->flush();
+
+	        /**
+	         * @var \Acme\EsBattleBundle\Entity\UserGame $firstUsergames
+	         */
+	        $aUsergames = $friend->getUsergames();
+	        $firstUsergames = $aUsergames[0];
+	        $gameUsername = $firstUsergames->getGameUsername();
+
+
+
+	        $url = 'http://www.esbattle.com/fr/users/connected?user='.$gameUsername;
+
+	        $message = \Swift_Message::newInstance()
+		        ->setContentType('text/html')
+		        ->setSubject("Demande d'amis sur Esbattle.com")
+		        ->setFrom('contact.esbattle@gmail.com')
+		        ->setTo($friend->getEmail())
+		        ->setBody($this->renderView('AcmeEsBattleBundle:Mail:request-friends.html.twig',array('username' => $friend->getUsername(),'from'=>$user->getUsername(),'url'=>$url)));
+	        $this->get('mailer')->send($message);
         }
 
 
