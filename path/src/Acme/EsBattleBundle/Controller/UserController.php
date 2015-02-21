@@ -160,6 +160,7 @@ class UserController extends Controller
             ->setParameter('userId', $user->getId());
 
         $alreadyFriend = $query->getResult();
+
         if($alreadyFriend !== null){
             $user->addFriend($friend);
             $em = $this->getDoctrine()->getManager();
@@ -169,7 +170,7 @@ class UserController extends Controller
 	        /**
 	         * @var \Acme\EsBattleBundle\Entity\UserGame $firstUsergames
 	         */
-	        $aUsergames = $friend->getUsergames();
+	        $aUsergames = $user->getUsergames();
 	        $firstUsergames = $aUsergames[0];
 	        $gameUsername = $firstUsergames->getGameUsername();
 
