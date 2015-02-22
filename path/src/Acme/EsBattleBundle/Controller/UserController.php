@@ -160,11 +160,31 @@ class UserController extends Controller
             ->setParameter('userId', $user->getId());
 
         $alreadyFriend = $query->getResult();
+
         if($alreadyFriend !== null){
             $user->addFriend($friend);
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);
             $em->flush();
+
+	        /**
+	         * @var \Acme\EsBattleBundle\Entity\UserGame $firstUsergames
+	         */
+	        $aUsergames = $user->getUsergames();
+	        $firstUsergames = $aUsergames[0];
+	        $gameUsername = $firstUsergames->getGameUsername();
+
+
+
+	        $url = 'http://www.esbattle.com/fr/users/connected?user='.$gameUsername;
+
+	        $message = \Swift_Message::newInstance()
+		        ->setContentType('text/html')
+		        ->setSubject("Demande d'amis sur Esbattle.com")
+		        ->setFrom('contact.esbattle@gmail.com')
+		        ->setTo($friend->getEmail())
+		        ->setBody($this->renderView('AcmeEsBattleBundle:Mail:request-friends.html.twig',array('username' => $friend->getUsername(),'from'=>$user->getUsername(),'url'=>$url)));
+	        $this->get('mailer')->send($message);
         }
 
 
@@ -237,35 +257,33 @@ class UserController extends Controller
         $response->headers->set('Content-Type', 'application/json');
         $response->setPublic();
         // définit l'âge max des caches privés ou des caches partagés
-        $response->setMaxAge(600);
         $response->setSharedMaxAge(600);
 
         $em = $this->getDoctrine()->getManager();
 
+//        $query = $em->createQuery(
+//            'SELECT user
+//            FROM AcmeEsBattleBundle:User user
+//            ORDER BY user.created DESC')
+//            ->setMaxResults(1);
+//
+//        $result = $query->getResult();
+//
+//        if(!$result[0]){
+//            return $response;
+//        }
+//
+//        $response->setLastModified($result[0]->getCreated());
+//
+//        // Vérifie que l'objet Response n'est pas modifié
+//        // pour un objet Request donné
+//        if ($response->isNotModified($this->getRequest())) {
+//            // Retourne immédiatement un objet 304 Response
+//            return $response;
+//        }
+
         $query = $em->createQuery(
             'SELECT user
-            FROM AcmeEsBattleBundle:User user
-            ORDER BY user.created DESC')
-            ->setMaxResults(1);
-
-        $result = $query->getResult();
-
-        if(!$result[0]){
-            return $response;
-        }
-
-        $response->setLastModified($result[0]->getCreated());
-
-        // Vérifie que l'objet Response n'est pas modifié
-        // pour un objet Request donné
-        if ($response->isNotModified($this->getRequest())) {
-            // Retourne immédiatement un objet 304 Response
-            return $response;
-        }
-
-        $em = $this->getDoctrine()->getManager();
-        $query = $em->createQuery(
-            'SELECT user,usergames, plateform, game
             FROM AcmeEsBattleBundle:User user
             JOIN user.usergames usergames
             JOIN usergames.plateform plateform
