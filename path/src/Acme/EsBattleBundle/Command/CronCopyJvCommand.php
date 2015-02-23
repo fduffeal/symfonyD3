@@ -84,14 +84,14 @@ class CronCopyJvCommand extends ContainerAwareCommand
 				$crontask->setLastrun(new \DateTime());
 			}
 
+			$crontask->setLocked(false);
+			$em->persist($crontask);
+			$em->flush();
+
 		}catch (\Exception $e){
 			$output->writeln('Exception ' . $e->getMessage());
 			$output->writeln($e->getTrace());
 		}
-
-		$crontask->setLocked(false);
-		$em->persist($crontask);
-		$em->flush();
 
 		$output->writeln('--END --');
 	}
