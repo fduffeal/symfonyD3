@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Acme\EsBattleBundle\Entity\Annonce as Annonce;
 use Acme\EsBattleBundle\Entity\Tag as Tag;
 use Acme\EsBattleBundle\Entity\CronTask;
+use Symfony\Component\Security\Acl\Exception\Exception;
 
 
 class CronCopyJvCommand extends ContainerAwareCommand
@@ -31,27 +32,36 @@ class CronCopyJvCommand extends ContainerAwareCommand
 		$cronId = $input->getArgument('id');
 		$em = $this->getContainer()->get('doctrine.orm.entity_manager');
 
-		$output->writeln('CRON ID '.$cronId);
+		$output->writeln('CRON ID ' . $cronId);
 		/**
 		 * @var \Acme\EsBattleBundle\Entity\CronTask $crontask
 		 */
 		$crontask = $em->getRepository('AcmeEsBattleBundle:CronTask')->find($cronId);
 
-		if($crontask->getLocked() === true){
-			$output->writeln('CRON ID '.$cronId.' LOCKED ---- bye bye ---');
-            return;
+		if ($crontask->getLocked() === true) {
+
+
+			$lockTimeMax = strtotime('-10 minutes', time());
+
+			$timeLastRun = $crontask->getLastrun()->getTimestamp();
+
+			if($lockTimeMax < $timeLastRun){
+				$output->writeln('CRON ID ' . $cronId . ' LOCKED ---- bye bye ---');
+				return;
+			}
+
+			$output->writeln('CRON ID ' . $cronId . ' LOCKED ---- max lock time raised, try to execute ---');
+
 		}
 
 		$crontask->setLocked(true);
-        $em->persist($crontask);
+		$em->persist($crontask);
 		$em->flush();
 
-
 		$url = $crontask->getCommands();
-		$output->writeln('Copie de '.$url);
+		$output->writeln('Copie de ' . $url);
 		$previousLastIdSave = intval($crontask->getOutput());
-		$output->writeln('Dernier post sauvegardé : '.$previousLastIdSave);
-
+		$output->writeln('Dernier post sauvegardé : ' . $previousLastIdSave);
 
 		$soft = false;
 		if ($input->getOption('soft')) {
@@ -59,24 +69,29 @@ class CronCopyJvCommand extends ContainerAwareCommand
 			$output->writeln('--MODE SOFT--');
 		}
 
-		$jeuxvideo = $this->getContainer()->get('acme_es_battle.jeuxvideo');
+		try {
 
-		$lastPage = $jeuxvideo->getLastPage($url);
+			$jeuxvideo = $this->getContainer()->get('acme_es_battle.jeuxvideo');
 
-		$output->writeln('Derniere page '.$lastPage);
+			$lastPage = $jeuxvideo->getLastPage($url);
 
-		$lastIdSave = $this->_copyJeuxVideoAction($lastPage,$soft,$output,$previousLastIdSave);
+			$output->writeln('Derniere page ' . $lastPage);
 
-		if($lastIdSave !== null){
-			$crontask->setOutput($lastIdSave);
-			$crontask->setLastrun(new \DateTime());
+			$lastIdSave = $this->_copyJeuxVideoAction($lastPage, $soft, $output, $previousLastIdSave);
+
+			if ($lastIdSave !== null) {
+				$crontask->setOutput($lastIdSave);
+				$crontask->setLastrun(new \DateTime());
+			}
+
+		}catch (\Exception $e){
+			$output->writeln('Exception ' . $e->getMessage());
+			$output->writeln($e->getTrace());
 		}
 
-        if(!$soft){
-            $crontask->setLocked(false);
-            $em->persist($crontask);
-            $em->flush();
-        }
+		$crontask->setLocked(false);
+		$em->persist($crontask);
+		$em->flush();
 
 		$output->writeln('--END --');
 	}
