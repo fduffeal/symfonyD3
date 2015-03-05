@@ -12,12 +12,16 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 /**
  * Topic
  *
- * @ORM\Table(name="Topic",indexes={@ORM\Index(name="updated_idx", columns={"updated"}),@ORM\Index(name="visible_idx", columns={"visible"})})
+ * @ORM\Table(name="Topic",indexes={@ORM\Index(name="updated_idx", columns={"updated"}),@ORM\Index(name="visible_idx", columns={"visible"}),@ORM\Index(name="status_idx", columns={"status"})})
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
  */
 class Topic
 {
+	const STATUS_HIGH = 'high';
+	const STATUS_NORMAL = 'normal';
+	const STATUS_POSTIT = 'postit';
+	const STATUS_NEWS = 'news';
     /**
      * @var integer
      *
@@ -38,7 +42,7 @@ class Topic
     /**
      * @var string
      *
-     * @ORM\Column(name="status", type="string", length=255)
+     * @ORM\Column(name="status", type="string", columnDefinition="ENUM('postit', 'high','normal','news')")
      */
     private $status;
 
@@ -119,7 +123,7 @@ class Topic
      */
     public function setStatusValue()
     {
-        $this->status = 'normal';
+        $this->status = self::STATUS_NORMAL;
     }
 
     /**

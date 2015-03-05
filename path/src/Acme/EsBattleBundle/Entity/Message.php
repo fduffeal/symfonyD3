@@ -228,6 +228,13 @@ class Message
         );
     }
 
+	public function _toArrayShort(){
+		return array(
+			'id' => $this->getId(),
+			'texte' => $this->getTexte()
+		);
+	}
+
     /**
      * Set updated
      *

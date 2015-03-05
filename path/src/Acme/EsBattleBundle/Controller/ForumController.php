@@ -79,6 +79,42 @@ class ForumController extends Controller
         return $response;
     }
 
+	public function getNewsAction(){
+		$response = new Response();
+		$response->headers->set('Content-Type', 'application/json');
+
+		$em = $this->getDoctrine()->getManager();
+
+		$query = $em->createQuery(
+			'SELECT topic
+            FROM AcmeEsBattleBundle:Topic topic
+            WHERE topic.visible = :visible and topic.status = :newsStatus
+            ORDER BY topic.created DESC'
+		)->setParameter('visible', true)->setParameter('newsStatus',Topic::STATUS_NEWS)->setMaxResults(10);
+
+		$topicCollection = $query->getResult();
+
+		$response->setPublic();
+
+		$aTopic = [];
+
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\Topic $topic
+		 */
+		foreach($topicCollection as $topic){
+			$aCurrentTopic = $topic->_toArray();
+			$aCurrentTopic['message'] = $topic->getMessages()->first()->_toArrayShort();
+//			var_dump($aCurrentTopic);die();
+			$aTopic[] = $aCurrentTopic;
+		}
+
+		$json = json_encode($aTopic);
+		$response->setContent($json);
+
+		$response->headers->set('Content-Type', 'application/json');
+		return $response;
+	}
+
     public function createTopicAction($username,$token)
     {
 
