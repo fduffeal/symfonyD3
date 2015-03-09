@@ -2,6 +2,9 @@
 
 namespace Acme\EsBattleBundle\Controller;
 
+use Acme\EsBattleBundle\Entity\Document;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
 use Acme\EsBattleBundle\Entity\UserGame;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -10,6 +13,7 @@ use Acme\EsBattleBundle\Entity\Annonce as Annonce;
 use Acme\EsBattleBundle\Entity\Tag as Tag;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 
 class AdminController extends Controller
 {
@@ -375,4 +379,31 @@ class AdminController extends Controller
         $response->headers->set('Content-Type', 'application/json');
         return $response;
     }
+
+	/**
+	 * @Template()
+	 */
+	public function uploadAction(Request $request)
+	{
+		$document = new Document();
+		$form = $this->createFormBuilder($document)
+			->add('name')
+			->add('file')
+			->getForm();
+
+		$form->handleRequest($request);
+
+		if ($form->isValid()) {
+			$em = $this->getDoctrine()->getManager();
+
+			$em->persist($document);
+			$em->flush();
+
+			$imgUrl = 'http://'.$_SERVER['SERVER_NAME'].'/'.$document->getWebPath();
+
+			return $this->redirect($imgUrl);
+		}
+
+		return array('form' => $form->createView());
+	}
 }

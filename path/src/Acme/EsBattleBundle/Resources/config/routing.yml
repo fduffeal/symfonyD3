@@ -175,6 +175,10 @@ acme_es_battle_annonce:
 #    path:     /francis/copy/{url}
 #    defaults: { _controller: AcmeEsBattleBundle:Admin:copyJeuxVideo }
 
+acme_es_battle_admin_upload:
+    path:     /francis/upload
+    defaults: { _controller: AcmeEsBattleBundle:Admin:upload }
+
 
 acme_es_battle_forum_topic_get_all:
     path:     /forum
