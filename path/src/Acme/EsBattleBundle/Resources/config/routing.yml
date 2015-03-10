@@ -179,7 +179,7 @@ acme_es_battle_admin_upload:
     path:     /admin/upload
     defaults: { _controller: AcmeEsBattleBundle:Admin:upload }
 
-acme_es_battle_admin_upload:
+acme_es_battle_admin_biblio:
     path:     /admin/biblio
     defaults: { _controller: AcmeEsBattleBundle:Admin:bibliotheque }
 
