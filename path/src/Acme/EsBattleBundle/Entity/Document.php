@@ -185,4 +185,20 @@ class Document
     {
         return $this->path;
     }
+
+	/*
+   * Serializes appointment.
+   *
+   * The serialized data have to contain the fields used by the equals method and the username.
+   *
+   * @return string
+   */
+	public function _toArray()
+	{
+
+		return array(
+			'id' => $this->getId(),
+			'src' => 'http://'.$_SERVER['SERVER_NAME'].'/'.$this->getWebPath()
+		);
+	}
 }

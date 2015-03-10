@@ -104,7 +104,7 @@ class ForumController extends Controller
 		foreach($topicCollection as $topic){
 			$aCurrentTopic = $topic->_toArray();
 			$aCurrentTopic['message'] = $topic->getMessages()->first()->_toArrayShort();
-//			var_dump($aCurrentTopic);die();
+			$aCurrentTopic['document'] = ($topic->getDocument())?$topic->getDocument()->_toArray():null;
 			$aTopic[] = $aCurrentTopic;
 		}
 
