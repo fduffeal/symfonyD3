@@ -3,6 +3,7 @@
 namespace Acme\EsBattleBundle\Controller;
 
 use Acme\EsBattleBundle\Entity\Document;
+use Acme\EsBattleBundle\Entity\Topic;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Acme\EsBattleBundle\Entity\UserGame;
@@ -416,6 +417,53 @@ class AdminController extends Controller
 
 		return $this->render('AcmeEsBattleBundle:Admin:bibliotheque.html.twig', array(
 			'documents' => $collectionDocument
+		));
+	}
+
+	public function topicAction($id,Request $request)
+	{
+
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\Topic $topic
+		 */
+		$topic = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Topic')
+			->find($id);
+
+		$collectionDocument = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Document')
+			->findAll();
+
+		$topicStatus = [];
+		$topicStatus[] = Topic::STATUS_NEWS;
+		$topicStatus[] = Topic::STATUS_NORMAL;
+		$topicStatus[] = Topic::STATUS_POSTIT;
+		$topicStatus[] = Topic::STATUS_HIGH;
+
+
+		$newStatus = $request->get('status');
+		$newDocument = $request->get('document');
+
+		if ($newStatus !== null) {
+			$em = $this->getDoctrine()->getManager();
+			$topic->setStatus($newStatus);
+			$newDocumentEntity = null;
+
+			if($newDocument !== null){
+				$newDocumentEntity = $this->getDoctrine()
+					->getRepository('AcmeEsBattleBundle:Document')
+					->find($newDocument);
+			}
+
+			$topic->setDocument($newDocumentEntity);
+			$em->flush();
+		}
+
+
+		return $this->render('AcmeEsBattleBundle:Admin:topic.html.twig', array(
+			'documents' => $collectionDocument,
+			'topic' => $topic,
+			'aStatus' => $topicStatus
 		));
 	}
 }

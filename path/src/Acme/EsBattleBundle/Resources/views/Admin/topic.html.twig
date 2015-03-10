@@ -1,0 +1,36 @@
+<h1>{{ topic.titre }}</h1>
+<span>
+    {{ topic.messages[0].texte |raw  }}
+</span>
+<hr/>
+<form name="test" action="" method="post">
+    <select name="status">
+        {% for status in aStatus %}
+            {% if status == topic.status %}
+                <option value="{{ status}}" selected>{{ status }}</option>
+            {% else %}
+                <option value="{{ status }}">{{ status }}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+    <div style="height: 400px;overflow: scroll">
+        <ul>
+            <li>Vider<input type="radio" name="document" value=""/></li>
+        {% for document in documents %}
+            <li>
+                <img src="/{{ document.webpath }}" width="20%" height="auto"/>
+                <a href="/{{ document.webpath }}">{{ document.name }}</a>
+
+                {% if document.id == topic.document.id %}
+                    <input type="radio" name="document" value="{{ document.id }}" checked/>
+                {% else %}
+                    <input type="radio" name="document" value="{{ document.id }}"/>
+                {% endif %}
+
+
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+    <input type="submit" value="Valider">
+</form>

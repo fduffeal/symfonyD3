@@ -79,6 +79,12 @@ class Topic
      */
     protected $user;
 
+	/**
+	 * @ORM\ManyToOne(targetEntity="Document")
+	 * @ORM\JoinColumn(name="document_id", referencedColumnName="id",nullable=true)
+	 */
+	protected $document;
+
     /**
      * @var integer
      *
@@ -432,5 +438,28 @@ class Topic
     public function getStatus()
     {
         return $this->status;
+    }
+
+    /**
+     * Set document
+     *
+     * @param \Acme\EsBattleBundle\Entity\Document $document
+     * @return Topic
+     */
+    public function setDocument(\Acme\EsBattleBundle\Entity\Document $document = null)
+    {
+        $this->document = $document;
+
+        return $this;
+    }
+
+    /**
+     * Get document
+     *
+     * @return \Acme\EsBattleBundle\Entity\Document 
+     */
+    public function getDocument()
+    {
+        return $this->document;
     }
 }
