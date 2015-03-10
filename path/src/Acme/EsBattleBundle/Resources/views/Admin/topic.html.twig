@@ -21,7 +21,7 @@
                 <img src="/{{ document.webpath }}" width="20%" height="auto"/>
                 <a href="/{{ document.webpath }}">{{ document.name }}</a>
 
-                {% if document.id == topic.document.id %}
+                {% if topic.document and document.id == topic.document.id %}
                     <input type="radio" name="document" value="{{ document.id }}" checked/>
                 {% else %}
                     <input type="radio" name="document" value="{{ document.id }}"/>
