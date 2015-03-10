@@ -1,0 +1,8 @@
+<ul>
+{% for document in documents %}
+    <ul>
+        <img src="/{{ document.webpath }}" width="20%" height="auto"/>
+        <a href="/{{ document.webpath }}">{{ document.name }}</a>
+    </ul>
+{% endfor %}
+</ul>

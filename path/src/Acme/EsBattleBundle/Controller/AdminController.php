@@ -406,4 +406,16 @@ class AdminController extends Controller
 
 		return array('form' => $form->createView());
 	}
+
+	public function bibliothequeAction()
+	{
+		$collectionDocument = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Document')
+			->findAll();
+
+
+		return $this->render('AcmeEsBattleBundle:Admin:bibliotheque.html.twig', array(
+			'documents' => $collectionDocument
+		));
+	}
 }
