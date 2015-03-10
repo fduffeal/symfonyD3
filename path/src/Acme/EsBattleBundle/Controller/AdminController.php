@@ -466,4 +466,24 @@ class AdminController extends Controller
 			'aStatus' => $topicStatus
 		));
 	}
+
+	/**
+	 * @Template()
+	 */
+	public function loginAction(Request $request)
+	{
+		$user = new User();
+		$form = $this->createFormBuilder($user)
+			->add('email')
+			->add('password')
+			->getForm();
+
+		$form->handleRequest($request);
+
+		if ($form->isValid()) {
+
+		}
+
+		return array('form' => $form->createView());
+	}
 }
