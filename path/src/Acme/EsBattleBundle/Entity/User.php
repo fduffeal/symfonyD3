@@ -20,6 +20,7 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
  */
 class User
 {
+	const ROLE_MODO = 'modo';
     /**
      * @var integer
      *
@@ -794,4 +795,8 @@ class User
     {
         return $this->userstats;
     }
+
+	public function isModo(){
+		return ($this->getRole() === self::ROLE_MODO);
+	}
 }

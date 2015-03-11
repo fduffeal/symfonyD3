@@ -16,6 +16,8 @@ use Acme\EsBattleBundle\Entity\Tag as Tag;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
+use Symfony\Component\HttpFoundation\Session\Session;
+
 class AdminController extends Controller
 {
     public function checkUserGameAction(){
@@ -386,6 +388,13 @@ class AdminController extends Controller
 	 */
 	public function uploadAction(Request $request)
 	{
+		$session = $request->getSession();
+		if(!$session->get('user')){
+			$response = new Response();
+			$response->setStatusCode(401);
+			return $response;
+		}
+
 		$document = new Document();
 		$form = $this->createFormBuilder($document)
 			->add('name')
@@ -410,6 +419,15 @@ class AdminController extends Controller
 
 	public function bibliothequeAction()
 	{
+
+		$session = new Session();
+
+		if(!$session->get('user')){
+			$response = new Response();
+			$response->setStatusCode(401);
+			return $response;
+		}
+
 		$collectionDocument = $this->getDoctrine()
 			->getRepository('AcmeEsBattleBundle:Document')
 			->findAll();
@@ -422,7 +440,13 @@ class AdminController extends Controller
 
 	public function topicAction($id,Request $request)
 	{
+		$session = new Session();
 
+		if(!$session->get('user')){
+			$response = new Response();
+			$response->setStatusCode(401);
+			return $response;
+		}
 		/**
 		 * @var \Acme\EsBattleBundle\Entity\Topic $topic
 		 */
@@ -472,18 +496,41 @@ class AdminController extends Controller
 	 */
 	public function loginAction(Request $request)
 	{
+
 		$user = new User();
 		$form = $this->createFormBuilder($user)
-			->add('email')
+			->add('username')
 			->add('password')
 			->getForm();
 
 		$form->handleRequest($request);
 
+		$logged = false;
+
 		if ($form->isValid()) {
+
+
+			$username = $user->getUsername();
+			$password = $user->getPassword();
+
+			/**
+			 * @var \Acme\EsBattleBundle\Entity\User $user
+			 */
+			$user = $this->getDoctrine()
+				->getRepository('AcmeEsBattleBundle:User')
+				->findOneBy(
+					array('username' => $username)
+				);
+
+
+			if($user !== null && $user->isPasswordOk($password) && $user->isModo()){
+				$session = new Session();
+				$session->set('user',$user->_toArrayShort());
+				$logged = true;
+			}
 
 		}
 
-		return array('form' => $form->createView());
+		return array('form' => $form->createView(),'logged' => $logged);
 	}
 }
