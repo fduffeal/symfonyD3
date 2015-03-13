@@ -175,10 +175,30 @@ acme_es_battle_annonce:
 #    path:     /francis/copy/{url}
 #    defaults: { _controller: AcmeEsBattleBundle:Admin:copyJeuxVideo }
 
+acme_es_battle_admin_upload:
+    path:     /admin/upload
+    defaults: { _controller: AcmeEsBattleBundle:Admin:upload }
+
+acme_es_battle_admin_biblio:
+    path:     /admin/biblio
+    defaults: { _controller: AcmeEsBattleBundle:Admin:bibliotheque }
+
+acme_es_battle_admin_topic:
+    path:     /admin/topic/{id}
+    defaults: { _controller: AcmeEsBattleBundle:Admin:topic }
+
+acme_es_battle_admin_login:
+    path:     /admin/login
+    defaults: { _controller: AcmeEsBattleBundle:Admin:login }
+
 
 acme_es_battle_forum_topic_get_all:
     path:     /forum
     defaults: { _controller: AcmeEsBattleBundle:Forum:getAllTopic }
+
+acme_es_battle_news_get_all:
+    path:     /news
+    defaults: { _controller: AcmeEsBattleBundle:Forum:getNews }
 
 acme_es_battle_forum_topic_get_one:
     path:     /forum/topic/get/{id}/{page}/{nbResult}

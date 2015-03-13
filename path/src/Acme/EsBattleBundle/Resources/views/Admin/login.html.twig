@@ -1,0 +1,15 @@
+<form action="#" method="post" {{ form_enctype(form) }}>
+    {{ form_widget(form) }}
+
+    <input type="submit" value="Login" />
+</form>
+
+{% if logged %}
+<div>
+    <ul>
+        <li><a href="upload">upload</a></li>
+        <li><a href="biblio">biblio</a></li>
+        <li><a href="topic/1">topic</a></li>
+    </ul>
+</div>
+{% endif %}

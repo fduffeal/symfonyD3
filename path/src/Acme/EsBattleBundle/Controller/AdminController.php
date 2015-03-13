@@ -2,6 +2,10 @@
 
 namespace Acme\EsBattleBundle\Controller;
 
+use Acme\EsBattleBundle\Entity\Document;
+use Acme\EsBattleBundle\Entity\Topic;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
 use Acme\EsBattleBundle\Entity\UserGame;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -10,6 +14,9 @@ use Acme\EsBattleBundle\Entity\Annonce as Annonce;
 use Acme\EsBattleBundle\Entity\Tag as Tag;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
+
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class AdminController extends Controller
 {
@@ -375,4 +382,155 @@ class AdminController extends Controller
         $response->headers->set('Content-Type', 'application/json');
         return $response;
     }
+
+	/**
+	 * @Template()
+	 */
+	public function uploadAction(Request $request)
+	{
+		$session = $request->getSession();
+		if(!$session->get('user')){
+			$response = new Response();
+			$response->setStatusCode(401);
+			return $response;
+		}
+
+		$document = new Document();
+		$form = $this->createFormBuilder($document)
+			->add('name')
+			->add('file')
+			->getForm();
+
+		$form->handleRequest($request);
+
+		if ($form->isValid()) {
+			$em = $this->getDoctrine()->getManager();
+
+			$em->persist($document);
+			$em->flush();
+
+			$imgUrl = 'http://'.$_SERVER['SERVER_NAME'].'/'.$document->getWebPath();
+
+			return $this->redirect($imgUrl);
+		}
+
+		return array('form' => $form->createView());
+	}
+
+	public function bibliothequeAction()
+	{
+
+		$session = new Session();
+
+		if(!$session->get('user')){
+			$response = new Response();
+			$response->setStatusCode(401);
+			return $response;
+		}
+
+		$collectionDocument = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Document')
+			->findAll();
+
+
+		return $this->render('AcmeEsBattleBundle:Admin:bibliotheque.html.twig', array(
+			'documents' => $collectionDocument
+		));
+	}
+
+	public function topicAction($id,Request $request)
+	{
+		$session = new Session();
+
+		if(!$session->get('user')){
+			$response = new Response();
+			$response->setStatusCode(401);
+			return $response;
+		}
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\Topic $topic
+		 */
+		$topic = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Topic')
+			->find($id);
+
+		$collectionDocument = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Document')
+			->findAll();
+
+		$topicStatus = [];
+		$topicStatus[] = Topic::STATUS_NEWS;
+		$topicStatus[] = Topic::STATUS_NORMAL;
+		$topicStatus[] = Topic::STATUS_POSTIT;
+		$topicStatus[] = Topic::STATUS_HIGH;
+
+
+		$newStatus = $request->get('status');
+		$newDocument = $request->get('document');
+
+		if ($newStatus !== null) {
+			$em = $this->getDoctrine()->getManager();
+			$topic->setStatus($newStatus);
+			$newDocumentEntity = null;
+
+			if($newDocument !== null){
+				$newDocumentEntity = $this->getDoctrine()
+					->getRepository('AcmeEsBattleBundle:Document')
+					->find($newDocument);
+			}
+
+			$topic->setDocument($newDocumentEntity);
+			$em->flush();
+		}
+
+
+		return $this->render('AcmeEsBattleBundle:Admin:topic.html.twig', array(
+			'documents' => $collectionDocument,
+			'topic' => $topic,
+			'aStatus' => $topicStatus
+		));
+	}
+
+	/**
+	 * @Template()
+	 */
+	public function loginAction(Request $request)
+	{
+
+		$user = new User();
+		$form = $this->createFormBuilder($user)
+			->add('username')
+			->add('password')
+			->getForm();
+
+		$form->handleRequest($request);
+
+		$logged = false;
+
+		if ($form->isValid()) {
+
+
+			$username = $user->getUsername();
+			$password = $user->getPassword();
+
+			/**
+			 * @var \Acme\EsBattleBundle\Entity\User $user
+			 */
+			$user = $this->getDoctrine()
+				->getRepository('AcmeEsBattleBundle:User')
+				->findOneBy(
+					array('username' => $username)
+				);
+
+
+			if($user !== null && $user->isPasswordOk($password) && $user->isModo()){
+				$session = new Session();
+				$session->set('user',$user->_toArrayShort());
+				$logged = true;
+			}
+
+		}
+
+		return array('form' => $form->createView(),'logged' => $logged);
+	}
 }
