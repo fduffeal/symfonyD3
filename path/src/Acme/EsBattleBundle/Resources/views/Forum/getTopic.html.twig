@@ -1,0 +1,15 @@
+<html>
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# article: http://ogp.me/ns/article#">
+    <meta property="og:title" content="Esbattle.com - News - {{ topic.titre }}"/>
+    <meta property="og:description" content="{{ messages[0].texte |e('html')}}"/>
+    <meta property="og:site_name" content="Esbattle.com"/>
+    <meta property="og:url" content="http://lfg.esbattle.com/app_dev.php/forum/topic/get/{{ topic.id }}/1/1.html"/>
+    <meta property="og:type" content="article" />
+    <meta property="og:image" content="http://api.esbattle.com/uploads/documents/729c50c0531021b02e92a64c03094c6d288d3bb6.png" />
+    <meta property="article:publisher" content="https://www.facebook.com/esbattlelfg">
+    <meta property="fb:app_id" content="1482107158698739">
+</head>
+<body>
+    {{ messages[0].texte |raw}}
+</body>
+</html>

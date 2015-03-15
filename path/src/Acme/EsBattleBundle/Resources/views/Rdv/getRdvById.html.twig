@@ -1,0 +1,31 @@
+<html>
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# article: http://ogp.me/ns/article#">
+    <meta property="og:title" content="Esbattle.com - Rejoins ma partie"/>
+    <meta property="og:site_name" content="Esbattle.com"/>
+    <meta property="og:url" content="http://lfg.esbattle.com/app_dev.php/rdv/get/{{ rdv.id }}.html"/>
+    <meta property="og:description" content="Rendez vous sur #{{ rdv.plateform.nom }}
+    à {{ rdv.start | date("d/m/Y H:i") }},
+    {{ rdv.description }}
+    {% for item in rdv.tags %}
+        {{ item.nom }}
+    {% endfor %}"/>
+    <meta property="og:type" content="article" />
+    <meta property="og:image" content="http://api.esbattle.com/uploads/documents/729c50c0531021b02e92a64c03094c6d288d3bb6.png" />
+    <meta property="article:publisher" content="https://www.facebook.com/esbattlelfg">
+    <meta property="fb:app_id" content="1482107158698739">
+</head>
+<body>
+    <p>
+        http://dev.esbattle.com/fr/party/waiting/{{ rdv.id }}
+    </p>
+    <p>{{ rdv.description }}</p>
+    <p>
+        {% for item in rdv.tags %}
+            {{ item.nom }}
+        {% endfor %}
+    </p>
+    <p>
+        {{ rdv.plateform.nom }}
+    </p>
+</body>
+</html>

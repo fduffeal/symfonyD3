@@ -2,6 +2,8 @@
 
 namespace Acme\EsBattleBundle\Controller;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
 use Acme\EsBattleBundle\Entity\Message;
 use Acme\EsBattleBundle\Entity\UserGame;
 use Acme\EsBattleBundle\Entity\Topic;
@@ -179,6 +181,9 @@ class ForumController extends Controller
 
     }
 
+    /**
+     * @Template()
+     */
     public function getTopicAction($id,$page,$nbResult)
     {
         $response = new Response();
@@ -244,8 +249,17 @@ class ForumController extends Controller
             'topic'   => $topic,
             'messages'  =>$aMessage);
 
-        $response->setContent(json_encode($data));
-        return $response;
+        $format = $this->getRequest()->getRequestFormat();
+
+        if($format === 'json'){
+            $response = new JsonResponse();
+            $response->setData($data);
+            return $response;
+        }
+
+
+
+        return $data;
 
     }
 
