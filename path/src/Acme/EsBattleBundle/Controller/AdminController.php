@@ -533,4 +533,26 @@ class AdminController extends Controller
 
 		return array('form' => $form->createView(),'logged' => $logged);
 	}
+
+	public function partenaireAction(){
+		$session = new Session();
+
+		if(!$session->get('user')){
+			$response = new Response();
+			$response->setStatusCode(401);
+			return $response;
+		}
+
+
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\User $user
+		 */
+		$partenaires = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Partenaire')
+			->findAll();
+
+		return $this->render('AcmeEsBattleBundle:Admin:partenaire.html.twig', array(
+			'partenaires' => $partenaires
+		));
+	}
 }

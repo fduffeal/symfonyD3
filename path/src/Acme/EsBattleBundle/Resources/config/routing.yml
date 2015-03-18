@@ -187,6 +187,10 @@ acme_es_battle_admin_topic:
     path:     /admin/topic/{id}
     defaults: { _controller: AcmeEsBattleBundle:Admin:topic }
 
+acme_es_battle_admin_partenaire:
+    path:     /admin/partenaire
+    defaults: { _controller: AcmeEsBattleBundle:Admin:partenaire }
+
 acme_es_battle_admin_login:
     path:     /admin/login
     defaults: { _controller: AcmeEsBattleBundle:Admin:login }

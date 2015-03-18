@@ -6,8 +6,8 @@
 DirectoryIndex app.php
 
 <IfModule mod_headers.c>
-    #Header set Access-Control-Allow-Origin "http://localhost:8000"
-    Header set Access-Control-Allow-Origin "http://dev.esbattle.com"
+    Header set Access-Control-Allow-Origin "http://localhost:8000"
+#    Header set Access-Control-Allow-Origin "http://dev.esbattle.com"
 #    Header set Access-Control-Allow-Origin "http://www.esbattle.com"
 #    Header set Content-Type 'application/json'
 </IfModule>

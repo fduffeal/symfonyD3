@@ -1,5 +1,19 @@
 <html>
 <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# article: http://ogp.me/ns/article#">
+    <title>Esbattle.com | le site francophone de recherche de groupe sur Destiny | {{ rdv.plateform.nom }}</title>
+    <meta name="description" content="Esbattle.com - Rejoins ma partie Destiny, Rendez vous sur #{{ rdv.plateform.nom }}
+    à {{ rdv.start | date("d/m/Y H:i") }},
+    {{ rdv.description }}
+    {% for item in rdv.tags %}
+        {{ item.nom }}
+    {% endfor %} #esbattle">
+    <meta name="keywords" content="Game,Matchmaking,Destiny,PS3,PS4,XBOX ONE,XBOX 360,RAID,Find Team,Looking for Group,Rechercher une équipe,Raid,Assault
+    {% for item in rdv.tags %}
+        ,{{ item.nom }}
+    {% endfor %}">
+    <meta name="classification" content="jeux video">
+    <meta name="language" content="fr">
+
     <meta property="og:title" content="Esbattle.com - Rejoins ma partie"/>
     <meta property="og:site_name" content="Esbattle.com"/>
     <meta property="og:url" content="http://lfg.esbattle.com/app_dev.php/rdv/get/{{ rdv.id }}.html"/>
@@ -8,13 +22,20 @@
     {{ rdv.description }}
     {% for item in rdv.tags %}
         {{ item.nom }}
-    {% endfor %}"/>
+    {% endfor %} #esbattle"/>
     <meta property="og:type" content="article" />
     <meta property="og:image" content="http://api.esbattle.com/uploads/documents/729c50c0531021b02e92a64c03094c6d288d3bb6.png" />
     <meta property="article:publisher" content="https://www.facebook.com/esbattlelfg">
     <meta property="fb:app_id" content="1482107158698739">
 </head>
+
+<script>
+    location.href = 'http://dev.esbattle.com/fr/party/waiting/{{ rdv.id }}';
+</script>
+
 <body>
+    <h1>Esbattle.com | le site francophone de recherche de groupe sur Destiny | {{ rdv.plateform.nom }}</h1>
+    <h2>Rejoins ma partie Destiny, Rendez vous sur #{{ rdv.plateform.nom }}</h2>
     <p>
         http://dev.esbattle.com/fr/party/waiting/{{ rdv.id }}
     </p>
@@ -27,5 +48,6 @@
     <p>
         {{ rdv.plateform.nom }}
     </p>
+    <i>Game,Matchmaking,Destiny,PS3,PS4,XBOX ONE,XBOX 360,RAID,Find Team,Looking for Group,Rechercher une équipe,Raid,Assault</i>
 </body>
 </html>

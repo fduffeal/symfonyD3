@@ -1,0 +1,7 @@
+<ul>
+    {% for partenaire in partenaires %}
+        <li>
+            <a href="/{{ partenaire.id }}">{{ partenaire.nom }}</a>
+        </li>
+    {% endfor %}
+</ul>

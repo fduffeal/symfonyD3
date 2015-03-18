@@ -261,30 +261,7 @@ class RdvController extends Controller
 			}
 		}
 
-        $json = $appointment->_toJson();
-/*
-        return $this->render('AcmeEsBattleBundle:Default:default.'.$format.'.twig',array('json'=>$json));
 
-
-        return array('$json' => $json);
-
-        return $this->render('AcmeEsBattleBundle:Default:default.json.twig', array(
-            'json' => $json
-        ));
-
-
-*/
-       // $this->render('AcmeEsBattleBundle:Default:default.'.$format.'.twig');
-
-        if($format === 'json'){
-            $response = new JsonResponse();
-            $response->setData($appointment->_toArray());
-            return $response;
-        }
-
-
-
-        return array('rdv' => $appointment->_toArray());
 
 //		var_dump($appointment->getUpdated());
 		//$response->setLastModified($appointment->getUpdated());
@@ -300,9 +277,13 @@ class RdvController extends Controller
 			// Retourne immédiatement un objet 304 Response
 			return $response;
 		} else {
-			$json = $appointment->_toJson();
-			$response->setContent($json);
-			return $response;
+			if($format === 'json'){
+				$response = new JsonResponse();
+				$response->setData($appointment->_toArray());
+				return $response;
+			}
+
+			return array('rdv' => $appointment->_toArray());
 		}
 	}
 
