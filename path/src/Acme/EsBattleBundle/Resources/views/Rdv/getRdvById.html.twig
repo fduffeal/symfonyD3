@@ -16,7 +16,7 @@
 
     <meta property="og:title" content="Esbattle.com - Rejoins ma partie"/>
     <meta property="og:site_name" content="Esbattle.com"/>
-    <meta property="og:url" content="http://lfg.esbattle.com/app_dev.php/rdv/get/{{ rdv.id }}.html"/>
+    <meta property="og:url" content="http://api.esbattle.com/rdv/get/{{ rdv.id }}.html"/>
     <meta property="og:description" content="Rendez vous sur #{{ rdv.plateform.nom }}
     à {{ rdv.start | date("d/m/Y H:i") }},
     {{ rdv.description }}
@@ -30,14 +30,14 @@
 </head>
 
 <script>
-    location.href = 'http://dev.esbattle.com/fr/party/waiting/{{ rdv.id }}';
+    location.href = 'http://www.esbattle.com/fr/party/waiting/{{ rdv.id }}';
 </script>
 
 <body>
     <h1>Esbattle.com | le site francophone de recherche de groupe sur Destiny | {{ rdv.plateform.nom }}</h1>
     <h2>Rejoins ma partie Destiny, Rendez vous sur #{{ rdv.plateform.nom }}</h2>
     <p>
-        http://dev.esbattle.com/fr/party/waiting/{{ rdv.id }}
+        http://www.esbattle.com/fr/party/waiting/{{ rdv.id }}
     </p>
     <p>{{ rdv.description }}</p>
     <p>
