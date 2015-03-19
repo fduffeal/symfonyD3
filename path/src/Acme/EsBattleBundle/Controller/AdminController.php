@@ -593,6 +593,7 @@ class AdminController extends Controller
 		$header = $request->get('header');
 		$blocHomeLink = $request->get('blocHomeLink');
 		$blocHomeImg = $request->get('blocHomeImg');
+		$order = $request->get('order');
 
 		if($nom !== null){
 
@@ -605,6 +606,7 @@ class AdminController extends Controller
 			$partenaire->setFacebook($facebook);
 			$partenaire->setTwitter($twitter);
 			$partenaire->setBlocHomeLink($blocHomeLink);
+//			$partenaire->setOrder($order);
 
 			$newDocumentEntity = $this->getDoctrine()
 				->getRepository('AcmeEsBattleBundle:Document')
