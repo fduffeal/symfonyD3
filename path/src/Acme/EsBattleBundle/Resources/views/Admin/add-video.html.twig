@@ -1,0 +1,17 @@
+<form name="test" action="" method="post">
+    <input type="text" name="url" placeholder="Url" value="{{ video.url }}"><br>
+    <textarea name="description" placeholder="description">{{ video.description }}</textarea><br>
+
+
+    <select name="partenaire">
+        {% for partenaire in partenaires %}
+            {% if video.partenaire and partenaire.id == video.partenaire.id %}
+                <option value="{{ partenaire.id }}" selected>{{ partenaire.nom }}</option>
+            {% else %}
+                <option value="{{ partenaire.id }}">{{  partenaire.nom }}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+
+    <input type="submit" value="Valider">
+</form>

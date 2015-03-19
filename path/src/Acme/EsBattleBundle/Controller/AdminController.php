@@ -5,6 +5,7 @@ namespace Acme\EsBattleBundle\Controller;
 use Acme\EsBattleBundle\Entity\Document;
 use Acme\EsBattleBundle\Entity\Partenaire;
 use Acme\EsBattleBundle\Entity\Topic;
+use Acme\EsBattleBundle\Entity\Video;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Acme\EsBattleBundle\Entity\UserGame;
@@ -624,6 +625,78 @@ class AdminController extends Controller
 		return $this->render('AcmeEsBattleBundle:Admin:add-partenaire.html.twig', array(
 			'documents' => $collectionDocument,
 			'partenaire' => $partenaire
+		));
+	}
+
+	public function videoAction(){
+		$session = new Session();
+
+		if(!$session->get('user')){
+			$response = new Response();
+			$response->setStatusCode(401);
+			return $response;
+		}
+
+
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\Video $videos
+		 */
+		$videos = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Video')
+			->findAll();
+
+		return $this->render('AcmeEsBattleBundle:Admin:video.html.twig', array(
+			'videos' => $videos
+		));
+	}
+
+	public function addVideoAction($id, Request $request){
+		$session = new Session();
+
+		if(!$session->get('user')){
+			$response = new Response();
+			$response->setStatusCode(401);
+			return $response;
+		}
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\Video $video
+		 */
+		$video = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Video')
+			->find($id);
+
+		if($video === null){
+			$video = new Video();
+		}
+
+		$collectionPartenaire = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Partenaire')
+			->findAll();
+
+		$url = $request->get('url');
+		$description = $request->get('description');
+		$partenaire = $request->get('partenaire');
+
+		if($url !== null){
+
+			$em = $this->getDoctrine()->getManager();
+
+			$video->setUrl($url);
+			$video->setDescription($description);
+
+			$newPartenaireEntity = $this->getDoctrine()
+				->getRepository('AcmeEsBattleBundle:Partenaire')
+				->find($partenaire);
+
+			$video->setPartenaire($newPartenaireEntity);
+
+			$em->persist($video);
+			$em->flush();
+		}
+
+		return $this->render('AcmeEsBattleBundle:Admin:add-video.html.twig', array(
+			'partenaires' => $collectionPartenaire,
+			'video' => $video
 		));
 	}
 }

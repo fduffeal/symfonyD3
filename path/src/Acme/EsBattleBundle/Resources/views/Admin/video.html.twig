@@ -1,0 +1,9 @@
+<ul>
+    {% for video in videos %}
+        <li>
+            <a href="video/add/{{ video.id }}">{{ video.description }}</a>
+        </li>
+    {% endfor %}
+</ul>
+
+<a href="video/add/0">Ajouter une video</a>

@@ -195,6 +195,14 @@ acme_es_battle_admin_partenaire_add:
     path:     /admin/partenaire/add/{id}
     defaults: { _controller: AcmeEsBattleBundle:Admin:addPartenaire }
 
+acme_es_battle_admin_video:
+    path:     /admin/video
+    defaults: { _controller: AcmeEsBattleBundle:Admin:video }
+
+acme_es_battle_admin_video_add:
+    path:     /admin/video/add/{id}
+    defaults: { _controller: AcmeEsBattleBundle:Admin:addVideo }
+
 acme_es_battle_admin_login:
     path:     /admin/login
     defaults: { _controller: AcmeEsBattleBundle:Admin:login }

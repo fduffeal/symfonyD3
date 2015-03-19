@@ -62,7 +62,7 @@ class Video
 	 * @ORM\ManyToOne(targetEntity="Partenaire", inversedBy="videos")
 	 * @ORM\JoinColumn(name="partenaire_id", referencedColumnName="id")
 	 **/
-	private $product;
+	private $partenaire;
 
     /**
      * Constructor
@@ -232,25 +232,25 @@ class Video
 	}
 
     /**
-     * Set product
+     * Set partenaire
      *
-     * @param \Acme\EsBattleBundle\Entity\Partenaire $product
+     * @param \Acme\EsBattleBundle\Entity\Partenaire $partenaire
      * @return Video
      */
-    public function setProduct(\Acme\EsBattleBundle\Entity\Partenaire $product = null)
+    public function setPartenaire(\Acme\EsBattleBundle\Entity\Partenaire $partenaire = null)
     {
-        $this->product = $product;
+        $this->partenaire = $partenaire;
 
         return $this;
     }
 
     /**
-     * Get product
+     * Get partenaire
      *
      * @return \Acme\EsBattleBundle\Entity\Partenaire 
      */
-    public function getProduct()
+    public function getPartenaire()
     {
-        return $this->product;
+        return $this->partenaire;
     }
 }
