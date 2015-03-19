@@ -239,3 +239,11 @@ acme_es_battle_forum_topic_message_delete:
 acme_es_battle_stats:
     path:     /stats
     defaults: { _controller: AcmeEsBattleBundle:Stats:index }
+
+acme_es_battle_partenaire:
+    path:     /partenaire
+    defaults: { _controller: AcmeEsBattleBundle:Partenaire:index }
+
+acme_es_battle_partenaire_get_one:
+    path:     /partenaire/{id}
+    defaults: { _controller: AcmeEsBattleBundle:Partenaire:get }

@@ -433,4 +433,41 @@ class Partenaire {
     {
         return $this->order;
     }
+
+	public function _toArrayShort()
+	{
+		$blocHomeImg = $this->getBlocHomeImg();
+		$logo = $this->getLogo();
+		$header = $this->getHeader();
+		$tuile = $this->getTuile();
+
+		return array(
+			'id' => $this->getId(),
+			'nom' => $this->getNom(),
+			'description' => $this->getDescription(),
+			'youtube' => $this->getYoutube(),
+			'twitch' => $this->getTwitch(),
+			'facebook' => $this->getFacebook(),
+			'twitter' => $this->getTwitter(),
+			'blocHomeImg' => ($blocHomeImg)?$blocHomeImg->_toArray():null,
+			'blocHomeLink' => $this->getBlocHomeLink(),
+			'logo' => ($logo)?$logo->_toArray():null,
+			'tuile' => ($tuile)?$tuile->_toArray():null,
+			'header' => ($header)?$header->_toArray():null,
+		);
+	}
+
+	public function _toArray(){
+		$videos = $this->getVideos();
+		$aVideos = array();
+		foreach($videos as $video){
+			$aVideos[] = $video->_toArray();
+		}
+
+		$array = $this->_toArrayShort();
+
+		$array['videos'] = $aVideos;
+
+		return $array;
+	}
 }
