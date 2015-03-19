@@ -24,13 +24,6 @@ class Partenaire {
 	private $id;
 
 	/**
-	 * @var integer
-	 *
-	 * @ORM\Column(name="order", type="integer")
-	 */
-	private $order;
-
-	/**
 	 * @var string
 	 *
 	 * @ORM\Column(name="nom", type="string", length=255)
@@ -100,7 +93,7 @@ class Partenaire {
 	/**
 	 * @var string
 	 *
-	 * @ORM\Column(name="blocHomeLink", type="string", length=255)
+	 * @ORM\Column(name="bloc_home_link", type="string", length=255,nullable=true)
 	 */
 	private $blocHomeLink;
 
@@ -409,29 +402,6 @@ class Partenaire {
     public function getBlocHomeImg()
     {
         return $this->blocHomeImg;
-    }
-
-    /**
-     * Set order
-     *
-     * @param integer $order
-     * @return Partenaire
-     */
-    public function setOrder($order)
-    {
-        $this->order = $order;
-
-        return $this;
-    }
-
-    /**
-     * Get order
-     *
-     * @return integer 
-     */
-    public function getOrder()
-    {
-        return $this->order;
     }
 
 	public function _toArrayShort()
