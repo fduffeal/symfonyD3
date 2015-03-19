@@ -1,13 +1,23 @@
 <form name="test" action="" method="post">
+    <label>Nom</label><br>
     <input type="text" name="nom" placeholder="Nom" value="{{ partenaire.nom }}"><br>
+    <label>description</label><br>
     <textarea name="description" placeholder="description">{{ partenaire.description }}</textarea><br>
+    <label>youtube</label><br>
     <input type="text" name="youtube" placeholder="youtube" value="{{ partenaire.youtube }}"><br>
-    <input type="text" name="twitch" placeholder="twitch"  value="{{ partenaire.twitch }}">
+    <label>twitch</label><br>
+    <input type="text" name="twitch" placeholder="twitch"  value="{{ partenaire.twitch }}"><br>
+    <label>facebook</label><br>
+    <input type="text" name="facebook" placeholder="facebook"  value="{{ partenaire.facebook }}"><br>
+    <label>twitter</label><br>
+    <input type="text" name="twitter" placeholder="twitter"  value="{{ partenaire.twitter }}"><br>
+    <label>lien depuis le bloc home partenaire</label><br>
+    <input type="text" name="blocHomeLink" placeholder="blocHomeLink"  value="{{ partenaire.blocHomeLink }}">
 
     <div style="height: 400px;overflow: scroll">
-        logo
+        logo : petit logo dans la tuile à coté de la description
         <ul>
-            <li>Vider<input type="radio" name="document" value=""/></li>
+            <li>Vider<input type="radio" name="logo" value=""/></li>
         {% for document in documents %}
             <li>
                 <img src="/{{ document.webpath }}" width="20%" height="auto"/>
@@ -24,9 +34,9 @@
     </div>
 
     <div style="height: 400px;overflow: scroll">
-        tuile
+        tuile : image de fond des tuiles dans la liste des partenaires
         <ul>
-            <li>Vider<input type="radio" name="document" value=""/></li>
+            <li>Vider<input type="radio" name="tuile" value=""/></li>
             {% for document in documents %}
                 <li>
                     <img src="/{{ document.webpath }}" width="20%" height="auto"/>
@@ -43,9 +53,9 @@
     </div>
 
     <div style="height: 400px;overflow: scroll">
-        header
+        header : image de la page partenaire
         <ul>
-            <li>Vider<input type="radio" name="document" value=""/></li>
+            <li>Vider<input type="radio" name="header" value=""/></li>
             {% for document in documents %}
                 <li>
                     <img src="/{{ document.webpath }}" width="20%" height="auto"/>
@@ -55,6 +65,25 @@
                         <input type="radio" name="header" value="{{ document.id }}" checked/>
                     {% else %}
                         <input type="radio" name="header" value="{{ document.id }}"/>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div style="height: 400px;overflow: scroll">
+        BlocHomeImg : image du bloc partenaire de la home
+        <ul>
+            <li>Vider<input type="radio" name="blocHomeImg" value=""/></li>
+            {% for document in documents %}
+                <li>
+                    <img src="/{{ document.webpath }}" width="20%" height="auto"/>
+                    <a href="/{{ document.webpath }}">{{ document.name }}</a>
+
+                    {% if partenaire and  partenaire.blocHomeImg and document.id == partenaire.blocHomeImg.id %}
+                        <input type="radio" name="blocHomeImg" value="{{ document.id }}" checked/>
+                    {% else %}
+                        <input type="radio" name="blocHomeImg" value="{{ document.id }}"/>
                     {% endif %}
                 </li>
             {% endfor %}

@@ -586,9 +586,13 @@ class AdminController extends Controller
 		$description = $request->get('description');
 		$youtube = $request->get('youtube');
 		$twitch = $request->get('twitch');
+		$facebook = $request->get('facebook');
+		$twitter = $request->get('twitter');
 		$logo = $request->get('logo');
 		$tuile = $request->get('tuile');
 		$header = $request->get('header');
+		$blocHomeLink = $request->get('blocHomeLink');
+		$blocHomeImg = $request->get('blocHomeImg');
 
 		if($nom !== null){
 
@@ -598,6 +602,9 @@ class AdminController extends Controller
 			$partenaire->setDescription($description);
 			$partenaire->setYoutube($youtube);
 			$partenaire->setTwitch($twitch);
+			$partenaire->setFacebook($facebook);
+			$partenaire->setTwitter($twitter);
+			$partenaire->setBlocHomeLink($blocHomeLink);
 
 			$newDocumentEntity = $this->getDoctrine()
 				->getRepository('AcmeEsBattleBundle:Document')
@@ -617,6 +624,12 @@ class AdminController extends Controller
 				->find($header);
 
 			$partenaire->setHeader($newDocumentEntity);
+
+			$newDocumentEntity = $this->getDoctrine()
+				->getRepository('AcmeEsBattleBundle:Document')
+				->find($blocHomeImg);
+
+			$partenaire->setBlocHomeImg($newDocumentEntity);
 
 			$em->persist($partenaire);
 			$em->flush();

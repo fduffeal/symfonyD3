@@ -52,6 +52,21 @@ class Partenaire {
 	private $twitch;
 
 	/**
+	 * @var string
+	 *
+	 * @ORM\Column(name="facebook", type="string", length=255)
+	 */
+	private $facebook;
+
+
+	/**
+	 * @var string
+	 *
+	 * @ORM\Column(name="twitter", type="string", length=255)
+	 */
+	private $twitter;
+
+	/**
 	 * @ORM\ManyToOne(targetEntity="Document")
 	 * @ORM\JoinColumn(name="logo_id", referencedColumnName="id",nullable=true)
 	 */
@@ -68,6 +83,19 @@ class Partenaire {
 	 * @ORM\JoinColumn(name="header_id", referencedColumnName="id",nullable=true)
 	 */
 	protected $header;
+
+	/**
+	 * @ORM\ManyToOne(targetEntity="Document")
+	 * @ORM\JoinColumn(name="bloc_home_img_id", referencedColumnName="id",nullable=true)
+	 */
+	protected $blocHomeImg;
+
+	/**
+	 * @var string
+	 *
+	 * @ORM\Column(name="blocHomeLink", type="string", length=255)
+	 */
+	private $blocHomeLink;
 
 
 	/**
@@ -282,5 +310,97 @@ class Partenaire {
     public function getVideos()
     {
         return $this->videos;
+    }
+
+    /**
+     * Set facebook
+     *
+     * @param string $facebook
+     * @return Partenaire
+     */
+    public function setFacebook($facebook)
+    {
+        $this->facebook = $facebook;
+
+        return $this;
+    }
+
+    /**
+     * Get facebook
+     *
+     * @return string 
+     */
+    public function getFacebook()
+    {
+        return $this->facebook;
+    }
+
+    /**
+     * Set twitter
+     *
+     * @param string $twitter
+     * @return Partenaire
+     */
+    public function setTwitter($twitter)
+    {
+        $this->twitter = $twitter;
+
+        return $this;
+    }
+
+    /**
+     * Get twitter
+     *
+     * @return string 
+     */
+    public function getTwitter()
+    {
+        return $this->twitter;
+    }
+
+    /**
+     * Set blocHomeLink
+     *
+     * @param string $blocHomeLink
+     * @return Partenaire
+     */
+    public function setBlocHomeLink($blocHomeLink)
+    {
+        $this->blocHomeLink = $blocHomeLink;
+
+        return $this;
+    }
+
+    /**
+     * Get blocHomeLink
+     *
+     * @return string 
+     */
+    public function getBlocHomeLink()
+    {
+        return $this->blocHomeLink;
+    }
+
+    /**
+     * Set blocHomeImg
+     *
+     * @param \Acme\EsBattleBundle\Entity\Document $blocHomeImg
+     * @return Partenaire
+     */
+    public function setBlocHomeImg(\Acme\EsBattleBundle\Entity\Document $blocHomeImg = null)
+    {
+        $this->blocHomeImg = $blocHomeImg;
+
+        return $this;
+    }
+
+    /**
+     * Get blocHomeImg
+     *
+     * @return \Acme\EsBattleBundle\Entity\Document 
+     */
+    public function getBlocHomeImg()
+    {
+        return $this->blocHomeImg;
     }
 }
