@@ -3,6 +3,7 @@
 namespace Acme\EsBattleBundle\Controller;
 
 use Acme\EsBattleBundle\Entity\Document;
+use Acme\EsBattleBundle\Entity\Partenaire;
 use Acme\EsBattleBundle\Entity\Topic;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -553,6 +554,76 @@ class AdminController extends Controller
 
 		return $this->render('AcmeEsBattleBundle:Admin:partenaire.html.twig', array(
 			'partenaires' => $partenaires
+		));
+	}
+
+	public function addPartenaireAction($id, Request $request){
+		$session = new Session();
+
+		if(!$session->get('user')){
+			$response = new Response();
+			$response->setStatusCode(401);
+			return $response;
+		}
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\Partenaire $partenaire
+		 */
+		$partenaire = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Partenaire')
+			->find($id);
+
+		if($partenaire === null){
+			$partenaire = new Partenaire();
+		}
+
+		$collectionDocument = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Document')
+			->findAll();
+
+
+		$nom = $request->get('nom');
+		$description = $request->get('description');
+		$youtube = $request->get('youtube');
+		$twitch = $request->get('twitch');
+		$logo = $request->get('logo');
+		$tuile = $request->get('tuile');
+		$header = $request->get('header');
+
+		if($nom !== null){
+
+			$em = $this->getDoctrine()->getManager();
+
+			$partenaire->setNom($nom);
+			$partenaire->setDescription($description);
+			$partenaire->setYoutube($youtube);
+			$partenaire->setTwitch($twitch);
+
+			$newDocumentEntity = $this->getDoctrine()
+				->getRepository('AcmeEsBattleBundle:Document')
+				->find($logo);
+
+			$partenaire->setLogo($newDocumentEntity);
+
+			$newDocumentEntity = $this->getDoctrine()
+				->getRepository('AcmeEsBattleBundle:Document')
+				->find($tuile);
+
+			$partenaire->setTuile($newDocumentEntity);
+
+
+			$newDocumentEntity = $this->getDoctrine()
+				->getRepository('AcmeEsBattleBundle:Document')
+				->find($header);
+
+			$partenaire->setHeader($newDocumentEntity);
+
+			$em->persist($partenaire);
+			$em->flush();
+		}
+
+		return $this->render('AcmeEsBattleBundle:Admin:add-partenaire.html.twig', array(
+			'documents' => $collectionDocument,
+			'partenaire' => $partenaire
 		));
 	}
 }

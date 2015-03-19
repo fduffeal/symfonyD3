@@ -191,6 +191,10 @@ acme_es_battle_admin_partenaire:
     path:     /admin/partenaire
     defaults: { _controller: AcmeEsBattleBundle:Admin:partenaire }
 
+acme_es_battle_admin_partenaire_add:
+    path:     /admin/partenaire/add/{id}
+    defaults: { _controller: AcmeEsBattleBundle:Admin:addPartenaire }
+
 acme_es_battle_admin_login:
     path:     /admin/login
     defaults: { _controller: AcmeEsBattleBundle:Admin:login }

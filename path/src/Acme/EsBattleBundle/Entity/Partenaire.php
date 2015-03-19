@@ -2,6 +2,8 @@
 
 namespace Acme\EsBattleBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -66,6 +68,17 @@ class Partenaire {
 	 * @ORM\JoinColumn(name="header_id", referencedColumnName="id",nullable=true)
 	 */
 	protected $header;
+
+
+	/**
+	 * @ORM\OneToMany(targetEntity="Video",mappedBy="partenaire")
+	 */
+	protected $videos;
+
+
+	public function __construct() {
+		$this->videos = new ArrayCollection();
+	}
 
     /**
      * Get id
@@ -236,5 +249,38 @@ class Partenaire {
     public function getHeader()
     {
         return $this->header;
+    }
+
+    /**
+     * Add videos
+     *
+     * @param \Acme\EsBattleBundle\Entity\Video $videos
+     * @return Partenaire
+     */
+    public function addVideo(\Acme\EsBattleBundle\Entity\Video $videos)
+    {
+        $this->videos[] = $videos;
+
+        return $this;
+    }
+
+    /**
+     * Remove videos
+     *
+     * @param \Acme\EsBattleBundle\Entity\Video $videos
+     */
+    public function removeVideo(\Acme\EsBattleBundle\Entity\Video $videos)
+    {
+        $this->videos->removeElement($videos);
+    }
+
+    /**
+     * Get videos
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getVideos()
+    {
+        return $this->videos;
     }
 }

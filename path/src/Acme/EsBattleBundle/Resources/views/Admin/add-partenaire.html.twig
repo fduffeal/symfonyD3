@@ -1,0 +1,64 @@
+<form name="test" action="" method="post">
+    <input type="text" name="nom" placeholder="Nom" value="{{ partenaire.nom }}"><br>
+    <textarea name="description" placeholder="description">{{ partenaire.description }}</textarea><br>
+    <input type="text" name="youtube" placeholder="youtube" value="{{ partenaire.youtube }}"><br>
+    <input type="text" name="twitch" placeholder="twitch"  value="{{ partenaire.twitch }}">
+
+    <div style="height: 400px;overflow: scroll">
+        logo
+        <ul>
+            <li>Vider<input type="radio" name="document" value=""/></li>
+        {% for document in documents %}
+            <li>
+                <img src="/{{ document.webpath }}" width="20%" height="auto"/>
+                <a href="/{{ document.webpath }}">{{ document.name }}</a>
+
+                {% if partenaire and partenaire.logo and document.id == partenaire.logo.id %}
+                    <input type="radio" name="logo" value="{{ document.id }}" checked/>
+                {% else %}
+                    <input type="radio" name="logo" value="{{ document.id }}"/>
+                {% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+
+    <div style="height: 400px;overflow: scroll">
+        tuile
+        <ul>
+            <li>Vider<input type="radio" name="document" value=""/></li>
+            {% for document in documents %}
+                <li>
+                    <img src="/{{ document.webpath }}" width="20%" height="auto"/>
+                    <a href="/{{ document.webpath }}">{{ document.name }}</a>
+
+                    {% if partenaire and partenaire.tuile and document.id == partenaire.tuile.id %}
+                        <input type="radio" name="tuile" value="{{ document.id }}" checked/>
+                    {% else %}
+                        <input type="radio" name="tuile" value="{{ document.id }}"/>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div style="height: 400px;overflow: scroll">
+        header
+        <ul>
+            <li>Vider<input type="radio" name="document" value=""/></li>
+            {% for document in documents %}
+                <li>
+                    <img src="/{{ document.webpath }}" width="20%" height="auto"/>
+                    <a href="/{{ document.webpath }}">{{ document.name }}</a>
+
+                    {% if partenaire and  partenaire.header and document.id == partenaire.header.id %}
+                        <input type="radio" name="header" value="{{ document.id }}" checked/>
+                    {% else %}
+                        <input type="radio" name="header" value="{{ document.id }}"/>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <input type="submit" value="Valider">
+</form>

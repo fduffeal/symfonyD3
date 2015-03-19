@@ -58,6 +58,12 @@ class Video
 	 */
 	protected $created;
 
+	/**
+	 * @ORM\ManyToOne(targetEntity="Partenaire", inversedBy="videos")
+	 * @ORM\JoinColumn(name="partenaire_id", referencedColumnName="id")
+	 **/
+	private $product;
+
     /**
      * Constructor
      */
@@ -224,4 +230,27 @@ class Video
 
 		return $serializer->serialize($aVideo, 'json');
 	}
+
+    /**
+     * Set product
+     *
+     * @param \Acme\EsBattleBundle\Entity\Partenaire $product
+     * @return Video
+     */
+    public function setProduct(\Acme\EsBattleBundle\Entity\Partenaire $product = null)
+    {
+        $this->product = $product;
+
+        return $this;
+    }
+
+    /**
+     * Get product
+     *
+     * @return \Acme\EsBattleBundle\Entity\Partenaire 
+     */
+    public function getProduct()
+    {
+        return $this->product;
+    }
 }
