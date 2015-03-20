@@ -31,8 +31,8 @@ acme_es_battle_rdv_create:
     defaults: { _controller: AcmeEsBattleBundle:Rdv:create }
 
 acme_es_battle_rdv_get:
-    path:     /rdv/get/{rdvId}
-    defaults: { _controller: AcmeEsBattleBundle:Rdv:getRdvById }
+    path:     /rdv/get/{rdvId}.{_format}
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:getRdvById,_format: json}
 
 acme_es_battle_rdv_join:
     path:     /rdv/join/{rdvId}/{userGameId}/{username}/{apikey}
@@ -187,6 +187,22 @@ acme_es_battle_admin_topic:
     path:     /admin/topic/{id}
     defaults: { _controller: AcmeEsBattleBundle:Admin:topic }
 
+acme_es_battle_admin_partenaire:
+    path:     /admin/partenaire
+    defaults: { _controller: AcmeEsBattleBundle:Admin:partenaire }
+
+acme_es_battle_admin_partenaire_add:
+    path:     /admin/partenaire/add/{id}
+    defaults: { _controller: AcmeEsBattleBundle:Admin:addPartenaire }
+
+acme_es_battle_admin_video:
+    path:     /admin/video
+    defaults: { _controller: AcmeEsBattleBundle:Admin:video }
+
+acme_es_battle_admin_video_add:
+    path:     /admin/video/add/{id}
+    defaults: { _controller: AcmeEsBattleBundle:Admin:addVideo }
+
 acme_es_battle_admin_login:
     path:     /admin/login
     defaults: { _controller: AcmeEsBattleBundle:Admin:login }
@@ -201,8 +217,8 @@ acme_es_battle_news_get_all:
     defaults: { _controller: AcmeEsBattleBundle:Forum:getNews }
 
 acme_es_battle_forum_topic_get_one:
-    path:     /forum/topic/get/{id}/{page}/{nbResult}
-    defaults: { _controller: AcmeEsBattleBundle:Forum:getTopic }
+    path:     /forum/topic/get/{id}/{page}/{nbResult}.{_format}
+    defaults: { _controller: AcmeEsBattleBundle:Forum:getTopic,_format: json }
 
 acme_es_battle_forum_topic_create:
     path:     /forum/topic/create/{username}/{token}
@@ -223,3 +239,11 @@ acme_es_battle_forum_topic_message_delete:
 acme_es_battle_stats:
     path:     /stats
     defaults: { _controller: AcmeEsBattleBundle:Stats:index }
+
+acme_es_battle_partenaire:
+    path:     /partenaire
+    defaults: { _controller: AcmeEsBattleBundle:Partenaire:index }
+
+acme_es_battle_partenaire_get_one:
+    path:     /partenaire/{id}
+    defaults: { _controller: AcmeEsBattleBundle:Partenaire:get }

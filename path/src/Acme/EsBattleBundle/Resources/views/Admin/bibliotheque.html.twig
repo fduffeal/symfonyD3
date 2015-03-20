@@ -1,8 +1,8 @@
 <ul>
 {% for document in documents %}
-    <ul>
+    <li>
         <img src="/{{ document.webpath }}" width="20%" height="auto"/>
         <a href="/{{ document.webpath }}">{{ document.name }}</a>
-    </ul>
+    </li>
 {% endfor %}
 </ul>

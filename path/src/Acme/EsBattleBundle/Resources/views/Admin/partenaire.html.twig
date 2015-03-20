@@ -1,0 +1,9 @@
+<ul>
+    {% for partenaire in partenaires %}
+        <li>
+            <a href="partenaire/add/{{ partenaire.id }}">{{ partenaire.nom }}</a>
+        </li>
+    {% endfor %}
+</ul>
+
+<a href="partenaire/add/0">Ajouter un partenaire</a>

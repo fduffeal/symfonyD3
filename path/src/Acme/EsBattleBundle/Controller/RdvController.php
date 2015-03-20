@@ -2,10 +2,14 @@
 
 namespace Acme\EsBattleBundle\Controller;
 
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 
 use Symfony\Component\Serializer\Serializer;
@@ -190,7 +194,16 @@ class RdvController extends Controller
 
 	}
 
+    /**
+     * @Template()
+     */
 	public function getRdvByIdAction($rdvId){
+
+        $format = $this->getRequest()->getRequestFormat();
+
+
+        //var_dump($rdvId);
+        //var_dump($format);die();
 
         $response = new Response();
         // Définit la réponse comme publique. Sinon elle sera privée par défaut.
@@ -249,6 +262,7 @@ class RdvController extends Controller
 		}
 
 
+
 //		var_dump($appointment->getUpdated());
 		//$response->setLastModified($appointment->getUpdated());
 		$response->setETag('RDV_'.$appointment->getId().'_'.$appointment->getUpdated()->getTimestamp());
@@ -263,9 +277,13 @@ class RdvController extends Controller
 			// Retourne immédiatement un objet 304 Response
 			return $response;
 		} else {
-			$json = $appointment->_toJson();
-			$response->setContent($json);
-			return $response;
+			if($format === 'json'){
+				$response = new JsonResponse();
+				$response->setData($appointment->_toArray());
+				return $response;
+			}
+
+			return array('rdv' => $appointment->_toArray());
 		}
 	}
 

@@ -3,7 +3,9 @@
 namespace Acme\EsBattleBundle\Controller;
 
 use Acme\EsBattleBundle\Entity\Document;
+use Acme\EsBattleBundle\Entity\Partenaire;
 use Acme\EsBattleBundle\Entity\Topic;
+use Acme\EsBattleBundle\Entity\Video;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Acme\EsBattleBundle\Entity\UserGame;
@@ -532,5 +534,182 @@ class AdminController extends Controller
 		}
 
 		return array('form' => $form->createView(),'logged' => $logged);
+	}
+
+	public function partenaireAction(){
+		$session = new Session();
+
+		if(!$session->get('user')){
+			$response = new Response();
+			$response->setStatusCode(401);
+			return $response;
+		}
+
+
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\User $user
+		 */
+		$partenaires = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Partenaire')
+			->findAll();
+
+		return $this->render('AcmeEsBattleBundle:Admin:partenaire.html.twig', array(
+			'partenaires' => $partenaires
+		));
+	}
+
+	public function addPartenaireAction($id, Request $request){
+		$session = new Session();
+
+		if(!$session->get('user')){
+			$response = new Response();
+			$response->setStatusCode(401);
+			return $response;
+		}
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\Partenaire $partenaire
+		 */
+		$partenaire = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Partenaire')
+			->find($id);
+
+		if($partenaire === null){
+			$partenaire = new Partenaire();
+		}
+
+		$collectionDocument = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Document')
+			->findAll();
+
+
+		$nom = $request->get('nom');
+		$description = $request->get('description');
+		$youtube = $request->get('youtube');
+		$twitch = $request->get('twitch');
+		$facebook = $request->get('facebook');
+		$twitter = $request->get('twitter');
+		$logo = $request->get('logo');
+		$tuile = $request->get('tuile');
+		$header = $request->get('header');
+		$blocHomeLink = $request->get('blocHomeLink');
+		$blocHomeImg = $request->get('blocHomeImg');
+
+		if($nom !== null){
+
+			$em = $this->getDoctrine()->getManager();
+
+			$partenaire->setNom($nom);
+			$partenaire->setDescription($description);
+			$partenaire->setYoutube($youtube);
+			$partenaire->setTwitch($twitch);
+			$partenaire->setFacebook($facebook);
+			$partenaire->setTwitter($twitter);
+			$partenaire->setBlocHomeLink($blocHomeLink);
+
+			$newDocumentEntity = $this->getDoctrine()
+				->getRepository('AcmeEsBattleBundle:Document')
+				->find($logo);
+
+			$partenaire->setLogo($newDocumentEntity);
+
+			$newDocumentEntity = $this->getDoctrine()
+				->getRepository('AcmeEsBattleBundle:Document')
+				->find($tuile);
+
+			$partenaire->setTuile($newDocumentEntity);
+
+
+			$newDocumentEntity = $this->getDoctrine()
+				->getRepository('AcmeEsBattleBundle:Document')
+				->find($header);
+
+			$partenaire->setHeader($newDocumentEntity);
+
+			$newDocumentEntity = $this->getDoctrine()
+				->getRepository('AcmeEsBattleBundle:Document')
+				->find($blocHomeImg);
+
+			$partenaire->setBlocHomeImg($newDocumentEntity);
+
+			$em->persist($partenaire);
+			$em->flush();
+		}
+
+		return $this->render('AcmeEsBattleBundle:Admin:add-partenaire.html.twig', array(
+			'documents' => $collectionDocument,
+			'partenaire' => $partenaire
+		));
+	}
+
+	public function videoAction(){
+		$session = new Session();
+
+		if(!$session->get('user')){
+			$response = new Response();
+			$response->setStatusCode(401);
+			return $response;
+		}
+
+
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\Video $videos
+		 */
+		$videos = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Video')
+			->findAll();
+
+		return $this->render('AcmeEsBattleBundle:Admin:video.html.twig', array(
+			'videos' => $videos
+		));
+	}
+
+	public function addVideoAction($id, Request $request){
+		$session = new Session();
+
+		if(!$session->get('user')){
+			$response = new Response();
+			$response->setStatusCode(401);
+			return $response;
+		}
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\Video $video
+		 */
+		$video = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Video')
+			->find($id);
+
+		if($video === null){
+			$video = new Video();
+		}
+
+		$collectionPartenaire = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Partenaire')
+			->findAll();
+
+		$url = $request->get('url');
+		$description = $request->get('description');
+		$partenaire = $request->get('partenaire');
+
+		if($url !== null){
+
+			$em = $this->getDoctrine()->getManager();
+
+			$video->setUrl($url);
+			$video->setDescription($description);
+
+			$newPartenaireEntity = $this->getDoctrine()
+				->getRepository('AcmeEsBattleBundle:Partenaire')
+				->find($partenaire);
+
+			$video->setPartenaire($newPartenaireEntity);
+
+			$em->persist($video);
+			$em->flush();
+		}
+
+		return $this->render('AcmeEsBattleBundle:Admin:add-video.html.twig', array(
+			'partenaires' => $collectionPartenaire,
+			'video' => $video
+		));
 	}
 }
