@@ -329,6 +329,7 @@ class ForumController extends Controller
             'id'  => $topic->getId(),
             'page'  => $page,
             'nbResult'  => $nbResult,
+	        '_format' => 'json'
         ));
 
 
@@ -411,6 +412,7 @@ class ForumController extends Controller
             'id'  => $topic->getId(),
             'page'  => $page,
             'nbResult'  => $nbResult,
+	        '_format' => 'json'
         ));
 
         return $response;
@@ -480,6 +482,7 @@ class ForumController extends Controller
             'id'  => $topic->getId(),
             'page'  => $page,
             'nbResult'  => $nbResult,
+	        '_format' => 'json'
         ));
 
         return $response;
