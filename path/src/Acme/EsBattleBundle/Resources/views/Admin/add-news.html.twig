@@ -1,0 +1,119 @@
+<script src="//cdn.ckeditor.com/4.4.7/full/ckeditor.js"></script>
+<style>
+    li{
+        display: inline-block;
+    }
+    img {
+        max-height: 200px;
+        border: 2px solid #000000;
+
+    }
+    img.selected {
+        border: 2px solid red;
+    }
+
+    #bibliotheque.open {
+        display: block;
+        height: 100%;
+        width:100%;
+        overflow: scroll;
+        position: fixed;
+        top:0;
+        left: 0;
+        background-color: #636363;
+    }
+
+    #bibliotheque.close {
+        display: none;
+    }
+
+    .action{
+        position: fixed;
+        bottom: 0px;
+    }
+</style>
+<form action="#" method="post">
+
+    <label>titre</label><br>
+    <input type="text" name="titre" placeholder="Titre" value="{{ topic.titre }}"><br>
+
+    <label>Vignette de la news</label><br>
+    <span onclick="openBiblioFor('vignette')">changer la vignette</span>
+    <input type="hidden" onclick="openBiblio(this)" name="vignette" id="vignette" value="{{ (topic.vignette)?topic.vignette.id:null }}"/><br>
+    <img id="vignette_previsu" src="/{{ (topic.vignette)?topic.vignette.webpath }}"><br>
+
+    <label>Image de carrousel pour la news</label><br>
+    <span onclick="openBiblioFor('document')">changer la vignette</span>
+    <input type="hidden" onclick="openBiblio(this)" name="document" id="document" value="{{ (topic.document)?topic.document.id:null }}"/><br>
+    <img id="document_previsu" src="/{{ (topic.document)?topic.document.webpath }}"><br>
+
+    <label>Message</label><br>
+    <textarea id="editor1" name="message">{{ (topic.messages[0])?topic.messages[0].texte }}</textarea><br>
+
+    <div id="bibliotheque" class="close">
+        <ul>
+        {% for document in documents %}
+            <li>
+                <img id="document_{{ document.id }}" src="/{{ document.webpath }}" alt="{{ document.name }}" onclick="setVignette({{ document.id }},'{{ document.webpath }}',this)"/>
+            </li>
+        {% endfor %}
+        </ul>
+
+        <div class="action">
+            <span type="button" onclick="closeBiblio()">Valider</span>
+        </div>
+    </div>
+
+    {{ form_widget(form) }}
+    <input type="submit" value="Valider">
+</form>
+
+<script>
+
+    var currentInput = null;
+    var currentImgPrevisu = null;
+
+    var biblioNode = document.getElementById('bibliotheque');
+
+    var setCurrent = function(name){
+        currentInput = document.getElementById(name);
+        currentImgPrevisu = document.getElementById(name+'_previsu');
+    };
+
+    var setVignette = function(id,webpath,elm){
+        var ul = elm.parentNode.parentNode;
+        var aSelected = ul.getElementsByClassName('selected');
+        for(var key in aSelected){
+            if(typeof aSelected[key] == "object" ){
+                aSelected[key].setAttribute('class','');
+            }
+        }
+        elm.setAttribute('class','selected');
+        currentInput.value = id;
+        currentImgPrevisu.setAttribute('src','/'+webpath);
+    };
+
+    var closeBiblio = function(){
+        biblioNode.setAttribute('class','close');
+    };
+
+    var openBiblioFor = function(name){
+        var elm = document.getElementById(name);
+        if(elm !== null){
+            elm.click();
+        }
+    };
+
+    var openBiblio = function(elm){
+        setCurrent(elm.getAttribute('name'));
+        biblioNode.setAttribute('class','open');
+
+        var currentDocument = document.getElementById('document_'+currentInput.value);
+        if(currentDocument != null){
+            currentDocument.click();
+        }
+    };
+    // Replace the <textarea id="editor1"> with a CKEditor
+    // instance, using default configuration.
+    CKEDITOR.replace( 'editor1' );
+</script>

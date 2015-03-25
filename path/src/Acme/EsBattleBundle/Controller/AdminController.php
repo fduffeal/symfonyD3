@@ -499,6 +499,11 @@ class AdminController extends Controller
 	public function loginAction(Request $request)
 	{
 
+		$logged = false;
+		if($request->getSession()->get('user')){
+			$logged = true;
+		}
+
 		$user = new User();
 		$form = $this->createFormBuilder($user)
 			->add('username')
@@ -507,7 +512,7 @@ class AdminController extends Controller
 
 		$form->handleRequest($request);
 
-		$logged = false;
+
 
 		if ($form->isValid()) {
 
@@ -710,6 +715,50 @@ class AdminController extends Controller
 		return $this->render('AcmeEsBattleBundle:Admin:add-video.html.twig', array(
 			'partenaires' => $collectionPartenaire,
 			'video' => $video
+		));
+	}
+
+	public function addNewsAction($id, Request $request){
+		$session = $request->getSession();
+
+		if(!$session->get('user')){
+			$response = new Response();
+			$response->setStatusCode(401);
+			return $response;
+		}
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\Topic $topic
+		 */
+		$topic = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Topic')
+			->find($id);
+
+		$collectionDocument = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Document')
+			->findBy(array(), array('id' => 'DESC'));;
+
+		if($topic === null){
+			$topic = new Topic();
+		}
+
+		$form = $this->createFormBuilder($topic)
+			->getForm();
+
+		$form->handleRequest($request);
+
+
+//		if($url !== null){
+//
+//			$em = $this->getDoctrine()->getManager();
+//
+//			$em->persist($video);
+//			$em->flush();
+//		}
+
+		return $this->render('AcmeEsBattleBundle:Admin:add-news.html.twig', array(
+			'topic' => $topic,
+			'documents' => $collectionDocument,
+			'form' => $form->createView()
 		));
 	}
 }
