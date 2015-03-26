@@ -1,8 +1,8 @@
-{% extends "TwigBundle::layout.html.twig" %}
+{#{% extends "TwigBundle::layout.html.twig" %}#}
 
 {% block head %}
     <link rel="icon" sizes="16x16" href="{{ asset('favicon.ico') }}" />
-    <link rel="stylesheet" href="{{ asset('bundles/acmedemo/css/demo.css') }}" />
+    <link rel="stylesheet" href="{{ asset('bundles/esbattle/css/all.css') }}" />
 {% endblock %}
 
 {% block title 'Demo Bundle' %}
@@ -15,11 +15,19 @@
     {% endfor %}
 
     {% block content_header %}
-        <ul id="menu">
+
             {% block content_header_more %}
-                <li><a href="{{ path('_demo') }}">Demo Home</a></li>
+                <div>
+                    <ul>
+                        <li><a href="/app_dev.php/admin/upload">upload</a></li>
+                        <li><a href="/app_dev.php/admin/biblio">biblio</a></li>
+                        <li><a href="/app_dev.php/admin/topic/1">topic</a></li>
+                        <li><a href="/app_dev.php/admin/news/add/0">news</a></li>
+                        <li><a href="/app_dev.php/admin/partenaire">partenaire</a></li>
+                        <li><a href="/app_dev.php/admin/video">video</a></li>
+                    </ul>
+                </div>
             {% endblock %}
-        </ul>
 
         <div style="clear: both"></div>
     {% endblock %}

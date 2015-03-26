@@ -1,3 +1,5 @@
+{% extends 'AcmeEsBattleBundle::layout.html.twig' %}
+{% block content %}
 <ul>
     {% for partenaire in partenaires %}
         <li>
@@ -7,3 +9,4 @@
 </ul>
 
 <a href="partenaire/add/0">Ajouter un partenaire</a>
+{% endblock %}

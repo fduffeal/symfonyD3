@@ -1,0 +1,31 @@
+li{
+	display: inline-block;
+}
+img {
+	max-height: 200px;
+	border: 2px solid #000000;
+
+}
+img.selected {
+	border: 2px solid red;
+}
+
+#bibliotheque.open {
+	display: block;
+	height: 100%;
+	width:100%;
+	overflow: scroll;
+	position: fixed;
+	top:0;
+	left: 0;
+	background-color: #636363;
+}
+
+#bibliotheque.close {
+	display: none;
+}
+
+.action{
+	position: fixed;
+	bottom: 0px;
+}

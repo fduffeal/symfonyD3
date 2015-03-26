@@ -1,3 +1,5 @@
+{% extends 'AcmeEsBattleBundle::layout.html.twig' %}
+{% block content %}
 <form name="test" action="" method="post">
     <label>Nom</label><br>
     <input type="text" name="nom" placeholder="Nom" value="{{ partenaire.nom }}"><br>
@@ -91,3 +93,4 @@
     </div>
     <input type="submit" value="Valider">
 </form>
+{% endblock %}
