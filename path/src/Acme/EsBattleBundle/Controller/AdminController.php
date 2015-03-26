@@ -3,6 +3,7 @@
 namespace Acme\EsBattleBundle\Controller;
 
 use Acme\EsBattleBundle\Entity\Document;
+use Acme\EsBattleBundle\Entity\Message;
 use Acme\EsBattleBundle\Entity\Partenaire;
 use Acme\EsBattleBundle\Entity\Topic;
 use Acme\EsBattleBundle\Entity\Video;
@@ -721,7 +722,13 @@ class AdminController extends Controller
 	public function addNewsAction($id, Request $request){
 		$session = $request->getSession();
 
-		if(!$session->get('user')){
+		$user = $session->get('user');
+
+		$user = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:User')
+			->find($user['id']);
+
+		if(!$user){
 			$response = new Response();
 			$response->setStatusCode(401);
 			return $response;
@@ -735,7 +742,7 @@ class AdminController extends Controller
 
 		$collectionDocument = $this->getDoctrine()
 			->getRepository('AcmeEsBattleBundle:Document')
-			->findBy(array(), array('id' => 'DESC'));;
+			->findBy(array(), array('id' => 'DESC'));
 
 		if($topic === null){
 			$topic = new Topic();
@@ -745,6 +752,55 @@ class AdminController extends Controller
 			->getForm();
 
 		$form->handleRequest($request);
+
+
+		if ($form->isValid()) {
+
+			$titre = $request->get('titre');
+			$vignette = $request->get('vignette');
+			$document = $request->get('document');
+			$texte = $request->get('message');
+
+			$topic->setTitre($titre);
+			$topic->setUser($user);
+			$topic->setVisible(false);
+			$topic->setStatus(Topic::STATUS_NEWS);
+
+			$newVignetteEntity = null;
+			if($vignette !== null){
+				$newVignetteEntity = $this->getDoctrine()
+					->getRepository('AcmeEsBattleBundle:Document')
+					->find($vignette);
+			}
+			$topic->setVignette($newVignetteEntity);
+
+			$newDocumentEntity = null;
+			if($document !== null){
+				$newDocumentEntity = $this->getDoctrine()
+					->getRepository('AcmeEsBattleBundle:Document')
+					->find($document);
+			}
+			$topic->setDocument($newDocumentEntity);
+
+			$message = $topic->getMessages()->first();
+			if($message == null){
+				$message = new Message();
+			}
+			$message->setVisible(false);
+			$message->setUser($user);
+			$message->setTexte($texte);
+
+
+			$topic->addMessage($message);
+
+			$em = $this->getDoctrine()->getManager();
+
+			$em->persist($topic);
+			$em->persist($message);
+			$em->flush();
+
+			// redirect to the show page for the just submitted item
+		}
 
 
 //		if($url !== null){

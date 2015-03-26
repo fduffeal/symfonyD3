@@ -48,7 +48,11 @@
     <img id="document_previsu" src="/{{ (topic.document)?topic.document.webpath }}"><br>
 
     <label>Message</label><br>
-    <textarea id="editor1" name="message">{{ (topic.messages[0])?topic.messages[0].texte }}</textarea><br>
+    {% if topic.messages and  topic.messages[0] is defined %}
+        <textarea id="editor1" name="message">{{ topic.messages[0].texte }}</textarea><br>
+    {% else %}
+        <textarea id="editor1" name="message"></textarea><br>
+    {% endif %}
 
     <div id="bibliotheque" class="close">
         <ul>
