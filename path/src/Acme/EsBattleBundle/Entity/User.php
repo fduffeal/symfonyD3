@@ -21,6 +21,8 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 class User
 {
 	const ROLE_MODO = 'modo';
+    const ROLE_REDACTEUR = 'redacteur';
+    const ROLE_PARTENAIRE = 'partenaire';
     /**
      * @var integer
      *
@@ -797,6 +799,14 @@ class User
     }
 
 	public function isModo(){
-		return ($this->getRole() === self::ROLE_MODO);
+        return preg_match('/'.self::ROLE_MODO.'/',$this->getRole());
 	}
+
+    public function isRedacteur(){
+        return preg_match('/'.self::ROLE_REDACTEUR.'/',$this->getRole());
+    }
+
+    public function isPartenaire(){
+        return preg_match('/'.self::ROLE_PARTENAIRE.'/',$this->getRole());
+    }
 }

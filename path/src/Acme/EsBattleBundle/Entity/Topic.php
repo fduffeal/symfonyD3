@@ -85,6 +85,12 @@ class Topic
 	 */
 	protected $document;
 
+	/**
+	 * @ORM\ManyToOne(targetEntity="Document")
+	 * @ORM\JoinColumn(name="vignette_id", referencedColumnName="id",nullable=true)
+	 */
+	protected $vignette;
+
     /**
      * @var integer
      *
@@ -461,5 +467,28 @@ class Topic
     public function getDocument()
     {
         return $this->document;
+    }
+
+    /**
+     * Set vignette
+     *
+     * @param \Acme\EsBattleBundle\Entity\Document $vignette
+     * @return Topic
+     */
+    public function setVignette(\Acme\EsBattleBundle\Entity\Document $vignette = null)
+    {
+        $this->vignette = $vignette;
+
+        return $this;
+    }
+
+    /**
+     * Get vignette
+     *
+     * @return \Acme\EsBattleBundle\Entity\Document 
+     */
+    public function getVignette()
+    {
+        return $this->vignette;
     }
 }

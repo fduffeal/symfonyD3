@@ -1,17 +1,27 @@
-<form action="#" method="post" {{ form_enctype(form) }}>
-    {{ form_widget(form) }}
+{% extends 'AcmeEsBattleBundle::layout.html.twig' %}
 
-    <input type="submit" value="Login" />
+{% block content %}
+<form action="#" method="post" class="form-signin" style="max-width:330px; padding:15px; margin: auto;" {{ form_enctype(form) }}>
+	<h2 class="form-signin-heading">Please sign in</h2>
+	{{ form_widget(form.username, {'attr': {'class':'form-control', 'placeholder':'Username'} }) }}
+	{{ form_widget(form.password, {'attr': {'class':'form-control', 'placeholder':'Password'} }) }}
+	{{ form_rest(form) }}
+	<!-- {{ form_widget(form) }}-->
+
+	<input type="submit" value="Login" class="btn btn-lg btn-primary btn-block"/>
 </form>
 
-{% if logged %}
-<div>
-    <ul>
-        <li><a href="upload">upload</a></li>
-        <li><a href="biblio">biblio</a></li>
-        <li><a href="topic/1">topic</a></li>
-        <li><a href="partenaire">partenaire</a></li>
-        <li><a href="video">video</a></li>
-    </ul>
-</div>
-{% endif %}
+{#{% if logged %}#}
+{#<div>#}
+{#<ul>#}
+{#<li><a href="upload">upload</a></li>#}
+{#<li><a href="biblio">biblio</a></li>#}
+{#<li><a href="topic/1">topic</a></li>#}
+{#<li><a href="news/add/0">news</a></li>#}
+{#<li><a href="partenaire">partenaire</a></li>#}
+{#<li><a href="video">video</a></li>#}
+{#</ul>#}
+{#</div>#}
+{#{% endif %}#}
+
+{% endblock %}

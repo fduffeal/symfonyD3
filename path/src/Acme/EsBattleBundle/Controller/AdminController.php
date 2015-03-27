@@ -3,6 +3,7 @@
 namespace Acme\EsBattleBundle\Controller;
 
 use Acme\EsBattleBundle\Entity\Document;
+use Acme\EsBattleBundle\Entity\Message;
 use Acme\EsBattleBundle\Entity\Partenaire;
 use Acme\EsBattleBundle\Entity\Topic;
 use Acme\EsBattleBundle\Entity\Video;
@@ -391,7 +392,7 @@ class AdminController extends Controller
 	public function uploadAction(Request $request)
 	{
 		$session = $request->getSession();
-		if(!$session->get('user')){
+		if(!$session->get('modo') && !$session->get('redacteur')){
 			$response = new Response();
 			$response->setStatusCode(401);
 			return $response;
@@ -424,7 +425,7 @@ class AdminController extends Controller
 
 		$session = new Session();
 
-		if(!$session->get('user')){
+		if(!$session->get('modo') && !$session->get('redacteur')){
 			$response = new Response();
 			$response->setStatusCode(401);
 			return $response;
@@ -444,7 +445,7 @@ class AdminController extends Controller
 	{
 		$session = new Session();
 
-		if(!$session->get('user')){
+		if(!$session->get('modo')){
 			$response = new Response();
 			$response->setStatusCode(401);
 			return $response;
@@ -456,9 +457,6 @@ class AdminController extends Controller
 			->getRepository('AcmeEsBattleBundle:Topic')
 			->find($id);
 
-		$collectionDocument = $this->getDoctrine()
-			->getRepository('AcmeEsBattleBundle:Document')
-			->findAll();
 
 		$topicStatus = [];
 		$topicStatus[] = Topic::STATUS_NEWS;
@@ -468,26 +466,32 @@ class AdminController extends Controller
 
 
 		$newStatus = $request->get('status');
-		$newDocument = $request->get('document');
+		$visible = $request->get('visible');
 
 		if ($newStatus !== null) {
 			$em = $this->getDoctrine()->getManager();
 			$topic->setStatus($newStatus);
-			$newDocumentEntity = null;
 
-			if($newDocument !== null){
-				$newDocumentEntity = $this->getDoctrine()
-					->getRepository('AcmeEsBattleBundle:Document')
-					->find($newDocument);
-			}
+            /**
+             * @var \Acme\EsBattleBundle\Entity\Message $message
+             */
+            $message = $topic->getMessages()->first();
 
-			$topic->setDocument($newDocumentEntity);
+            if($visible === "1" && $message !== null){
+                $topic->setVisible(true);
+                $message->setVisible(true);
+            } else {
+                $topic->setVisible(false);
+                if($message !== null){
+                    $message->setVisible(false);
+                }
+            }
+
 			$em->flush();
 		}
 
 
 		return $this->render('AcmeEsBattleBundle:Admin:topic.html.twig', array(
-			'documents' => $collectionDocument,
 			'topic' => $topic,
 			'aStatus' => $topicStatus
 		));
@@ -499,6 +503,11 @@ class AdminController extends Controller
 	public function loginAction(Request $request)
 	{
 
+		$logged = false;
+		if($request->getSession()->get('user')){
+			$logged = true;
+		}
+
 		$user = new User();
 		$form = $this->createFormBuilder($user)
 			->add('username')
@@ -507,7 +516,7 @@ class AdminController extends Controller
 
 		$form->handleRequest($request);
 
-		$logged = false;
+
 
 		if ($form->isValid()) {
 
@@ -525,9 +534,21 @@ class AdminController extends Controller
 				);
 
 
-			if($user !== null && $user->isPasswordOk($password) && $user->isModo()){
+			if($user !== null && $user->isPasswordOk($password) && $user->getRole() !== null){
 				$session = new Session();
 				$session->set('user',$user->_toArrayShort());
+
+                if($user->isModo()){
+                    $session->set('modo',true);
+                }
+
+                if($user->isRedacteur()){
+                    $session->set('redacteur',true);
+                }
+
+                if($user->isPartenaire()){
+                    $session->set('partenaire',true);
+                }
 				$logged = true;
 			}
 
@@ -539,7 +560,7 @@ class AdminController extends Controller
 	public function partenaireAction(){
 		$session = new Session();
 
-		if(!$session->get('user')){
+		if(!$session->get('modo')){
 			$response = new Response();
 			$response->setStatusCode(401);
 			return $response;
@@ -561,7 +582,7 @@ class AdminController extends Controller
 	public function addPartenaireAction($id, Request $request){
 		$session = new Session();
 
-		if(!$session->get('user')){
+		if(!$session->get('modo')){
 			$response = new Response();
 			$response->setStatusCode(401);
 			return $response;
@@ -644,7 +665,7 @@ class AdminController extends Controller
 	public function videoAction(){
 		$session = new Session();
 
-		if(!$session->get('user')){
+		if(!$session->get('modo')){
 			$response = new Response();
 			$response->setStatusCode(401);
 			return $response;
@@ -666,7 +687,7 @@ class AdminController extends Controller
 	public function addVideoAction($id, Request $request){
 		$session = new Session();
 
-		if(!$session->get('user')){
+		if(!$session->get('modo')){
 			$response = new Response();
 			$response->setStatusCode(401);
 			return $response;
@@ -712,4 +733,115 @@ class AdminController extends Controller
 			'video' => $video
 		));
 	}
+
+	public function addNewsAction($id, Request $request){
+		$session = $request->getSession();
+
+        if(!$session->get('modo') && !$session->get('redacteur')){
+            $response = new Response();
+            $response->setStatusCode(401);
+            return $response;
+        }
+
+		$user = $session->get('user');
+
+		$user = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:User')
+			->find($user['id']);
+
+		if(!$user){
+			$response = new Response();
+			$response->setStatusCode(401);
+			return $response;
+		}
+
+        if($request->get('topicId')){
+            $id = $request->get('topicId');
+        }
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\Topic $topic
+		 */
+		$topic = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Topic')
+			->find($id);
+
+		$collectionDocument = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Document')
+			->findBy(array(), array('id' => 'DESC'));
+
+		if($topic === null){
+			$topic = new Topic();
+		}
+
+		$form = $this->createFormBuilder($topic)
+			->getForm();
+
+		$form->handleRequest($request);
+
+
+		if ($form->isValid()) {
+
+			$titre = $request->get('titre');
+			$vignette = $request->get('vignette');
+			$document = $request->get('document');
+			$texte = $request->get('message');
+
+			$topic->setTitre($titre);
+			$topic->setUser($user);
+			$topic->setVisible(false);
+			$topic->setStatus(Topic::STATUS_NEWS);
+
+			$newVignetteEntity = null;
+			if($vignette !== null){
+				$newVignetteEntity = $this->getDoctrine()
+					->getRepository('AcmeEsBattleBundle:Document')
+					->find($vignette);
+			}
+			$topic->setVignette($newVignetteEntity);
+
+			$newDocumentEntity = null;
+			if($document !== null){
+				$newDocumentEntity = $this->getDoctrine()
+					->getRepository('AcmeEsBattleBundle:Document')
+					->find($document);
+			}
+			$topic->setDocument($newDocumentEntity);
+
+			$message = $topic->getMessages()->first();
+			if($message == null){
+				$message = new Message();
+			}
+			$message->setVisible(false);
+			$message->setUser($user);
+			$message->setTexte($texte);
+
+
+			$em = $this->getDoctrine()->getManager();
+
+            $topic->addMessage($message);
+            $message->setTopic($topic);
+            $em->persist($message);
+			$em->persist($topic);
+			$em->flush();
+
+			// redirect to the show page for the just submitted item
+		}
+
+		return $this->render('AcmeEsBattleBundle:Admin:add-news.html.twig', array(
+			'topic' => $topic,
+			'documents' => $collectionDocument,
+			'form' => $form->createView()
+		));
+	}
+
+    /**
+     * @Template()
+     */
+    public function redactionAction(){
+        $collectionTopic = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Topic')
+            ->findBy(array(), array('id' => 'DESC'));
+
+        return array('topics'=>$collectionTopic);
+    }
 }

@@ -1,37 +1,59 @@
-{% extends "TwigBundle::layout.html.twig" %}
+{#{% extends "TwigBundle::layout.html.twig" %}#}
 
 {% block head %}
-    <link rel="icon" sizes="16x16" href="{{ asset('favicon.ico') }}" />
-    <link rel="stylesheet" href="{{ asset('bundles/acmedemo/css/demo.css') }}" />
+<link rel="icon" sizes="16x16" href="{{ asset('favicon.ico') }}" />
+<link rel="stylesheet" href="{{ asset('bundles/esbattle/css/all.css') }}" />
+<link rel="icon" sizes="16x16" href="{{ asset('favicon.ico') }}" />
+<link rel="stylesheet" href="{{ asset('bundles/esbattle/css/all.css') }}" />
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
 {% endblock %}
 
 {% block title 'Demo Bundle' %}
 
 {% block body %}
-    {% for flashMessage in app.session.flashbag.get('notice') %}
-        <div class="flash-message">
-            <em>Notice</em>: {{ flashMessage }}
-        </div>
-    {% endfor %}
+{% for flashMessage in app.session.flashbag.get('notice') %}
+<div class="flash-message">
+	<em>Notice</em>: {{ flashMessage }}
+</div>
+{% endfor %}
 
-    {% block content_header %}
-        <ul id="menu">
-            {% block content_header_more %}
-                <li><a href="{{ path('_demo') }}">Demo Home</a></li>
-            {% endblock %}
-        </ul>
+{% block content_header %}
 
-        <div style="clear: both"></div>
-    {% endblock %}
+{% block content_header_more %}
+<nav class="navbar navbar-inverse navbar-fixed-top">
+	<div class="container">
+		<div class="navbar-header">
+			<a href="" class="navbar-brand">ESBATTLE ADMIN</a>
+		</div>
+		<ul class="nav navbar-nav">
+			<li><a href="/app_dev.php/admin/upload">Upload image</a></li>
+			<li><a href="/app_dev.php/admin/biblio">Images</a></li>
+			<li><a href="/app_dev.php/admin/topic/1">Topic</a></li>
+			<li><a href="/app_dev.php/admin/news/add/0">News</a></li>
+			<li><a href="/app_dev.php/admin/partenaire">Partenaires</a></li>
+			<li><a href="/app_dev.php/admin/video">Vidéos</a></li>
+		</ul>
+	</div>
+</nav>
 
-    <div class="block">
-        {% block content %}{% endblock %}
-    </div>
+{% endblock %}
 
-    {% if code is defined %}
-        <h2>Code behind this page</h2>
-        <div class="block">
-            <div class="symfony-content">{{ code|raw }}</div>
-        </div>
-    {% endif %}
+{% endblock %}
+
+<div class="container" style="margin-top:70px">
+	{% block content %}{% endblock %}
+</div>
+
+{% if code is defined %}
+<h2>Code behind this page</h2>
+<div class="block">
+	<div class="symfony-content">{{ code|raw }}</div>
+</div>
+{% endif %}
 {% endblock %}

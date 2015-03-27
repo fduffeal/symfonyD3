@@ -1,9 +1,11 @@
-<ul>
+{% extends 'AcmeEsBattleBundle::layout.html.twig' %}
+{% block content %}
+<h2>Liste des Partenaires</h2>
+<div class="list-group">
     {% for partenaire in partenaires %}
-        <li>
-            <a href="partenaire/add/{{ partenaire.id }}">{{ partenaire.nom }}</a>
-        </li>
+            <a href="partenaire/add/{{ partenaire.id }}" class="list-group-item">{{ partenaire.nom }}</a>
     {% endfor %}
-</ul>
+</div>
 
-<a href="partenaire/add/0">Ajouter un partenaire</a>
+<a href="partenaire/add/0" class="btn btn-primary">Ajouter un partenaire</a>
+{% endblock %}

@@ -1,9 +1,12 @@
-<ul>
-    {% for video in videos %}
-        <li>
-            <a href="video/add/{{ video.id }}">{{ video.description }}</a>
-        </li>
-    {% endfor %}
-</ul>
+{% extends 'AcmeEsBattleBundle::layout.html.twig' %}
 
-<a href="video/add/0">Ajouter une video</a>
+{% block content %}
+<h2>Liste des vidéos</h2>
+<div class="list-group">
+    {% for video in videos %}
+        <a href="video/add/{{ video.id }}" class="list-group-item">{{ video.description }}</a>
+    {% endfor %}
+</div>
+
+<a href="video/add/0" class="btn btn-lg btn-primary btn-block">Ajouter une video</a>
+{% endblock %}

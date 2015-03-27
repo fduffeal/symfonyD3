@@ -203,6 +203,15 @@ acme_es_battle_admin_video_add:
     path:     /admin/video/add/{id}
     defaults: { _controller: AcmeEsBattleBundle:Admin:addVideo }
 
+acme_es_battle_admin_news_add:
+    path:     /admin/news/add/{id}
+    defaults: { _controller: AcmeEsBattleBundle:Admin:addNews }
+
+acme_es_battle_admin_redaction:
+    path:     /admin/redaction
+    defaults: { _controller: AcmeEsBattleBundle:Admin:redaction }
+
+
 acme_es_battle_admin_login:
     path:     /admin/login
     defaults: { _controller: AcmeEsBattleBundle:Admin:login }

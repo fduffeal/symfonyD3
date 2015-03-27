@@ -224,16 +224,26 @@ class Message
             'texte' => $this->getTexte(),
             'created' => $this->getCreated()->getTimestamp(),
             'updated' => $this->getUpdated()->getTimestamp(),
-            'user' => $this->getUser()->_toArray()
+            'user' => $this->getUser()->_toArray(),
+            'texteBrut' => $this->getTexteBrut()
         );
     }
 
 	public function _toArrayShort(){
 		return array(
 			'id' => $this->getId(),
-			'texte' => $this->getTexte()
+			'texte' => $this->getTexte(),
+            'texteBrut' => $this->getTexteBrut()
 		);
 	}
+
+    public function getTexteBrut(){
+        $texte = $this->getTexte();
+
+        $texte = strip_tags($texte,'<p></p>');
+        $texte = html_entity_decode($texte);
+        return $texte;
+    }
 
     /**
      * Set updated
