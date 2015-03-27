@@ -457,9 +457,6 @@ class AdminController extends Controller
 			->getRepository('AcmeEsBattleBundle:Topic')
 			->find($id);
 
-		$collectionDocument = $this->getDoctrine()
-			->getRepository('AcmeEsBattleBundle:Document')
-			->findAll();
 
 		$topicStatus = [];
 		$topicStatus[] = Topic::STATUS_NEWS;
@@ -469,26 +466,32 @@ class AdminController extends Controller
 
 
 		$newStatus = $request->get('status');
-		$newDocument = $request->get('document');
+		$visible = $request->get('visible');
 
 		if ($newStatus !== null) {
 			$em = $this->getDoctrine()->getManager();
 			$topic->setStatus($newStatus);
-			$newDocumentEntity = null;
 
-			if($newDocument !== null){
-				$newDocumentEntity = $this->getDoctrine()
-					->getRepository('AcmeEsBattleBundle:Document')
-					->find($newDocument);
-			}
+            /**
+             * @var \Acme\EsBattleBundle\Entity\Message $message
+             */
+            $message = $topic->getMessages()->first();
 
-			$topic->setDocument($newDocumentEntity);
+            if($visible === "1" && $message !== null){
+                $topic->setVisible(true);
+                $message->setVisible(true);
+            } else {
+                $topic->setVisible(false);
+                if($message !== null){
+                    $message->setVisible(false);
+                }
+            }
+
 			$em->flush();
 		}
 
 
 		return $this->render('AcmeEsBattleBundle:Admin:topic.html.twig', array(
-			'documents' => $collectionDocument,
 			'topic' => $topic,
 			'aStatus' => $topicStatus
 		));
@@ -733,6 +736,10 @@ class AdminController extends Controller
 			$response->setStatusCode(401);
 			return $response;
 		}
+
+        if($request->get('topicId')){
+            $id = $request->get('topicId');
+        }
 		/**
 		 * @var \Acme\EsBattleBundle\Entity\Topic $topic
 		 */
@@ -791,25 +798,16 @@ class AdminController extends Controller
 			$message->setTexte($texte);
 
 
-			$topic->addMessage($message);
-
 			$em = $this->getDoctrine()->getManager();
 
+            $topic->addMessage($message);
+            $message->setTopic($topic);
+            $em->persist($message);
 			$em->persist($topic);
-			$em->persist($message);
 			$em->flush();
 
 			// redirect to the show page for the just submitted item
 		}
-
-
-//		if($url !== null){
-//
-//			$em = $this->getDoctrine()->getManager();
-//
-//			$em->persist($video);
-//			$em->flush();
-//		}
 
 		return $this->render('AcmeEsBattleBundle:Admin:add-news.html.twig', array(
 			'topic' => $topic,
@@ -817,4 +815,15 @@ class AdminController extends Controller
 			'form' => $form->createView()
 		));
 	}
+
+    /**
+     * @Template()
+     */
+    public function redactionAction(){
+        $collectionTopic = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Topic')
+            ->findBy(array(), array('id' => 'DESC'));
+
+        return array('topics'=>$collectionTopic);
+    }
 }

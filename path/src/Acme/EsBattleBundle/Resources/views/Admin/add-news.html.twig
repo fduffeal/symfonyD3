@@ -6,6 +6,7 @@
 <script src="//cdn.ckeditor.com/4.4.7/full/ckeditor.js"></script>
 <form action="#" method="post">
 
+    <input type="hidden" name="topicId" value="{{ topic.id }}">
     <label>titre</label><br>
     <input type="text" name="titre" placeholder="Titre" value="{{ topic.titre }}"><br>
 
