@@ -392,7 +392,7 @@ class AdminController extends Controller
 	public function uploadAction(Request $request)
 	{
 		$session = $request->getSession();
-		if(!$session->get('user')){
+		if(!$session->get('modo') && !$session->get('redacteur')){
 			$response = new Response();
 			$response->setStatusCode(401);
 			return $response;
@@ -425,7 +425,7 @@ class AdminController extends Controller
 
 		$session = new Session();
 
-		if(!$session->get('user')){
+		if(!$session->get('modo') && !$session->get('redacteur')){
 			$response = new Response();
 			$response->setStatusCode(401);
 			return $response;
@@ -445,7 +445,7 @@ class AdminController extends Controller
 	{
 		$session = new Session();
 
-		if(!$session->get('user')){
+		if(!$session->get('modo')){
 			$response = new Response();
 			$response->setStatusCode(401);
 			return $response;
@@ -534,9 +534,21 @@ class AdminController extends Controller
 				);
 
 
-			if($user !== null && $user->isPasswordOk($password) && $user->isModo()){
+			if($user !== null && $user->isPasswordOk($password) && $user->getRole() !== null){
 				$session = new Session();
 				$session->set('user',$user->_toArrayShort());
+
+                if($user->isModo()){
+                    $session->set('modo',true);
+                }
+
+                if($user->isRedacteur()){
+                    $session->set('redacteur',true);
+                }
+
+                if($user->isPartenaire()){
+                    $session->set('partenaire',true);
+                }
 				$logged = true;
 			}
 
@@ -548,7 +560,7 @@ class AdminController extends Controller
 	public function partenaireAction(){
 		$session = new Session();
 
-		if(!$session->get('user')){
+		if(!$session->get('modo')){
 			$response = new Response();
 			$response->setStatusCode(401);
 			return $response;
@@ -570,7 +582,7 @@ class AdminController extends Controller
 	public function addPartenaireAction($id, Request $request){
 		$session = new Session();
 
-		if(!$session->get('user')){
+		if(!$session->get('modo')){
 			$response = new Response();
 			$response->setStatusCode(401);
 			return $response;
@@ -653,7 +665,7 @@ class AdminController extends Controller
 	public function videoAction(){
 		$session = new Session();
 
-		if(!$session->get('user')){
+		if(!$session->get('modo')){
 			$response = new Response();
 			$response->setStatusCode(401);
 			return $response;
@@ -675,7 +687,7 @@ class AdminController extends Controller
 	public function addVideoAction($id, Request $request){
 		$session = new Session();
 
-		if(!$session->get('user')){
+		if(!$session->get('modo')){
 			$response = new Response();
 			$response->setStatusCode(401);
 			return $response;
@@ -724,6 +736,12 @@ class AdminController extends Controller
 
 	public function addNewsAction($id, Request $request){
 		$session = $request->getSession();
+
+        if(!$session->get('modo') && !$session->get('redacteur')){
+            $response = new Response();
+            $response->setStatusCode(401);
+            return $response;
+        }
 
 		$user = $session->get('user');
 

@@ -108,6 +108,7 @@ class ForumController extends Controller
 			$aCurrentTopic = $topic->_toArray();
 			$aCurrentTopic['message'] = $topic->getMessages()->first()->_toArrayShort();
 			$aCurrentTopic['document'] = ($topic->getDocument())?$topic->getDocument()->_toArray():null;
+			$aCurrentTopic['vignette'] = ($topic->getVignette())?$topic->getVignette()->_toArray():null;
 			$aTopic[] = $aCurrentTopic;
 		}
 
