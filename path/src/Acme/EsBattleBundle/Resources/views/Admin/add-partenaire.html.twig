@@ -1,96 +1,116 @@
 {% extends 'AcmeEsBattleBundle::layout.html.twig' %}
 {% block content %}
+<h2>Partenaire</h2>
 <form name="test" action="" method="post">
-    <label>Nom</label><br>
-    <input type="text" name="nom" placeholder="Nom" value="{{ partenaire.nom }}"><br>
-    <label>description</label><br>
-    <textarea name="description" placeholder="description">{{ partenaire.description }}</textarea><br>
-    <label>youtube</label><br>
-    <input type="text" name="youtube" placeholder="youtube" value="{{ partenaire.youtube }}"><br>
-    <label>twitch</label><br>
-    <input type="text" name="twitch" placeholder="twitch"  value="{{ partenaire.twitch }}"><br>
-    <label>facebook</label><br>
-    <input type="text" name="facebook" placeholder="facebook"  value="{{ partenaire.facebook }}"><br>
-    <label>twitter</label><br>
-    <input type="text" name="twitter" placeholder="twitter"  value="{{ partenaire.twitter }}"><br>
-    <label>lien depuis le bloc home partenaire</label><br>
-    <input type="text" name="blocHomeLink" placeholder="blocHomeLink"  value="{{ partenaire.blocHomeLink }}"><br>
+	<div class="group-control">
+		<label>Nom</label><br>
+		<input type="text" name="nom" class="form-control" placeholder="Nom" value="{{ partenaire.nom }}"><br>
+	</div>
+	<div class="group-control">
+		<label>Description</label><br>
+	<textarea name="description" class="form-control" placeholder="description">{{ partenaire.description }}</textarea><br>
+	</div>
+	<div class="group-control">
+		<label>youtube</label><br>
+	<input type="text" name="youtube" class="form-control" placeholder="youtube" value="{{ partenaire.youtube }}"><br>
+	</div>
+	<div class="group-control">
+		<label>twitch</label><br>
+	<input type="text" name="twitch" class="form-control" placeholder="twitch"  value="{{ partenaire.twitch }}"><br>
+	</div>
+	<div class="group-control">
+		<label>facebook</label><br>
+	<input type="text" name="facebook" class="form-control" placeholder="facebook"  value="{{ partenaire.facebook }}"><br>
+	</div>
+	<div class="group-control">
+		<label>twitter</label><br>
+	<input type="text" name="twitter" class="form-control" placeholder="twitter"  value="{{ partenaire.twitter }}"><br>
+	</div>
+	<div class="group-control">
+		<label>lien depuis le bloc home partenaire</label><br>
+	<input type="text" name="blocHomeLink" class="form-control" placeholder="blocHomeLink"  value="{{ partenaire.blocHomeLink }}"><br>
+	</div>
+	<div class="group-control">
+		
+	</div>
+	
+	
 
-    <div style="height: 400px;overflow: scroll">
-        logo : petit logo dans la tuile à coté de la description
-        <ul>
-            <li>Vider<input type="radio" name="logo" value=""/></li>
-        {% for document in documents %}
-            <li>
-                <img src="/{{ document.webpath }}" width="20%" height="auto"/>
-                <a href="/{{ document.webpath }}">{{ document.name }}</a>
+	<div style="height: 400px;overflow: scroll">
+		<label for="">Logo : petit logo dans la tuile à coté de la description</label>
+		<ul class="row">
+			<li class="col-sm-6 col-md-2">Vider<input type="radio" name="logo" value=""/></li>
+			{% for document in documents %}
+			<li class="col-sm-6 col-md-2">
+				<img src="/{{ document.webpath }}" width="20%" height="auto"/>
+				<a href="/{{ document.webpath }}">{{ document.name }}</a>
 
-                {% if partenaire and partenaire.logo and document.id == partenaire.logo.id %}
-                    <input type="radio" name="logo" value="{{ document.id }}" checked/>
-                {% else %}
-                    <input type="radio" name="logo" value="{{ document.id }}"/>
-                {% endif %}
-            </li>
-        {% endfor %}
-        </ul>
-    </div>
+				{% if partenaire and partenaire.logo and document.id == partenaire.logo.id %}
+				<input type="radio" name="logo" value="{{ document.id }}" checked/>
+				{% else %}
+				<input type="radio" name="logo" value="{{ document.id }}"/>
+				{% endif %}
+			</li>
+			{% endfor %}
+		</ul>
+	</div>
 
-    <div style="height: 400px;overflow: scroll">
-        tuile : image de fond des tuiles dans la liste des partenaires
-        <ul>
-            <li>Vider<input type="radio" name="tuile" value=""/></li>
-            {% for document in documents %}
-                <li>
-                    <img src="/{{ document.webpath }}" width="20%" height="auto"/>
-                    <a href="/{{ document.webpath }}">{{ document.name }}</a>
+	<div style="height: 400px;overflow: scroll">
+		<label for="">Tuile : image de fond des tuiles dans la liste des partenaires</label>
+		<ul class="row">
+			<li class="col-sm-6 col-md-2">Vider<input type="radio" name="tuile" value=""/></li>
+			{% for document in documents %}
+			<li class="col-sm-6 col-md-2">
+				<img src="/{{ document.webpath }}" width="20%" height="auto"/>
+				<a href="/{{ document.webpath }}">{{ document.name }}</a>
 
-                    {% if partenaire and partenaire.tuile and document.id == partenaire.tuile.id %}
-                        <input type="radio" name="tuile" value="{{ document.id }}" checked/>
-                    {% else %}
-                        <input type="radio" name="tuile" value="{{ document.id }}"/>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
+				{% if partenaire and partenaire.tuile and document.id == partenaire.tuile.id %}
+				<input type="radio" name="tuile" value="{{ document.id }}" checked/>
+				{% else %}
+				<input type="radio" name="tuile" value="{{ document.id }}"/>
+				{% endif %}
+			</li>
+			{% endfor %}
+		</ul>
+	</div>
 
-    <div style="height: 400px;overflow: scroll">
-        header : image de la page partenaire
-        <ul>
-            <li>Vider<input type="radio" name="header" value=""/></li>
-            {% for document in documents %}
-                <li>
-                    <img src="/{{ document.webpath }}" width="20%" height="auto"/>
-                    <a href="/{{ document.webpath }}">{{ document.name }}</a>
+	<div style="height: 400px;overflow: scroll">
+	<label for="">Header : image de la page partenaire</label>
+		<ul class="row">
+			<li class="col-sm-6 col-md-2">Vider<input type="radio" name="header" value=""/></li>
+			{% for document in documents %}
+			<li class="col-sm-6 col-md-2">
+				<img src="/{{ document.webpath }}" width="20%" height="auto"/>
+				<a href="/{{ document.webpath }}">{{ document.name }}</a>
 
-                    {% if partenaire and  partenaire.header and document.id == partenaire.header.id %}
-                        <input type="radio" name="header" value="{{ document.id }}" checked/>
-                    {% else %}
-                        <input type="radio" name="header" value="{{ document.id }}"/>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
+				{% if partenaire and  partenaire.header and document.id == partenaire.header.id %}
+				<input type="radio" name="header" value="{{ document.id }}" checked/>
+				{% else %}
+				<input type="radio" name="header" value="{{ document.id }}"/>
+				{% endif %}
+			</li>
+			{% endfor %}
+		</ul>
+	</div>
 
-    <div style="height: 400px;overflow: scroll">
-        BlocHomeImg : image du bloc partenaire de la home
-        <ul>
-            <li>Vider<input type="radio" name="blocHomeImg" value=""/></li>
-            {% for document in documents %}
-                <li>
-                    <img src="/{{ document.webpath }}" width="20%" height="auto"/>
-                    <a href="/{{ document.webpath }}">{{ document.name }}</a>
+	<div style="height: 400px;overflow: scroll">
+		<label for="">BlocHomeImg : image du bloc partenaire de la home</label>
+		<ul class="row">
+			<li class="col-sm-6 col-md-2">Vider<input type="radio" name="blocHomeImg" value=""/></li>
+			{% for document in documents %}
+			<li class="col-sm-6 col-md-2">
+				<img src="/{{ document.webpath }}" width="20%" height="auto"/>
+				<a href="/{{ document.webpath }}">{{ document.name }}</a>
 
-                    {% if partenaire and  partenaire.blocHomeImg and document.id == partenaire.blocHomeImg.id %}
-                        <input type="radio" name="blocHomeImg" value="{{ document.id }}" checked/>
-                    {% else %}
-                        <input type="radio" name="blocHomeImg" value="{{ document.id }}"/>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
-    <input type="submit" value="Valider">
+				{% if partenaire and  partenaire.blocHomeImg and document.id == partenaire.blocHomeImg.id %}
+				<input type="radio" name="blocHomeImg" value="{{ document.id }}" checked/>
+				{% else %}
+				<input type="radio" name="blocHomeImg" value="{{ document.id }}"/>
+				{% endif %}
+			</li>
+			{% endfor %}
+		</ul>
+	</div>
+	<input type="submit" value="Valider" class="btn btn-primary">
 </form>
 {% endblock %}
