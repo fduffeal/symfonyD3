@@ -4,95 +4,102 @@
 
 {% block content %}
 <script src="//cdn.ckeditor.com/4.4.7/full/ckeditor.js"></script>
+<h2>Ajouter une news</h2>
 <form action="#" method="post">
+	<div class="form-group">
+		<input type="hidden" name="topicId" value="{{ topic.id }}">
+		<label>Titre</label>
+		<input type="text" name="titre" placeholder="Titre" class="form-control" value="{{ topic.titre }}">
+	</div>
 
-    <input type="hidden" name="topicId" value="{{ topic.id }}">
-    <label>titre</label><br>
-    <input type="text" name="titre" placeholder="Titre" value="{{ topic.titre }}"><br>
+	<div class="form-group">
+		<label>Vignette de la news</label><br>
+		<span onclick="openBiblioFor('vignette')" class="btn btn-primary">changer la vignette</span>
+		<input type="hidden" onclick="openBiblio(this)" name="vignette" id="vignette" value="{{ (topic.vignette)?topic.vignette.id:null }}"/><br>
+		<img id="vignette_previsu" src="/{{ (topic.vignette)?topic.vignette.webpath }}">
+	</div>
 
-    <label>Vignette de la news</label><br>
-    <span onclick="openBiblioFor('vignette')">changer la vignette</span>
-    <input type="hidden" onclick="openBiblio(this)" name="vignette" id="vignette" value="{{ (topic.vignette)?topic.vignette.id:null }}"/><br>
-    <img id="vignette_previsu" src="/{{ (topic.vignette)?topic.vignette.webpath }}"><br>
+	<div class="form-group">
+		<label>Image de carrousel pour la news</label><br>
+		<span onclick="openBiblioFor('document')" class="btn btn-primary">changer la vignette</span>
+		<input type="hidden" onclick="openBiblio(this)" name="document" id="document" value="{{ (topic.document)?topic.document.id:null }}"/><br>
+		<img id="document_previsu" src="/{{ (topic.document)?topic.document.webpath }}"><br>
+	</div>
 
-    <label>Image de carrousel pour la news</label><br>
-    <span onclick="openBiblioFor('document')">changer la vignette</span>
-    <input type="hidden" onclick="openBiblio(this)" name="document" id="document" value="{{ (topic.document)?topic.document.id:null }}"/><br>
-    <img id="document_previsu" src="/{{ (topic.document)?topic.document.webpath }}"><br>
 
-    <label>Message</label><br>
-    {% if topic.messages and  topic.messages[0] is defined %}
-        <textarea id="editor1" name="message">{{ topic.messages[0].texte }}</textarea><br>
-    {% else %}
-        <textarea id="editor1" name="message"></textarea><br>
-    {% endif %}
+	<label>Message</label><br>
+	{% if topic.messages and  topic.messages[0] is defined %}
+	<textarea id="editor1" name="message">{{ topic.messages[0].texte }}</textarea><br>
+	{% else %}
+	<textarea id="editor1" name="message"></textarea><br>
+	{% endif %}
 
-    <div id="bibliotheque" class="close">
-        <ul>
-        {% for document in documents %}
-            <li>
-                <img id="document_{{ document.id }}" src="/{{ document.webpath }}" alt="{{ document.name }}" onclick="setVignette({{ document.id }},'{{ document.webpath }}',this)"/>
-            </li>
-        {% endfor %}
-        </ul>
+	<div id="bibliotheque" class="close">
+		<ul>
+			{% for document in documents %}
+			<li>
+				<img id="document_{{ document.id }}" src="/{{ document.webpath }}" alt="{{ document.name }}" onclick="setVignette({{ document.id }},'{{ document.webpath }}',this)"/>
+			</li>
+			{% endfor %}
+		</ul>
 
-        <div class="action">
-            <span type="button" onclick="closeBiblio()">Valider</span>
-        </div>
-    </div>
+		<div class="action">
+			<span type="button" onclick="closeBiblio()">Valider</span>
+		</div>
+	</div>
 
-    {{ form_widget(form) }}
-    <input type="submit" value="Valider">
+	{{ form_widget(form) }}
+	<input type="submit" value="Valider"  class="btn btn-primary">
 </form>
 
 <script>
 
-    var currentInput = null;
-    var currentImgPrevisu = null;
+	var currentInput = null;
+	var currentImgPrevisu = null;
 
-    var biblioNode = document.getElementById('bibliotheque');
+	var biblioNode = document.getElementById('bibliotheque');
 
-    var setCurrent = function(name){
-        currentInput = document.getElementById(name);
-        currentImgPrevisu = document.getElementById(name+'_previsu');
-    };
+	var setCurrent = function(name){
+		currentInput = document.getElementById(name);
+		currentImgPrevisu = document.getElementById(name+'_previsu');
+	};
 
-    var setVignette = function(id,webpath,elm){
-        var ul = elm.parentNode.parentNode;
-        var aSelected = ul.getElementsByClassName('selected');
-        for(var key in aSelected){
-            if(typeof aSelected[key] == "object" ){
-                aSelected[key].setAttribute('class','');
-            }
-        }
-        elm.setAttribute('class','selected');
-        currentInput.value = id;
-        currentImgPrevisu.setAttribute('src','/'+webpath);
-    };
+	var setVignette = function(id,webpath,elm){
+		var ul = elm.parentNode.parentNode;
+		var aSelected = ul.getElementsByClassName('selected');
+		for(var key in aSelected){
+			if(typeof aSelected[key] == "object" ){
+				aSelected[key].setAttribute('class','');
+			}
+		}
+		elm.setAttribute('class','selected');
+		currentInput.value = id;
+		currentImgPrevisu.setAttribute('src','/'+webpath);
+	};
 
-    var closeBiblio = function(){
-        biblioNode.setAttribute('class','close');
-    };
+	var closeBiblio = function(){
+		biblioNode.setAttribute('class','close');
+	};
 
-    var openBiblioFor = function(name){
-        var elm = document.getElementById(name);
-        if(elm !== null){
-            elm.click();
-        }
-    };
+	var openBiblioFor = function(name){
+		var elm = document.getElementById(name);
+		if(elm !== null){
+			elm.click();
+		}
+	};
 
-    var openBiblio = function(elm){
-        setCurrent(elm.getAttribute('name'));
-        biblioNode.setAttribute('class','open');
+	var openBiblio = function(elm){
+		setCurrent(elm.getAttribute('name'));
+		biblioNode.setAttribute('class','open');
 
-        var currentDocument = document.getElementById('document_'+currentInput.value);
-        if(currentDocument != null){
-            currentDocument.click();
-        }
-    };
-    // Replace the <textarea id="editor1"> with a CKEditor
-    // instance, using default configuration.
-    CKEDITOR.replace( 'editor1' );
+		var currentDocument = document.getElementById('document_'+currentInput.value);
+		if(currentDocument != null){
+			currentDocument.click();
+		}
+	};
+	// Replace the <textarea id="editor1"> with a CKEditor
+	// instance, using default configuration.
+	CKEDITOR.replace( 'editor1' );
 </script>
 
 {% endblock  %}

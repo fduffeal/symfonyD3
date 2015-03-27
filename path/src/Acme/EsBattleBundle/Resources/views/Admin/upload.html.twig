@@ -1,10 +1,17 @@
 {% extends 'AcmeEsBattleBundle::layout.html.twig' %}
 {% block content %}
-<h1>Upload File</h1>
 
 <form action="#" method="post" {{ form_enctype(form) }}>
-    {{ form_widget(form) }}
+	<h2 class="form-signin-heading">Upload Image</h2>
+	<div class="group-control">
+		{{ form_widget(form.name, {'attr': {'class':'form-control', 'placeholder':'Image name'} }) }}
+	</div>
+	<div class="group-control">
+		{{ form_widget(form.file, {'attr': {'class':'file'} }) }}
+	</div>
+	{{ form_rest(form) }}
+	<!--{{ form_widget(form) }}-->
 
-    <input type="submit" value="Upload Document" />
+	<input type="submit" value="Upload Document" class="btn btn-lg btn-primary btn-block"/>
 </form>
 {% endblock %}
