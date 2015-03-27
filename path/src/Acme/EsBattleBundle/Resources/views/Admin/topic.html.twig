@@ -1,39 +1,33 @@
 {% extends 'AcmeEsBattleBundle::layout.html.twig' %}
 {% block content %}
-<h1>{{ topic.titre }}</h1>
-<span>
-    {{ topic.messages[0].texte |raw  }}
-</span>
-<hr/>
-<form name="test" action="" method="post">
-    <select name="status">
-        {% for status in aStatus %}
-            {% if status == topic.status %}
-                <option value="{{ status}}" selected>{{ status }}</option>
-            {% else %}
-                <option value="{{ status }}">{{ status }}</option>
-            {% endif %}
-        {% endfor %}
-    </select>
-    <div style="height: 400px;overflow: scroll">
-        <ul>
-            <li>Vider<input type="radio" name="document" value=""/></li>
-        {% for document in documents %}
-            <li>
-                <img src="/{{ document.webpath }}" width="20%" height="auto"/>
-                <a href="/{{ document.webpath }}">{{ document.name }}</a>
-
-                {% if topic.document and document.id == topic.document.id %}
-                    <input type="radio" name="document" value="{{ document.id }}" checked/>
+    <hr/>
+    <form name="test" action="" method="post">
+        <select name="status">
+            {% for status in aStatus %}
+                {% if status == topic.status %}
+                    <option value="{{ status}}" selected>{{ status }}</option>
                 {% else %}
-                    <input type="radio" name="document" value="{{ document.id }}"/>
+                    <option value="{{ status }}">{{ status }}</option>
                 {% endif %}
-
-
-            </li>
-        {% endfor %}
-        </ul>
-    </div>
-    <input type="submit" value="Valider">
-</form>
+            {% endfor %}
+        </select>
+        <label>Visible ?</label>
+        {% if topic.visible and topic.messages[0].visible %}
+            <input type="checkbox" name="visible" value="1" checked>
+        {% else %}
+            <input type="checkbox" name="visible" value="1">
+        {% endif %}
+        <input type="submit" value="Valider">
+    </form>
+    <hr/>
+    <h2>> Titre</h2>
+    <h1>{{ topic.titre }}</h1>
+    <h2>> Vignette</h2>
+    <img id="vignette_previsu" src="/{{ (topic.vignette)?topic.vignette.webpath }}"><br>
+    <h2>> Carrousel</h2>
+    <img id="document_previsu" src="/{{ (topic.document)?topic.document.webpath }}"><br>
+    <h2>> Message</h2>
+    <span>
+        {{ topic.messages[0].texte |raw  }}
+    </span>
 {% endblock %}

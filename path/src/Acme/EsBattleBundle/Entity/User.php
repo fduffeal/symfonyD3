@@ -797,6 +797,6 @@ class User
     }
 
 	public function isModo(){
-		return ($this->getRole() === self::ROLE_MODO);
+        return preg_match('/'.self::ROLE_MODO.'/',$this->getRole());
 	}
 }
