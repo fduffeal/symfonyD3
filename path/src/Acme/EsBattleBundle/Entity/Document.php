@@ -44,6 +44,11 @@ class Document
 		return null === $this->path ? null : $this->getUploadDir().'/'.$this->path;
 	}
 
+    public function getFullPath()
+    {
+        return null === $this->path ? null : "http://".$_SERVER['SERVER_NAME']."/".$this->getWebPath();
+    }
+
 	protected function getUploadRootDir()
 	{
 		// le chemin absolu du répertoire où les documents uploadés doivent être sauvegardés

@@ -240,7 +240,7 @@ class Message
     public function getTexteBrut(){
         $texte = $this->getTexte();
 
-        $texte = strip_tags($texte,'<p></p>');
+        $texte = strip_tags($texte);
         $texte = html_entity_decode($texte);
         return $texte;
     }

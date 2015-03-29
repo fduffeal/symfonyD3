@@ -341,6 +341,7 @@ class Topic
     }
 
     public function _toArray(){
+        $vignette = $this->getVignette();
         return array(
             'id' => $this->getId(),
             'titre' => $this->getTitre(),
@@ -349,7 +350,8 @@ class Topic
             'user' => $this->getUser()->_toArrayShort(),
             'nbMessages' => $this->getNbMessages(),
             'position' => $this->getPosition(),
-            'status' => $this->getStatus()
+            'status' => $this->getStatus(),
+            'vignette' => ($vignette)?$vignette->getFullPath():null
         );
     }
 
@@ -365,6 +367,8 @@ class Topic
     }
 
     public function _toArrayShort(){
+        $vignette = $this->getVignette();
+
         return array(
             'id' => $this->getId(),
             'titre' => $this->getTitre(),
@@ -373,7 +377,8 @@ class Topic
             'user' => $this->getUser()->_toArrayShort(),
             'nbMessages' => $this->getNbMessages(),
             'position' => $this->getPosition(),
-            'status' => $this->getStatus()
+            'status' => $this->getStatus(),
+            'vignette' => ($vignette)?$vignette->getFullPath():null
         );
     }
 
