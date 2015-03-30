@@ -39,7 +39,7 @@
 		<ul>
 			{% for document in documents %}
 			<li>
-				<img width="100" id="document_{{ document.id }}"  src="/{{ document.webpath }}" alt="{{ document.name }}" onclick="setVignette({{ document.id }},'{{ document.webpath }}',this)"/>
+				<img width="150" id="document_{{ document.id }}"  src="/{{ document.webpath }}" alt="{{ document.name }}" onclick="setVignette({{ document.id }},'{{ document.webpath }}',this)"/>
 			</li>
 			{% endfor %}
 		</ul>
