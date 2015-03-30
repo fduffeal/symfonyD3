@@ -38,13 +38,13 @@
 		<ul>
 			{% for document in documents %}
 			<li>
-				<img id="document_{{ document.id }}" src="/{{ document.webpath }}" alt="{{ document.name }}" onclick="setVignette({{ document.id }},'{{ document.webpath }}',this)"/>
+				<img width="100" id="document_{{ document.id }}"  src="/{{ document.webpath }}" alt="{{ document.name }}" onclick="setVignette({{ document.id }},'{{ document.webpath }}',this)"/>
 			</li>
 			{% endfor %}
 		</ul>
 
 		<div class="action">
-			<span type="button" onclick="closeBiblio()">Valider</span>
+			<span type="button" onclick="closeBiblio()"  class="btn btn-primary">Valider</span>
 		</div>
 	</div>
 
