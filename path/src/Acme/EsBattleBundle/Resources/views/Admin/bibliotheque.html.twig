@@ -4,9 +4,9 @@
 <h2>Liste des images</h2>
 <div class="row">
 	{% for document in documents %}
-	<div class="col-sm-6 col-md-2">
-		<a href="/{{ document.webpath }}" class="thumbnail ">
-			<img src="/{{ document.webpath }}" width="20%" height="auto"/>
+	<div style="display:inline-block">
+		<a href="/{{ document.webpath }}">
+			<img src="/{{ document.webpath }}" width="150"/>
 			<!--<div class="caption">{{ document.name }}</div>-->
 		</a>
 	</div>
