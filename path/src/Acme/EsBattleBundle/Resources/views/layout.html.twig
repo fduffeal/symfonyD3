@@ -32,12 +32,11 @@
 			<a href="" class="navbar-brand">ESBATTLE ADMIN</a>
 		</div>
 		<ul class="nav navbar-nav">
-			<li><a href="/app_dev.php/admin/upload">Upload image</a></li>
-			<li><a href="/app_dev.php/admin/biblio">Images</a></li>
-			<li><a href="/app_dev.php/admin/topic/1">Topic</a></li>
-			<li><a href="/app_dev.php/admin/news/add/0">News</a></li>
-			<li><a href="/app_dev.php/admin/partenaire">Partenaires</a></li>
-			<li><a href="/app_dev.php/admin/video">Vidéos</a></li>
+			<li><a href="{{ path('acme_es_battle_admin_upload') }}">Upload image</a></li>
+			<li><a href="{{ path('acme_es_battle_admin_biblio') }}">Images</a></li>
+            <li><a href="{{ path('acme_es_battle_admin_redaction') }}">Rédaction News</a></li>
+			<li><a href="{{ path('acme_es_battle_admin_partenaire') }}">Partenaires</a></li>
+			<li><a href="{{ path('acme_es_battle_admin_video') }}">Vidéos</a></li>
 		</ul>
 	</div>
 </nav>

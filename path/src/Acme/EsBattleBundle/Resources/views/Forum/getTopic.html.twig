@@ -1,13 +1,20 @@
 <html>
 <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# article: http://ogp.me/ns/article#">
     <meta property="og:title" content="Esbattle.com - News - {{ topic.titre }}"/>
-    <meta property="og:description" content="{{ messages[0].texte |e('html')}}"/>
+    <meta property="og:description" content="{{ messages[0].texteBrut }}"/>
     <meta property="og:site_name" content="Esbattle.com"/>
     <meta property="og:url" content="http://api.esbattle.com/forum/topic/get/{{ topic.id }}/1/1.html"/>
     <meta property="og:type" content="article" />
-    <meta property="og:image" content="http://api.esbattle.com/uploads/documents/729c50c0531021b02e92a64c03094c6d288d3bb6.png" />
+    <meta property="og:image" content="{{ (topic.vignette)?topic.vignette }}" />
     <meta property="article:publisher" content="https://www.facebook.com/esbattlelfg">
     <meta property="fb:app_id" content="1482107158698739">
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@esbattle" />
+    <meta name="twitter:title" content="Esbattle.com - News - {{ topic.titre }}" />
+    <meta name="twitter:description" content="{{ messages[0].texteBrut }}" />
+    <meta name="twitter:image" content="{{ (topic.vignette)?topic.vignette }}" />
+    <meta name="twitter:url" content="http://api.esbattle.com/forum/topic/get/{{ topic.id }}/1/1.html" />
 </head>
 <script>
     location.href = 'http://www.esbattle.com/fr/forum/topic/{{ topic.id }}/1/re';

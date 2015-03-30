@@ -1,13 +1,13 @@
 {% extends 'AcmeEsBattleBundle::layout.html.twig' %}
 {% block content %}
         <p>
-            <br/><a href="/app_dev.php/admin/news/add/0">Ecrire une nouvelle news</a>
+            <br/><a href="{{ path('acme_es_battle_admin_news_add', { 'id': 0 }) }}">Ecrire une nouvelle news</a>
         </p>
     {% for topic in topics %}
         <p>
             {{ topic.id }} - [{{ topic.status }}] {% if not topic.visible %} NON VISIBLE {% endif %} - {{ topic.titre }}
-            <br/><a href="/app_dev.php/admin/news/add/{{ topic.id }}">Editer</a>
-            <br/><a href="/app_dev.php/admin/topic/{{ topic.id }}">Administrer</a>
+            <br/><a href="{{ path('acme_es_battle_admin_news_add', { 'id': topic.id }) }}">Editer</a>
+            <br/><a href="{{ path('acme_es_battle_admin_topic', { 'id': topic.id }) }}">Administrer</a>
         </p>
     {% endfor %}
 {% endblock %}
