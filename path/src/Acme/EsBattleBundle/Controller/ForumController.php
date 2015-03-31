@@ -82,18 +82,33 @@ class ForumController extends Controller
         return $response;
     }
 
+	/**
+	 * @Template()
+	 */
 	public function getNewsAction(){
-		$response = new Response();
-		$response->headers->set('Content-Type', 'application/json');
+
+		$format = $this->getRequest()->getRequestFormat();
+
+		if($format === 'json') {
+			$response = new JsonResponse();
+		} else {
+			$response = new Response();
+		}
+
+		$response->setMaxAge(300);
+		$response->setSharedMaxAge(300);
 
 		$em = $this->getDoctrine()->getManager();
 
 		$query = $em->createQuery(
-			'SELECT topic
+			'SELECT topic,vignette,messages
             FROM AcmeEsBattleBundle:Topic topic
-            WHERE topic.visible = :visible and topic.status = :newsStatus
+            JOIN topic.messages messages
+            JOIN topic.vignette vignette
+            WHERE topic.visible = :visible
+            AND topic.status = :newsStatus
             ORDER BY topic.created DESC'
-		)->setParameter('visible', true)->setParameter('newsStatus',Topic::STATUS_NEWS)->setMaxResults(10);
+		)->setParameter('visible', true)->setParameter('newsStatus',Topic::STATUS_NEWS);
 
 		$topicCollection = $query->getResult();
 
@@ -112,11 +127,14 @@ class ForumController extends Controller
 			$aTopic[] = $aCurrentTopic;
 		}
 
-		$json = json_encode($aTopic);
-		$response->setContent($json);
 
-		$response->headers->set('Content-Type', 'application/json');
-		return $response;
+		if($format === 'json'){
+			$response = new JsonResponse();
+			$response->setData($aTopic);
+			return $response;
+		}
+
+		return $aTopic;
 	}
 
     public function createTopicAction($username,$token)

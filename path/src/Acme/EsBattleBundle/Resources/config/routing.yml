@@ -222,8 +222,8 @@ acme_es_battle_forum_topic_get_all:
     defaults: { _controller: AcmeEsBattleBundle:Forum:getAllTopic }
 
 acme_es_battle_news_get_all:
-    path:     /news
-    defaults: { _controller: AcmeEsBattleBundle:Forum:getNews }
+    path:     /news.{_format}
+    defaults: { _controller: AcmeEsBattleBundle:Forum:getNews,_format: json }
 
 acme_es_battle_forum_topic_get_one:
     path:     /forum/topic/get/{id}/{page}/{nbResult}.{_format}
