@@ -50,13 +50,6 @@ class RdvController extends Controller
 	    $query = $em->createQuery(
 		    'SELECT rdv
             FROM AcmeEsBattleBundle:Appointment rdv
-            JOIN rdv.usersGame usersGame
-            JOIN usersGame.user user
-            JOIN rdv.plateform plateform
-            JOIN rdv.game game
-            JOIN rdv.tags tags
-            JOIN rdv.leader leader
-            where rdv.end > :now
 		    ORDER BY rdv.updated DESC'
 	    )->setParameter('now', $now)->setMaxResults(1);
 
