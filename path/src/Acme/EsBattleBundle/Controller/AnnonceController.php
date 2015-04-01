@@ -3,9 +3,7 @@
 namespace Acme\EsBattleBundle\Controller;
 
 use Acme\EsBattleBundle\Entity\UserGame;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 use Acme\EsBattleBundle\Entity\User as User;
 use Acme\EsBattleBundle\Entity\Annonce as Annonce;
@@ -98,55 +96,47 @@ class AnnonceController extends Controller
 
     }
 
-	/**
-	 * @Template()
-	 */
     public function indexAction(){
 
-	    $format = $this->getRequest()->getRequestFormat();
+        $response = new Response();
+	    $response->headers->set('Content-Type', 'application/json');
+        $response->setPublic();
 
-	    if($format === 'json') {
-		    $response = new JsonResponse();
-	    } else {
-		    $response = new Response();
-	    }
-
-	    $response->setPublic();
-
-        $response->setMaxAge(60);
-        $response->setSharedMaxAge(60);
+        $response->setMaxAge(30);
+        $response->setSharedMaxAge(30);
 
         $em = $this->getDoctrine()->getManager();
 
-//        $query = $em->createQuery(
-//	        'SELECT annonce
-//            FROM AcmeEsBattleBundle:Annonce annonce
-//            ORDER BY annonce.id DESC'
-//        )->setMaxResults(1);
-//
-//        $result = $query->getResult();
-//
-//        if(!$result[0]){
-//            return $response;
-//        }
-//
-//        $response->setLastModified($result[0]->getCreated());
-//
-//        // Vérifie que l'objet Response n'est pas modifié
-//        // pour un objet Request donné
-//        if ($response->isNotModified($this->getRequest())) {
-//            // Retourne immédiatement un objet 304 Response
-//            return $response;
-//        }
+        $query = $em->createQuery(
+            'SELECT annonce
+            FROM AcmeEsBattleBundle:Annonce annonce
+            ORDER BY annonce.id DESC
+            '
+        )->setMaxResults(1);
+
+        $result = $query->getResult();
+
+        if(!$result[0]){
+            return $response;
+        }
+
+        $response->setLastModified($result[0]->getCreated());
+
+        // Vérifie que l'objet Response n'est pas modifié
+        // pour un objet Request donné
+        if ($response->isNotModified($this->getRequest())) {
+            // Retourne immédiatement un objet 304 Response
+            return $response;
+        }
 
         $query = $em->createQuery(
-            'SELECT annonce,author,plateform,game,tags
+            'SELECT annonce
             FROM AcmeEsBattleBundle:Annonce annonce
             JOIN annonce.author author
             JOIN annonce.plateform plateform
             JOIN annonce.game game
             JOIN annonce.tags tags ORDER BY annonce.id DESC'
-        )->setMaxResults(30);
+        )->setMaxResults(100);
 
         $result = $query->getResult();
         $aResult = [];
@@ -157,11 +147,11 @@ class AnnonceController extends Controller
             $aResult[] = $annonce->_toArrayShort();
         }
 
-	    if($format === 'json'){
-		    $response->setData($aResult);
-		    return $response;
-	    }
+        $json = json_encode($aResult);
 
-	    return array('aResult' => $aResult);
+
+        $response->setContent($json);
+
+        return $response;
     }
 }
