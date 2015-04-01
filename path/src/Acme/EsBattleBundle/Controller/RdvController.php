@@ -42,6 +42,10 @@ class RdvController extends Controller
 	    } else {
 		    $response = new Response();
 	    }
+	    $response->setPublic();
+	    // définit l'âge max des caches privés ou des caches partagés
+	    $response->setMaxAge(60);
+	    $response->setSharedMaxAge(60);
 
 	    $now = date('Y-m-d H:i:s',strtotime('-2 day', time()));
 
@@ -54,11 +58,6 @@ class RdvController extends Controller
 	    )->setParameter('now', $now)->setMaxResults(1);
 
         $collection = $query->getResult();
-
-        $response->setPublic();
-        // définit l'âge max des caches privés ou des caches partagés
-        $response->setMaxAge(60);
-        $response->setSharedMaxAge(60);
 
         if(!$collection[0]){
             return $response;
