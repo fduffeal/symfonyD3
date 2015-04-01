@@ -3,7 +3,9 @@
 namespace Acme\EsBattleBundle\Controller;
 
 use Acme\EsBattleBundle\Entity\UserGame;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 use Acme\EsBattleBundle\Entity\User as User;
 use Acme\EsBattleBundle\Entity\Annonce as Annonce;
@@ -96,22 +98,30 @@ class AnnonceController extends Controller
 
     }
 
+	/**
+	 * @Template()
+	 */
     public function indexAction(){
 
-        $response = new Response();
-	    $response->headers->set('Content-Type', 'application/json');
-        $response->setPublic();
+	    $format = $this->getRequest()->getRequestFormat();
 
-        $response->setMaxAge(30);
-        $response->setSharedMaxAge(30);
+	    if($format === 'json') {
+		    $response = new JsonResponse();
+	    } else {
+		    $response = new Response();
+	    }
+
+	    $response->setPublic();
+
+        $response->setMaxAge(60);
+        $response->setSharedMaxAge(60);
 
         $em = $this->getDoctrine()->getManager();
 
         $query = $em->createQuery(
-            'SELECT annonce
+	        'SELECT annonce
             FROM AcmeEsBattleBundle:Annonce annonce
-            ORDER BY annonce.id DESC
-            '
+            ORDER BY annonce.id DESC'
         )->setMaxResults(1);
 
         $result = $query->getResult();
@@ -130,13 +140,13 @@ class AnnonceController extends Controller
         }
 
         $query = $em->createQuery(
-            'SELECT annonce
+            'SELECT annonce,author,plateform,game,tags
             FROM AcmeEsBattleBundle:Annonce annonce
             JOIN annonce.author author
             JOIN annonce.plateform plateform
             JOIN annonce.game game
             JOIN annonce.tags tags ORDER BY annonce.id DESC'
-        )->setMaxResults(100);
+        )->setMaxResults(70);
 
         $result = $query->getResult();
         $aResult = [];
@@ -147,11 +157,11 @@ class AnnonceController extends Controller
             $aResult[] = $annonce->_toArrayShort();
         }
 
-        $json = json_encode($aResult);
+	    if($format === 'json'){
+		    $response->setData($aResult);
+		    return $response;
+	    }
 
-
-        $response->setContent($json);
-
-        return $response;
+	    return array('aResult' => $aResult);
     }
 }

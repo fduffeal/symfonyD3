@@ -1,1 +1,5 @@
-{% extends '@WebProfiler/Profiler/base.html.twig' %}
+{% block content %}
+    {% for item in aTopic %}
+       <p>{{ item.titre }}</p>
+    {% endfor %}
+{%  endblock %}

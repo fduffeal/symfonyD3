@@ -95,10 +95,35 @@ class ForumController extends Controller
 			$response = new Response();
 		}
 
-		$response->setMaxAge(300);
-		$response->setSharedMaxAge(300);
 
 		$em = $this->getDoctrine()->getManager();
+
+		$query = $em->createQuery(
+			'SELECT topic
+            FROM AcmeEsBattleBundle:Topic topic
+            JOIN topic.messages messages
+            JOIN topic.vignette vignette
+            WHERE topic.visible = :visible
+            AND topic.status = :newsStatus
+            ORDER BY topic.updated DESC'
+		)->setParameter('visible', true)
+			->setParameter('newsStatus',Topic::STATUS_NEWS)
+			->setMaxResults(1);
+
+		$topicCollection = $query->getResult();
+
+		$response->setPublic();
+		$response->setMaxAge(60);
+		$response->setSharedMaxAge(60);
+
+		$response->setLastModified($topicCollection[0]->getUpdated());
+
+		// Vérifie que l'objet Response n'est pas modifié
+		// pour un objet Request donné
+		if ($response->isNotModified($this->getRequest())) {
+			// Retourne immédiatement un objet 304 Response
+			return $response;
+		}
 
 		$query = $em->createQuery(
 			'SELECT topic,vignette,messages
@@ -129,12 +154,11 @@ class ForumController extends Controller
 
 
 		if($format === 'json'){
-			$response = new JsonResponse();
 			$response->setData($aTopic);
 			return $response;
 		}
 
-		return $aTopic;
+		return array('aTopic' => $aTopic);
 	}
 
     public function createTopicAction($username,$token)
