@@ -118,26 +118,26 @@ class AnnonceController extends Controller
 
         $em = $this->getDoctrine()->getManager();
 
-        $query = $em->createQuery(
-	        'SELECT annonce
-            FROM AcmeEsBattleBundle:Annonce annonce
-            ORDER BY annonce.id DESC'
-        )->setMaxResults(1);
-
-        $result = $query->getResult();
-
-        if(!$result[0]){
-            return $response;
-        }
-
-        $response->setLastModified($result[0]->getCreated());
-
-        // Vérifie que l'objet Response n'est pas modifié
-        // pour un objet Request donné
-        if ($response->isNotModified($this->getRequest())) {
-            // Retourne immédiatement un objet 304 Response
-            return $response;
-        }
+//        $query = $em->createQuery(
+//	        'SELECT annonce
+//            FROM AcmeEsBattleBundle:Annonce annonce
+//            ORDER BY annonce.id DESC'
+//        )->setMaxResults(1);
+//
+//        $result = $query->getResult();
+//
+//        if(!$result[0]){
+//            return $response;
+//        }
+//
+//        $response->setLastModified($result[0]->getCreated());
+//
+//        // Vérifie que l'objet Response n'est pas modifié
+//        // pour un objet Request donné
+//        if ($response->isNotModified($this->getRequest())) {
+//            // Retourne immédiatement un objet 304 Response
+//            return $response;
+//        }
 
         $query = $em->createQuery(
             'SELECT annonce,author,plateform,game,tags
@@ -146,7 +146,7 @@ class AnnonceController extends Controller
             JOIN annonce.plateform plateform
             JOIN annonce.game game
             JOIN annonce.tags tags ORDER BY annonce.id DESC'
-        )->setMaxResults(70);
+        )->setMaxResults(30);
 
         $result = $query->getResult();
         $aResult = [];
