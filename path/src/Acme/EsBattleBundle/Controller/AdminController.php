@@ -554,7 +554,7 @@ class AdminController extends Controller
 
 		}
 
-		return array('form' => $form->createView(),'logged' => $logged);
+		return array('form' => $form->createView(),'logged' => $logged,'user'=>$user);
 	}
 
 	public function partenaireAction(){

@@ -82,18 +82,58 @@ class ForumController extends Controller
         return $response;
     }
 
+	/**
+	 * @Template()
+	 */
 	public function getNewsAction(){
-		$response = new Response();
-		$response->headers->set('Content-Type', 'application/json');
+
+		$format = $this->getRequest()->getRequestFormat();
+
+		if($format === 'json') {
+			$response = new JsonResponse();
+		} else {
+			$response = new Response();
+		}
+
 
 		$em = $this->getDoctrine()->getManager();
 
 		$query = $em->createQuery(
 			'SELECT topic
             FROM AcmeEsBattleBundle:Topic topic
-            WHERE topic.visible = :visible and topic.status = :newsStatus
+            JOIN topic.messages messages
+            JOIN topic.vignette vignette
+            WHERE topic.visible = :visible
+            AND topic.status = :newsStatus
+            ORDER BY topic.updated DESC'
+		)->setParameter('visible', true)
+			->setParameter('newsStatus',Topic::STATUS_NEWS)
+			->setMaxResults(1);
+
+		$topicCollection = $query->getResult();
+
+		$response->setPublic();
+		$response->setMaxAge(60);
+		$response->setSharedMaxAge(60);
+
+		$response->setLastModified($topicCollection[0]->getUpdated());
+
+		// Vérifie que l'objet Response n'est pas modifié
+		// pour un objet Request donné
+		if ($response->isNotModified($this->getRequest())) {
+			// Retourne immédiatement un objet 304 Response
+			return $response;
+		}
+
+		$query = $em->createQuery(
+			'SELECT topic,vignette,messages
+            FROM AcmeEsBattleBundle:Topic topic
+            JOIN topic.messages messages
+            JOIN topic.vignette vignette
+            WHERE topic.visible = :visible
+            AND topic.status = :newsStatus
             ORDER BY topic.created DESC'
-		)->setParameter('visible', true)->setParameter('newsStatus',Topic::STATUS_NEWS)->setMaxResults(10);
+		)->setParameter('visible', true)->setParameter('newsStatus',Topic::STATUS_NEWS);
 
 		$topicCollection = $query->getResult();
 
@@ -112,11 +152,13 @@ class ForumController extends Controller
 			$aTopic[] = $aCurrentTopic;
 		}
 
-		$json = json_encode($aTopic);
-		$response->setContent($json);
 
-		$response->headers->set('Content-Type', 'application/json');
-		return $response;
+		if($format === 'json'){
+			$response->setData($aTopic);
+			return $response;
+		}
+
+		return array('aTopic' => $aTopic);
 	}
 
     public function createTopicAction($username,$token)

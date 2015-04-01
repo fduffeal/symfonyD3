@@ -28,23 +28,44 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 
 class RdvController extends Controller
 {
+	/**
+	 * @Template()
+	 */
     public function indexAction()
     {
+
+
+	    $format = $this->getRequest()->getRequestFormat();
+
+	    if($format === 'json') {
+		    $response = new JsonResponse();
+	    } else {
+		    $response = new Response();
+	    }
+
+	    $now = date('Y-m-d H:i:s',strtotime('-2 day', time()));
+
         $em = $this->getDoctrine()->getManager();
-        $query = $em->createQuery(
-            'SELECT rdv
+
+	    $query = $em->createQuery(
+		    'SELECT rdv
             FROM AcmeEsBattleBundle:Appointment rdv
-            ORDER BY rdv.updated DESC'
-        )->setMaxResults(1);
+            JOIN rdv.usersGame usersGame
+            JOIN usersGame.user user
+            JOIN rdv.plateform plateform
+            JOIN rdv.game game
+            JOIN rdv.tags tags
+            JOIN rdv.leader leader
+            where rdv.end > :now
+		    ORDER BY rdv.updated DESC'
+	    )->setParameter('now', $now)->setMaxResults(1);
 
         $collection = $query->getResult();
 
-        $response = new Response();
         $response->setPublic();
         // définit l'âge max des caches privés ou des caches partagés
-        $response->setMaxAge(30);
-        $response->setSharedMaxAge(30);
-        $response->headers->set('Content-Type', 'application/json');
+        $response->setMaxAge(60);
+        $response->setSharedMaxAge(60);
 
         if(!$collection[0]){
             return $response;
@@ -58,8 +79,6 @@ class RdvController extends Controller
             // Retourne immédiatement un objet 304 Response
             return $response;
         }
-
-        $now = date('Y-m-d H:i:s',strtotime('-2 day', time()));
 
         $query = $em->createQuery(
             'SELECT rdv,usersGame, tags, plateform, game, user, leader
@@ -84,14 +103,12 @@ class RdvController extends Controller
             $aResult[] = $appointment->_toArrayShort();
         }
 
-        $json = json_encode($aResult);
+	    if($format === 'json'){
+		    $response->setData($aResult);
+		    return $response;
+	    }
 
-//        throw new Exception();
-
-        $response->setContent($json);
-
-
-        return $response;
+	    return array('aResult' =>$aResult);
     }
 
 	public function createAction($plateform,$game,$tags,$description,$start,$duree,$nbParticipant,$userGameId,$username,$token)

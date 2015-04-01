@@ -23,8 +23,8 @@ acme_es_battle_register:
     defaults: { _controller: AcmeEsBattleBundle:Login:register }
 
 acme_es_battle_rdv:
-    path:     /rdv/
-    defaults: { _controller: AcmeEsBattleBundle:Rdv:index }
+    path:     /rdv/.{_format}
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:index,_format: json }
 
 acme_es_battle_rdv_create:
     path:     /rdv/add/{plateform}/{game}/{tags}/{description}/{start}/{duree}/{nbParticipant}/{userGameId}/{username}/{token}
@@ -156,8 +156,8 @@ acme_es_battle_annonce_create:
     defaults: { _controller: AcmeEsBattleBundle:Annonce:create }
 
 acme_es_battle_annonce:
-    path:     /annonce
-    defaults: { _controller: AcmeEsBattleBundle:Annonce:index }
+    path:     /annonce.{_format}
+    defaults: { _controller: AcmeEsBattleBundle:Annonce:index,_format:json }
 
 #acme_es_battle_admin_check_usergame:
 #    path:     /francis/usergame
@@ -222,8 +222,8 @@ acme_es_battle_forum_topic_get_all:
     defaults: { _controller: AcmeEsBattleBundle:Forum:getAllTopic }
 
 acme_es_battle_news_get_all:
-    path:     /news
-    defaults: { _controller: AcmeEsBattleBundle:Forum:getNews }
+    path:     /news.{_format}
+    defaults: { _controller: AcmeEsBattleBundle:Forum:getNews,_format: json }
 
 acme_es_battle_forum_topic_get_one:
     path:     /forum/topic/get/{id}/{page}/{nbResult}.{_format}
