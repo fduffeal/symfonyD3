@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Acme\EsBattleBundle\Entity\User as User;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class LoginController extends Controller
@@ -52,6 +53,34 @@ class LoginController extends Controller
         }
         return $user;
     }
+
+	public function refreshBungieAction(){
+		$request = $this->getRequest();
+
+		$requestContent = json_decode($request->getContent());
+		if($requestContent === null || !$requestContent->username || !$requestContent->token){
+			$response = new Response();
+			$response->setStatusCode(401);
+			return $response;
+		}
+		$username = $requestContent->username;
+		$token = $requestContent->token;
+
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\User $user
+		 */
+		$user = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:User')
+			->findOneBy(
+				array('username' => $username,'apikey' => $token)
+			);
+
+		$this->_updateDestinyCharacter($user);
+
+		$response = new JsonResponse();
+		$response->setData($user->_toArrayPrivate());
+		return $response;
+	}
 
     public function indexAction($username,$password)
     {

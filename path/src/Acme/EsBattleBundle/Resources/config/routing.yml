@@ -18,6 +18,10 @@ acme_es_battle_login_set_online:
     path:     /login/online/{username}/{token}
     defaults: { _controller: AcmeEsBattleBundle:Login:setOnline }
 
+acme_es_battle_login_refresh_bungie:
+    path:     /login/refresh
+    defaults: { _controller: AcmeEsBattleBundle:Login:refreshBungie }
+
 acme_es_battle_register:
     path:     /register/{email}/{password}/{username}/{plateformId}/{gamerTag}
     defaults: { _controller: AcmeEsBattleBundle:Login:register }
