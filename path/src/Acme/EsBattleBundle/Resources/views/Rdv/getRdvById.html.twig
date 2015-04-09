@@ -16,7 +16,7 @@
 
     <meta property="og:title" content="Esbattle.com - Rejoins ma partie"/>
     <meta property="og:site_name" content="Esbattle.com"/>
-    <meta property="og:url" content="http://api.esbattle.com/rdv/get/{{ rdv.id }}.html"/>
+    <meta property="og:url" content="http://apiv2.esbattle.com/rdv/get/{{ rdv.id }}.html"/>
     <meta property="og:description" content="Rendez vous sur #{{ rdv.plateform.nom }}
     à {{ rdv.start | date("d/m/Y H:i") }},
     {{ rdv.description }}
@@ -24,7 +24,7 @@
         {{ item.nom }}
     {% endfor %} #esbattle"/>
     <meta property="og:type" content="article" />
-    <meta property="og:image" content="http://api.esbattle.com/uploads/documents/729c50c0531021b02e92a64c03094c6d288d3bb6.png" />
+    <meta property="og:image" content="http://apiv2.esbattle.com/uploads/documents/729c50c0531021b02e92a64c03094c6d288d3bb6.png" />
     <meta property="article:publisher" content="https://www.facebook.com/esbattlelfg">
     <meta property="fb:app_id" content="1482107158698739">
 
@@ -33,8 +33,8 @@
     <meta name="twitter:creator" content="@esbattle">
     <meta name="twitter:domain" content="esbattle.com">
     <meta name="twitter:title" content="Esbattle.com - Rejoins ma partie">
-    <meta name="twitter:url" content="http://api.esbattle.com/rdv/get/{{ rdv.id }}.html" />
-    <meta name="twitter:image" content="http://api.esbattle.com/uploads/documents/729c50c0531021b02e92a64c03094c6d288d3bb6.png">
+    <meta name="twitter:url" content="http://apiv2.esbattle.com/rdv/get/{{ rdv.id }}.html" />
+    <meta name="twitter:image" content="http://apiv2.esbattle.com/uploads/documents/729c50c0531021b02e92a64c03094c6d288d3bb6.png">
     <meta name="twitter:label1" content="Rendez vous sur #{{ rdv.plateform.nom }}">
     <meta name="twitter:data1" content="à {{ rdv.start | date("d/m/Y H:i") }}">
     <meta name="twitter:label2" content="{% for item in rdv.tags %}{{ item.nom }}{% endfor %}">
