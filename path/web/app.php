@@ -13,11 +13,18 @@ $loader = new ApcClassLoader('sf2', $loader);
 $loader->register(true);
 */
 
-if($_SERVER['SERVER_NAME'] === 'lfg.esbattle.com'){
-	header('Access-Control-Allow-Origin: http://localhost:8000');
+if($_SERVER['SERVER_ADDR'] === '195.154.119.183' || $_SERVER['SERVER_ADDR'] === '62.210.252.220'){
+	header('Access-Control-Allow-Origin: '.$_SERVER['HTTP_ORIGIN']);
+//	header('Access-Control-Allow-Origin: http://www.esbattle.com');
 } else {
-	header('Access-Control-Allow-Origin: http://www.esbattle.com');
+	header('Access-Control-Allow-Origin: http://localhost:8000');
 }
+
+//if($_SERVER['SERVER_NAME'] === 'lfg.esbattle.com'){
+//	header('Access-Control-Allow-Origin: http://localhost:8000');
+//} else {
+//	header('Access-Control-Allow-Origin: http://www.esbattle.com');
+//}
 
 $loader = require_once __DIR__.'/../app/bootstrap.php.cache';
 
