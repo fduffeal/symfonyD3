@@ -94,7 +94,7 @@ class RdvController extends Controller
         return $response;
     }
 
-	public function createAction($plateform,$game,$tags,$description,$start,$duree,$nbParticipant,$userGameId,$username,$token)
+	public function createAction($plateform,$game,$tags,$description,$start,$duree,$nbParticipant,$userGameId,$vignetteId,$username,$token)
 	{
 
         $user = $this->getDoctrine()
@@ -127,6 +127,12 @@ class RdvController extends Controller
                 array('id' => $userGameId)
             );
 
+		$vignette = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Document')
+			->findOneBy(
+				array('id' => $vignetteId)
+			);
+
 		$startDay = new \DateTime();
 		$startDay->setTimestamp($start);
 		$nbParticipant = intval($nbParticipant);
@@ -151,6 +157,7 @@ class RdvController extends Controller
         $appointment->addUsersGame($userGame);
         $appointment->setPlateform($myPlateform);
         $appointment->setGame($myGame);
+		$appointment->setVignette($vignette);
 
 
         $aTags = preg_split("/[\s,]+/",$tags);
