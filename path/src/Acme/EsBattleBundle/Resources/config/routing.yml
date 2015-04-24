@@ -260,3 +260,15 @@ acme_es_battle_partenaire:
 acme_es_battle_partenaire_get_one:
     path:     /partenaire/{id}
     defaults: { _controller: AcmeEsBattleBundle:Partenaire:get }
+
+acme_es_battle_avis_get:
+    path:     /avis/{id}.{_format}
+    defaults: { _controller: AcmeEsBattleBundle:Avis:get,_format:json }
+    requirements:
+                _method:  GET
+
+acme_es_battle_avis_add:
+    path:     /avis/{id}.{_format}
+    defaults: { _controller: AcmeEsBattleBundle:Avis:post,_format:json }
+    requirements:
+            _method:  POST
