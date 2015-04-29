@@ -20,6 +20,8 @@ if($_SERVER['SERVER_ADDR'] === '195.154.119.183' || $_SERVER['SERVER_ADDR'] === 
 	header('Access-Control-Allow-Origin: http://localhost:8000');
 }
 
+header('Access-Control-Allow-Methods',"POST, GET, PUT, DELETE, OPTIONS");
+
 //if($_SERVER['SERVER_NAME'] === 'lfg.esbattle.com'){
 //	header('Access-Control-Allow-Origin: http://localhost:8000');
 //} else {
