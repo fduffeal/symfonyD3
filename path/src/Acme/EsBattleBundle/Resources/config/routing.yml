@@ -264,11 +264,14 @@ acme_es_battle_partenaire_get_one:
 acme_es_battle_avis_get:
     path:     /avis/{id}.{_format}
     defaults: { _controller: AcmeEsBattleBundle:Avis:get,_format:json }
-    requirements:
-                _method:  GET
+    methods:  [GET]
 
 acme_es_battle_avis_add:
     path:     /avis/{id}.{_format}
     defaults: { _controller: AcmeEsBattleBundle:Avis:post,_format:json }
-    requirements:
-            _method:  POST
+    methods:  [POST]
+
+acme_es_battle_avis_add:
+    path:     /avis/{id}.{_format}
+    defaults: { _controller: AcmeEsBattleBundle:Avis:options,_format:json }
+    methods:  [OPTIONS]

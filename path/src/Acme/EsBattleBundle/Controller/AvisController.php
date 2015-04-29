@@ -2,6 +2,7 @@
 
 namespace Acme\EsBattleBundle\Controller;
 
+use Acme\EsBattleBundle\Entity\UserAvis;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -15,6 +16,16 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class AvisController extends Controller
 {
 
+	public function optionsAction(){
+		$format = $this->getRequest()->getRequestFormat();
+
+		if($format === 'json') {
+			$response = new JsonResponse();
+		} else {
+			$response = new Response();
+		}
+		return $response;
+	}
 	/**
 	 * @Template()
 	 * @return array|JsonResponse|Response
@@ -29,7 +40,7 @@ class AvisController extends Controller
 	    }
 
 	    $response->setPublic();
-	    $response->setSharedMaxAge(600);
+	    $response->setSharedMaxAge(10);
 
         $em = $this->getDoctrine()->getManager();
 
@@ -59,43 +70,67 @@ class AvisController extends Controller
 	    return array('aAvis' => $aAvis);
     }
 
+	/**
+	 * @param $id
+	 * @return JsonResponse
+	 */
     public function postAction($id)
     {
+
 	    $request = $this->getRequest();
-
-	    $format = $request->getRequestFormat();
-
-	    if($format === 'json') {
-		    $response = new JsonResponse();
-	    } else {
-		    $response = new Response();
-	    }
-
+	    $response = new JsonResponse();
 	    $requestContent = json_decode($request->getContent());
 	    if($requestContent === null){
-		    $response = new Response();
 		    $response->setStatusCode(401);
 		    return $response;
 	    }
-	    $texte = $requestContent->texte;
+	    $avis = $requestContent->avis;
 	    $username = $requestContent->username;
 	    $token = $requestContent->token;
-
 
 	    /**
 	     * @var \Acme\EsBattleBundle\Entity\User $user
 	     */
 	    $user = $this->getDoctrine()
 		    ->getRepository('AcmeEsBattleBundle:User')
+		    ->find($id);
+
+	    if($user === null){
+		    $response->setStatusCode(401);
+		    return $response;
+	    }
+
+	    /**
+	     * @var \Acme\EsBattleBundle\Entity\User $auteur
+	     */
+	    $auteur = $this->getDoctrine()
+		    ->getRepository('AcmeEsBattleBundle:User')
 		    ->findOneBy(
 			    array('username' => $username,'apikey' => $token)
 		    );
 
-	    if($user === null){
-		    $response = new Response();
+	    if($auteur === null){
 		    $response->setStatusCode(401);
 		    return $response;
 	    }
+
+	    /**
+	     * @var \Acme\EsBattleBundle\Entity\UserAvis $userAvis
+	     */
+	    $userAvis = new UserAvis();
+	    $userAvis->setAuteur($auteur);
+	    $userAvis->setAvis($avis);
+	    $userAvis->setUser($user);
+
+	    $em = $this->getDoctrine()->getManager();
+	    $em->persist($userAvis);
+
+	    $response = $this->forward('AcmeEsBattleBundle:Avis:get', array(
+		    'id'  => $id,
+		    '_format' => 'json'
+	    ));
+
+	    return $response;
 
     }
 
