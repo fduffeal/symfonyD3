@@ -50,3 +50,11 @@ DirectoryIndex app.php
         # RedirectTemp cannot be used instead
     </IfModule>
 </IfModule>
+
+<ifModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin: "*"
+    Header always set Access-Control-Allow-Methods "POST, GET, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Request-Method "POST, GET, PUT, DELETE, OPTIONS"
+    Header always set Allow "POST, GET, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "origin, x-requested-with, content-type, Token, User, x-requested-by"
+</ifModule>

@@ -80,13 +80,15 @@ class AvisController extends Controller
 	    $request = $this->getRequest();
 	    $response = new JsonResponse();
 	    $requestContent = json_decode($request->getContent());
+
 	    if($requestContent === null){
 		    $response->setStatusCode(401);
 		    return $response;
 	    }
+	    $token = $request->headers->get('Token');
+	    $userId = $request->headers->get('User');
+
 	    $avis = $requestContent->avis;
-	    $username = $requestContent->username;
-	    $token = $requestContent->token;
 
 	    /**
 	     * @var \Acme\EsBattleBundle\Entity\User $user
@@ -105,11 +107,9 @@ class AvisController extends Controller
 	     */
 	    $auteur = $this->getDoctrine()
 		    ->getRepository('AcmeEsBattleBundle:User')
-		    ->findOneBy(
-			    array('username' => $username,'apikey' => $token)
-		    );
+		    ->find($userId);
 
-	    if($auteur === null){
+	    if($auteur === null || $auteur->getApikey() !== $token){
 		    $response->setStatusCode(401);
 		    return $response;
 	    }
@@ -124,6 +124,7 @@ class AvisController extends Controller
 
 	    $em = $this->getDoctrine()->getManager();
 	    $em->persist($userAvis);
+	    $em->flush();
 
 	    $response = $this->forward('AcmeEsBattleBundle:Avis:get', array(
 		    'id'  => $id,

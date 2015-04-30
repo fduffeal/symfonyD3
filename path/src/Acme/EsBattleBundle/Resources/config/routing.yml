@@ -267,11 +267,11 @@ acme_es_battle_avis_get:
     methods:  [GET]
 
 acme_es_battle_avis_add:
-    path:     /avis/{id}.{_format}
+    path:     /avis/{id}
     defaults: { _controller: AcmeEsBattleBundle:Avis:post,_format:json }
     methods:  [POST]
 
-acme_es_battle_avis_add:
+acme_es_battle_avis_options:
     path:     /avis/{id}.{_format}
     defaults: { _controller: AcmeEsBattleBundle:Avis:options,_format:json }
     methods:  [OPTIONS]
