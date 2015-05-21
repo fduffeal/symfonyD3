@@ -22,6 +22,8 @@ class Topic
 	const STATUS_NORMAL = 'normal';
 	const STATUS_POSTIT = 'postit';
 	const STATUS_NEWS = 'news';
+	const STATUS_VIDEO = 'video';
+	const STATUS_TUTO = 'tuto';
     /**
      * @var integer
      *
@@ -42,7 +44,7 @@ class Topic
     /**
      * @var string
      *
-     * @ORM\Column(name="status", type="string", columnDefinition="ENUM('postit', 'high','normal','news')")
+     * @ORM\Column(name="status", type="string", columnDefinition="ENUM('postit', 'high','normal','news','video','tuto')")
      */
     private $status;
 
@@ -127,7 +129,7 @@ class Topic
      */
     public function setVisibleValue()
     {
-        $this->visible = true;
+//        $this->visible = true;
     }
 
     /**
@@ -135,7 +137,7 @@ class Topic
      */
     public function setStatusValue()
     {
-        $this->status = self::STATUS_NORMAL;
+//        $this->status = self::STATUS_NORMAL;
     }
 
     /**
@@ -167,6 +169,8 @@ class Topic
     public function __construct()
     {
         $this->messages = new \Doctrine\Common\Collections\ArrayCollection();
+	    $this->visible = true;
+		$this->status = self::STATUS_NORMAL;
     }
 
     /**

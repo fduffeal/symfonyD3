@@ -27,14 +27,16 @@ class ForumController extends Controller
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
 
+	    $arrayStatus = array(Topic::STATUS_HIGH,Topic::STATUS_NORMAL,Topic::STATUS_POSTIT);
         $em = $this->getDoctrine()->getManager();
 
         $query = $em->createQuery(
             'SELECT topic
             FROM AcmeEsBattleBundle:Topic topic
             WHERE topic.visible = :visible
+            AND topic.status IN (:arrayStatus)
             ORDER BY topic.updated DESC'
-        )->setParameter('visible', true)->setMaxResults(1);
+        )->setParameter('visible', true)->setParameter('arrayStatus', $arrayStatus)->setMaxResults(1);
 
         $topicCollection = $query->getResult();
 
@@ -59,8 +61,9 @@ class ForumController extends Controller
             JOIN topic.user user
             JOIN topic.messages messages
             WHERE topic.visible = :visible
+            AND topic.status IN (:arrayStatus)
             ORDER BY topic.position ASC, topic.updated DESC'
-        )->setParameter('visible', true);
+        )->setParameter('visible', true)->setParameter('arrayStatus', $arrayStatus);
 
         $topicCollection = $query->getResult();
 
@@ -95,6 +98,7 @@ class ForumController extends Controller
 			$response = new Response();
 		}
 
+		$arrayStatus = array(Topic::STATUS_VIDEO,Topic::STATUS_TUTO,Topic::STATUS_NEWS);
 
 		$em = $this->getDoctrine()->getManager();
 
@@ -104,10 +108,10 @@ class ForumController extends Controller
             JOIN topic.messages messages
             JOIN topic.vignette vignette
             WHERE topic.visible = :visible
-            AND topic.status = :newsStatus
+            AND topic.status IN (:arrayStatus)
             ORDER BY topic.updated DESC'
 		)->setParameter('visible', true)
-			->setParameter('newsStatus',Topic::STATUS_NEWS)
+			->setParameter('arrayStatus',$arrayStatus)
 			->setMaxResults(1);
 
 		$topicCollection = $query->getResult();
@@ -131,9 +135,9 @@ class ForumController extends Controller
             JOIN topic.messages messages
             JOIN topic.vignette vignette
             WHERE topic.visible = :visible
-            AND topic.status = :newsStatus
+            AND topic.status IN (:arrayStatus)
             ORDER BY topic.created DESC'
-		)->setParameter('visible', true)->setParameter('newsStatus',Topic::STATUS_NEWS);
+		)->setParameter('visible', true)->setParameter('arrayStatus',$arrayStatus);
 
 		$topicCollection = $query->getResult();
 

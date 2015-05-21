@@ -463,6 +463,8 @@ class AdminController extends Controller
 		$topicStatus[] = Topic::STATUS_NORMAL;
 		$topicStatus[] = Topic::STATUS_POSTIT;
 		$topicStatus[] = Topic::STATUS_HIGH;
+		$topicStatus[] = Topic::STATUS_TUTO;
+		$topicStatus[] = Topic::STATUS_VIDEO;
 
 
 		$newStatus = $request->get('status');
