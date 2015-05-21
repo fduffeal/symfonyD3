@@ -21,6 +21,12 @@ acme_es_battle_login_set_online:
 acme_es_battle_login_refresh_bungie:
     path:     /login/refresh
     defaults: { _controller: AcmeEsBattleBundle:Login:refreshBungie }
+    methods:  [POST]
+
+acme_es_battle_login_refresh_bungie_options:
+    path:     /login/refresh
+    defaults: {_controller: AcmeEsBattleBundle:Avis:options }
+    methods:  [OPTIONS]
 
 acme_es_battle_register:
     path:     /register/{email}/{password}/{username}/{plateformId}/{gamerTag}
