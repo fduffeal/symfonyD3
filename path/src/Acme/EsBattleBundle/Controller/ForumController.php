@@ -88,7 +88,7 @@ class ForumController extends Controller
 	/**
 	 * @Template()
 	 */
-	public function getNewsAction(){
+	public function getNewsAction($offset,$limit){
 
 		$format = $this->getRequest()->getRequestFormat();
 
@@ -105,20 +105,25 @@ class ForumController extends Controller
 		$query = $em->createQuery(
 			'SELECT topic
             FROM AcmeEsBattleBundle:Topic topic
-            JOIN topic.messages messages
-            JOIN topic.vignette vignette
             WHERE topic.visible = :visible
             AND topic.status IN (:arrayStatus)
             ORDER BY topic.updated DESC'
 		)->setParameter('visible', true)
 			->setParameter('arrayStatus',$arrayStatus)
+			->setFirstResult($offset)
 			->setMaxResults(1);
 
 		$topicCollection = $query->getResult();
 
+		if(!$topicCollection){
+			return $response;
+		}
+
 		$response->setPublic();
 		$response->setMaxAge(60);
 		$response->setSharedMaxAge(60);
+
+//		var_dump($topicCollection[0]->getUpdated());die();
 
 		$response->setLastModified($topicCollection[0]->getUpdated());
 
@@ -130,14 +135,15 @@ class ForumController extends Controller
 		}
 
 		$query = $em->createQuery(
-			'SELECT topic,vignette,messages
+			'SELECT topic
             FROM AcmeEsBattleBundle:Topic topic
-            JOIN topic.messages messages
-            JOIN topic.vignette vignette
             WHERE topic.visible = :visible
             AND topic.status IN (:arrayStatus)
             ORDER BY topic.created DESC'
-		)->setParameter('visible', true)->setParameter('arrayStatus',$arrayStatus);
+		)->setParameter('visible', true)
+			->setParameter('arrayStatus',$arrayStatus)
+			->setFirstResult($offset)
+			->setMaxResults($limit);
 
 		$topicCollection = $query->getResult();
 
