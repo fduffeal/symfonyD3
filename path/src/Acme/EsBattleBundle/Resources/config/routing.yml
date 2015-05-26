@@ -242,14 +242,33 @@ acme_es_battle_forum_topic_get_one:
 acme_es_battle_forum_topic_create:
     path:     /forum/topic/create/{username}/{token}
     defaults: { _controller: AcmeEsBattleBundle:Forum:createTopic }
+    methods : [POST]
+
+acme_es_battle_forum_topic_create_options:
+    path:     /forum/topic/create/{username}/{token}
+    defaults: {_controller: AcmeEsBattleBundle:Avis:options }
+    methods : [OPTIONS]
 
 acme_es_battle_forum_topic_message_create:
     path:     /forum/topic/message/{topicId}/{page}/{nbResult}/{username}/{token}
     defaults: { _controller: AcmeEsBattleBundle:Forum:createMessage }
+    methods : [POST]
+
+
+acme_es_battle_forum_topic_message_create_options:
+    path:    /forum/topic/message/{topicId}/{page}/{nbResult}/{username}/{token}
+    defaults: {_controller: AcmeEsBattleBundle:Avis:options }
+    methods : [OPTIONS]
 
 acme_es_battle_forum_topic_message_update:
     path:     /forum/topic/message/update/{messageId}/{page}/{nbResult}/{username}/{token}
     defaults: { _controller: AcmeEsBattleBundle:Forum:updateMessage }
+    methods : [POST]
+
+acme_es_battle_forum_topic_message_update_options:
+    path:     /forum/topic/message/update/{messageId}/{page}/{nbResult}/{username}/{token}
+    defaults: {_controller: AcmeEsBattleBundle:Avis:options }
+    methods : [OPTIONS]
 
 acme_es_battle_forum_topic_message_delete:
     path:     /forum/topic/message/delete/{messageId}/{page}/{nbResult}/{username}/{token}
@@ -281,3 +300,24 @@ acme_es_battle_avis_options:
     path:     /avis/{id}.{_format}
     defaults: { _controller: AcmeEsBattleBundle:Avis:options,_format:json }
     methods:  [OPTIONS]
+
+acme_es_battle_planification_get:
+    path:     /planification.{_format}
+    defaults: { _controller: AcmeEsBattleBundle:Planification:index,_format:json }
+    methods:  [GET]
+
+acme_es_battle_planification_admin:
+    path:     /admin/planification
+    defaults: { _controller: AcmeEsBattleBundle:Planification:list }
+
+acme_es_battle_planification_create:
+    path:     /admin/planification/create
+    defaults: { _controller: AcmeEsBattleBundle:Planification:create }
+
+acme_es_battle_planification_update:
+    path:     /admin/planification/update/{id}
+    defaults: { _controller: AcmeEsBattleBundle:Planification:update }
+
+acme_es_battle_planification_delete:
+    path:     /admin/planification/delete/{id}
+    defaults: { _controller: AcmeEsBattleBundle:Planification:delete }

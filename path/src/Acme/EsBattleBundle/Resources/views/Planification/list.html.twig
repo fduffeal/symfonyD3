@@ -1,0 +1,37 @@
+{% extends 'AcmeEsBattleBundle::layout.html.twig' %}
+{% block content %}
+    <p>
+        <br/><a class="btn btn-primary" href="{{ path('acme_es_battle_planification_create') }}">Nouvelle Planification</a>
+    </p>
+    <h2>Planification affichée en ce moment</h2>
+    <ul style="padding:0">
+        {% for planification in current %}
+            <li class="list-group-item">
+                {{ planification.id }} -  {{ planification.titre }}
+                </br>
+                {{ planification.description }}
+                </br>
+                {% if planification.video %}
+                Vidéo : {{ planification.video.url }}
+                {%  endif %}
+                </br>
+                {% if planification.image %}
+                Image : {{ planification.image.url }}
+                {%  endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    <h2>Toutes les planifications</h2>
+    <ul style="padding:0">
+        {% for planification in planifications %}
+            <li class="list-group-item">
+                {{ planification.id }} -  {{ planification.titre }}
+                <br/>
+                <div class="btn-group-xs">
+                    <a href="{{ path('acme_es_battle_planification_update', { 'id': planification.id }) }}" class="btn btn-default">Modifier</a>
+                    <a href="{{ path('acme_es_battle_planification_delete', { 'id': planification.id }) }}" class="btn btn-default">Supprimer</a>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
