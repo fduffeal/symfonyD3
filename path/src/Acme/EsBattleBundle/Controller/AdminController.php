@@ -445,7 +445,7 @@ class AdminController extends Controller
 	{
 		$session = new Session();
 
-		if(!$session->get('modo')){
+		if(!$session->get('modo') && !$session->get('redacteur')){
 			$response = new Response();
 			$response->setStatusCode(401);
 			return $response;
