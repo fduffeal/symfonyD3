@@ -26,7 +26,20 @@ class PlanificationController extends Controller
 
 		$response = new JsonResponse();
 
+		$response->setPublic();
+		$response->setMaxAge(300);
+		$response->setSharedMaxAge(300);
+
 		if(!$collection){
+			return $response;
+		}
+
+		$response->setLastModified($collection[0]->getStart());
+
+		// Vérifie que l'objet Response n'est pas modifié
+		// pour un objet Request donné
+		if ($response->isNotModified($this->getRequest())) {
+			// Retourne immédiatement un objet 304 Response
 			return $response;
 		}
 
@@ -40,15 +53,14 @@ class PlanificationController extends Controller
 
 	public function listAction(){
 		$em = $this->getDoctrine()->getManager();
-		$query = $em->createQuery(
-			'SELECT planification
-            FROM AcmeEsBattleBundle:Planification planification
-            WHERE planification.start < CURRENT_TIMESTAMP()
-            AND planification.end > CURRENT_TIMESTAMP()
-            ORDER BY planification.start DESC'
-		)->setMaxResults(1);
+		$response = $this->forward('AcmeEsBattleBundle:Planification:index');
 
-		$displayed = $query->getResult();
+		$content = $response->getContent();
+		$displayed = json_decode($content);
+
+		if(!property_exists($displayed,'id')){
+			$displayed = null;
+		}
 
 		$query = $em->createQuery(
 			'SELECT planification
@@ -61,24 +73,6 @@ class PlanificationController extends Controller
 		return $this->render('AcmeEsBattleBundle:Planification:list.html.twig', array(
 			'current' => $displayed,
 			'planifications' => $all
-		));
-	}
-
-	public function retrieveAction($id){
-		/**
-		 * @var \Acme\EsBattleBundle\Entity\Planification $planification
-		 */
-		$planification = $this->getDoctrine()
-			->getRepository('AcmeEsBattleBundle:Planification')
-			->find($id);
-		$response = new JsonResponse();
-
-		if(!$planification){
-			return $response;
-		}
-
-		return $this->render('AcmeEsBattleBundle:Planification:retrieve.html.twig', array(
-			'planification' => $planification
 		));
 	}
 
@@ -124,7 +118,7 @@ class PlanificationController extends Controller
 			$response = $this->forward('AcmeEsBattleBundle:Planification:list');
 		} else {
 
-			$response = $this->render('AcmeEsBattleBundle:Planification:retrieve.html.twig', array(
+			$response = $this->render('AcmeEsBattleBundle:Planification:form.html.twig', array(
 				'planification'  => $planification,
 				'form' => $form->createView()
 			));
@@ -176,7 +170,7 @@ class PlanificationController extends Controller
 			}
 		}
 
-		$response = $this->render('AcmeEsBattleBundle:Planification:retrieve.html.twig', array(
+		$response = $this->render('AcmeEsBattleBundle:Planification:form.html.twig', array(
 			'planification'  => $planification,
 			'form' => $form->createView()
 		));

@@ -321,3 +321,8 @@ acme_es_battle_planification_update:
 acme_es_battle_planification_delete:
     path:     /admin/planification/delete/{id}
     defaults: { _controller: AcmeEsBattleBundle:Planification:delete }
+
+acme_es_battle_admin_logout:
+    path:     /admin/logout
+    defaults: { _controller: AcmeEsBattleBundle:Admin:logout }
+

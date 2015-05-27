@@ -846,4 +846,11 @@ class AdminController extends Controller
 
         return array('topics'=>$collectionTopic);
     }
+
+	public function logoutAction(Request $request){
+		$request->getSession()->clear();
+
+		$response = $this->forward('AcmeEsBattleBundle:Admin:login');
+		return $response;
+	}
 }
