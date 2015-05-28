@@ -18,12 +18,19 @@ umask(0000);
     exit('You are not allowed to access this file. Check '.basename(__FILE__).' for more information.');
 }*/
 
-if($_SERVER['SERVER_ADDR'] === '195.154.119.183' || $_SERVER['SERVER_ADDR'] === '62.210.252.220'){
-	header('Access-Control-Allow-Origin: '.$_SERVER['HTTP_ORIGIN']);
-//	header('Access-Control-Allow-Origin: http://www.esbattle.com');
-} else {
-	header('Access-Control-Allow-Origin: http://localhost:8000');
-}
+//if($_SERVER['SERVER_ADDR'] === '195.154.119.183' || $_SERVER['SERVER_ADDR'] === '62.210.252.220'){
+////	header('Access-Control-Allow-Origin: '.$_SERVER['HTTP_ORIGIN']);
+////	header('Access-Control-Allow-Origin: http://www.esbattle.com');
+//} else {
+////	header('Access-Control-Allow-Origin: *');
+//}
+
+//
+//header('Allow: POST, GET, HEAD, PUT, DELETE, OPTIONS');
+//
+//header('Access-Control-Allow-Headers: Origin, content-type, accept, User, Authorization, X-Requested-With');
+//header('Access-Control-Allow-Credentials: true');
+//header('Access-Control-Allow-Methods: POST, GET, HEAD, PUT, DELETE, OPTIONS');
 
 //if($_SERVER['SERVER_NAME'] === 'lfg.esbattle.com'){
 //    header('Access-Control-Allow-Origin: http://localhost:8000');

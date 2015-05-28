@@ -21,6 +21,12 @@ acme_es_battle_login_set_online:
 acme_es_battle_login_refresh_bungie:
     path:     /login/refresh
     defaults: { _controller: AcmeEsBattleBundle:Login:refreshBungie }
+    methods:  [POST]
+
+acme_es_battle_login_refresh_bungie_options:
+    path:     /login/refresh
+    defaults: {_controller: AcmeEsBattleBundle:Avis:options }
+    methods:  [OPTIONS]
 
 acme_es_battle_register:
     path:     /register/{email}/{password}/{username}/{plateformId}/{gamerTag}
@@ -31,7 +37,7 @@ acme_es_battle_rdv:
     defaults: { _controller: AcmeEsBattleBundle:Rdv:index,_format: json }
 
 acme_es_battle_rdv_create:
-    path:     /rdv/add/{plateform}/{game}/{tags}/{description}/{start}/{duree}/{nbParticipant}/{userGameId}/{username}/{token}
+    path:     /rdv/add/{plateform}/{game}/{tags}/{description}/{start}/{duree}/{nbParticipant}/{userGameId}/{vignetteId}/{username}/{token}
     defaults: { _controller: AcmeEsBattleBundle:Rdv:create }
 
 acme_es_battle_rdv_get:
@@ -225,9 +231,9 @@ acme_es_battle_forum_topic_get_all:
     path:     /forum
     defaults: { _controller: AcmeEsBattleBundle:Forum:getAllTopic }
 
-acme_es_battle_news_get_all:
-    path:     /news.{_format}
-    defaults: { _controller: AcmeEsBattleBundle:Forum:getNews,_format: json }
+acme_es_battle_news_get_page:
+    path:     /news/{offset}/{limit}.{_format}
+    defaults: { _controller: AcmeEsBattleBundle:Forum:getNews,_format: json, offset: 0, limit: 12 }
 
 acme_es_battle_forum_topic_get_one:
     path:     /forum/topic/get/{id}/{page}/{nbResult}.{_format}
@@ -236,14 +242,33 @@ acme_es_battle_forum_topic_get_one:
 acme_es_battle_forum_topic_create:
     path:     /forum/topic/create/{username}/{token}
     defaults: { _controller: AcmeEsBattleBundle:Forum:createTopic }
+    methods : [POST]
+
+acme_es_battle_forum_topic_create_options:
+    path:     /forum/topic/create/{username}/{token}
+    defaults: {_controller: AcmeEsBattleBundle:Avis:options }
+    methods : [OPTIONS]
 
 acme_es_battle_forum_topic_message_create:
     path:     /forum/topic/message/{topicId}/{page}/{nbResult}/{username}/{token}
     defaults: { _controller: AcmeEsBattleBundle:Forum:createMessage }
+    methods : [POST]
+
+
+acme_es_battle_forum_topic_message_create_options:
+    path:    /forum/topic/message/{topicId}/{page}/{nbResult}/{username}/{token}
+    defaults: {_controller: AcmeEsBattleBundle:Avis:options }
+    methods : [OPTIONS]
 
 acme_es_battle_forum_topic_message_update:
     path:     /forum/topic/message/update/{messageId}/{page}/{nbResult}/{username}/{token}
     defaults: { _controller: AcmeEsBattleBundle:Forum:updateMessage }
+    methods : [POST]
+
+acme_es_battle_forum_topic_message_update_options:
+    path:     /forum/topic/message/update/{messageId}/{page}/{nbResult}/{username}/{token}
+    defaults: {_controller: AcmeEsBattleBundle:Avis:options }
+    methods : [OPTIONS]
 
 acme_es_battle_forum_topic_message_delete:
     path:     /forum/topic/message/delete/{messageId}/{page}/{nbResult}/{username}/{token}
@@ -260,3 +285,44 @@ acme_es_battle_partenaire:
 acme_es_battle_partenaire_get_one:
     path:     /partenaire/{id}
     defaults: { _controller: AcmeEsBattleBundle:Partenaire:get }
+
+acme_es_battle_avis_get:
+    path:     /avis/{id}.{_format}
+    defaults: { _controller: AcmeEsBattleBundle:Avis:get,_format:json }
+    methods:  [GET]
+
+acme_es_battle_avis_add:
+    path:     /avis/{id}
+    defaults: { _controller: AcmeEsBattleBundle:Avis:post,_format:json }
+    methods:  [POST]
+
+acme_es_battle_avis_options:
+    path:     /avis/{id}.{_format}
+    defaults: { _controller: AcmeEsBattleBundle:Avis:options,_format:json }
+    methods:  [OPTIONS]
+
+acme_es_battle_planification_get:
+    path:     /planification.{_format}
+    defaults: { _controller: AcmeEsBattleBundle:Planification:index,_format:json }
+    methods:  [GET]
+
+acme_es_battle_planification_admin:
+    path:     /admin/planification
+    defaults: { _controller: AcmeEsBattleBundle:Planification:list }
+
+acme_es_battle_planification_create:
+    path:     /admin/planification/create
+    defaults: { _controller: AcmeEsBattleBundle:Planification:create }
+
+acme_es_battle_planification_update:
+    path:     /admin/planification/update/{id}
+    defaults: { _controller: AcmeEsBattleBundle:Planification:update }
+
+acme_es_battle_planification_delete:
+    path:     /admin/planification/delete/{id}
+    defaults: { _controller: AcmeEsBattleBundle:Planification:delete }
+
+acme_es_battle_admin_logout:
+    path:     /admin/logout
+    defaults: { _controller: AcmeEsBattleBundle:Admin:logout }
+

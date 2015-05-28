@@ -27,14 +27,16 @@ class ForumController extends Controller
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
 
+	    $arrayStatus = array(Topic::STATUS_HIGH,Topic::STATUS_NORMAL,Topic::STATUS_POSTIT);
         $em = $this->getDoctrine()->getManager();
 
         $query = $em->createQuery(
             'SELECT topic
             FROM AcmeEsBattleBundle:Topic topic
             WHERE topic.visible = :visible
+            AND topic.status IN (:arrayStatus)
             ORDER BY topic.updated DESC'
-        )->setParameter('visible', true)->setMaxResults(1);
+        )->setParameter('visible', true)->setParameter('arrayStatus', $arrayStatus)->setMaxResults(1);
 
         $topicCollection = $query->getResult();
 
@@ -59,8 +61,9 @@ class ForumController extends Controller
             JOIN topic.user user
             JOIN topic.messages messages
             WHERE topic.visible = :visible
+            AND topic.status IN (:arrayStatus)
             ORDER BY topic.position ASC, topic.updated DESC'
-        )->setParameter('visible', true);
+        )->setParameter('visible', true)->setParameter('arrayStatus', $arrayStatus);
 
         $topicCollection = $query->getResult();
 
@@ -85,7 +88,7 @@ class ForumController extends Controller
 	/**
 	 * @Template()
 	 */
-	public function getNewsAction(){
+	public function getNewsAction($offset,$limit){
 
 		$format = $this->getRequest()->getRequestFormat();
 
@@ -95,26 +98,32 @@ class ForumController extends Controller
 			$response = new Response();
 		}
 
+		$arrayStatus = array(Topic::STATUS_VIDEO,Topic::STATUS_TUTO,Topic::STATUS_NEWS);
 
 		$em = $this->getDoctrine()->getManager();
 
 		$query = $em->createQuery(
 			'SELECT topic
             FROM AcmeEsBattleBundle:Topic topic
-            JOIN topic.messages messages
-            JOIN topic.vignette vignette
             WHERE topic.visible = :visible
-            AND topic.status = :newsStatus
+            AND topic.status IN (:arrayStatus)
             ORDER BY topic.updated DESC'
 		)->setParameter('visible', true)
-			->setParameter('newsStatus',Topic::STATUS_NEWS)
+			->setParameter('arrayStatus',$arrayStatus)
+			->setFirstResult($offset)
 			->setMaxResults(1);
 
 		$topicCollection = $query->getResult();
 
+		if(!$topicCollection){
+			return $response;
+		}
+
 		$response->setPublic();
 		$response->setMaxAge(60);
 		$response->setSharedMaxAge(60);
+
+//		var_dump($topicCollection[0]->getUpdated());die();
 
 		$response->setLastModified($topicCollection[0]->getUpdated());
 
@@ -126,14 +135,15 @@ class ForumController extends Controller
 		}
 
 		$query = $em->createQuery(
-			'SELECT topic,vignette,messages
+			'SELECT topic
             FROM AcmeEsBattleBundle:Topic topic
-            JOIN topic.messages messages
-            JOIN topic.vignette vignette
             WHERE topic.visible = :visible
-            AND topic.status = :newsStatus
+            AND topic.status IN (:arrayStatus)
             ORDER BY topic.created DESC'
-		)->setParameter('visible', true)->setParameter('newsStatus',Topic::STATUS_NEWS);
+		)->setParameter('visible', true)
+			->setParameter('arrayStatus',$arrayStatus)
+			->setFirstResult($offset)
+			->setMaxResults($limit);
 
 		$topicCollection = $query->getResult();
 

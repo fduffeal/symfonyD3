@@ -445,7 +445,7 @@ class AdminController extends Controller
 	{
 		$session = new Session();
 
-		if(!$session->get('modo')){
+		if(!$session->get('modo') && !$session->get('redacteur')){
 			$response = new Response();
 			$response->setStatusCode(401);
 			return $response;
@@ -463,6 +463,8 @@ class AdminController extends Controller
 		$topicStatus[] = Topic::STATUS_NORMAL;
 		$topicStatus[] = Topic::STATUS_POSTIT;
 		$topicStatus[] = Topic::STATUS_HIGH;
+		$topicStatus[] = Topic::STATUS_TUTO;
+		$topicStatus[] = Topic::STATUS_VIDEO;
 
 
 		$newStatus = $request->get('status');
@@ -685,7 +687,7 @@ class AdminController extends Controller
 	}
 
 	public function addVideoAction($id, Request $request){
-		$session = new Session();
+		$session = $request->getSession();
 
 		if(!$session->get('modo')){
 			$response = new Response();
@@ -703,34 +705,29 @@ class AdminController extends Controller
 			$video = new Video();
 		}
 
-		$collectionPartenaire = $this->getDoctrine()
-			->getRepository('AcmeEsBattleBundle:Partenaire')
-			->findAll();
+		$form = $this->createFormBuilder($video)
+			->add('url')
+			->add('description')
+			->add('partenaire', 'entity', array(
+				'empty_value' => 'Choisissez un partenaire',
+				'required' => false,
+				'class' => 'AcmeEsBattleBundle:Partenaire',
+				'property' => 'nom',
+			))
+			->getForm();
 
-		$url = $request->get('url');
-		$description = $request->get('description');
-		$partenaire = $request->get('partenaire');
+		$form->handleRequest($request);
 
-		if($url !== null){
-
+		if ($form->isValid()) {
 			$em = $this->getDoctrine()->getManager();
-
-			$video->setUrl($url);
-			$video->setDescription($description);
-
-			$newPartenaireEntity = $this->getDoctrine()
-				->getRepository('AcmeEsBattleBundle:Partenaire')
-				->find($partenaire);
-
-			$video->setPartenaire($newPartenaireEntity);
-
 			$em->persist($video);
 			$em->flush();
+
+			return $this->redirect($this->generateUrl('acme_es_battle_admin_video'), 301);
 		}
 
 		return $this->render('AcmeEsBattleBundle:Admin:add-video.html.twig', array(
-			'partenaires' => $collectionPartenaire,
-			'video' => $video
+			'form' => $form->createView()
 		));
 	}
 
@@ -844,4 +841,11 @@ class AdminController extends Controller
 
         return array('topics'=>$collectionTopic);
     }
+
+	public function logoutAction(Request $request){
+		$request->getSession()->clear();
+
+		$response = $this->forward('AcmeEsBattleBundle:Admin:login');
+		return $response;
+	}
 }

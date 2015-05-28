@@ -132,6 +132,12 @@ class Appointment
      */
     protected $matchmaking;
 
+	/**
+	 * @ORM\ManyToOne(targetEntity="Document")
+	 * @ORM\JoinColumn(name="vignette_id", referencedColumnName="id",nullable=true)
+	 */
+	protected $vignette;
+
     /**
      * Get id
      *
@@ -374,6 +380,8 @@ class Appointment
 
 
         $leader = $this->getLeader();
+	    $matchmaking = $this->getMatchmaking();
+	    $vignette = $this->getVignette();
 
         return array(
             'id' => $this->getId(),
@@ -390,7 +398,8 @@ class Appointment
             'usersInQueue' => $aUsersInQueue,
             'usersInvite' => $aUsersInvite,
             'lastUpdate' => $this->getUpdated()->getTimestamp(),
-            'matchmaking' => ($this->getMatchmaking())?$this->getMatchmaking()->_toArray():''
+            'matchmaking' => ($matchmaking)?$matchmaking->_toArray():'',
+	        'vignette' => ($vignette)?$vignette->_toArray():null
 
         );
     }
@@ -751,5 +760,28 @@ class Appointment
     public function getUsersGameInvite()
     {
         return $this->usersGameInvite;
+    }
+
+    /**
+     * Set vignette
+     *
+     * @param \Acme\EsBattleBundle\Entity\Document $vignette
+     * @return Appointment
+     */
+    public function setVignette(\Acme\EsBattleBundle\Entity\Document $vignette = null)
+    {
+        $this->vignette = $vignette;
+
+        return $this;
+    }
+
+    /**
+     * Get vignette
+     *
+     * @return \Acme\EsBattleBundle\Entity\Document 
+     */
+    public function getVignette()
+    {
+        return $this->vignette;
     }
 }

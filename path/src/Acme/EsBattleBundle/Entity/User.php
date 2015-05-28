@@ -98,6 +98,13 @@ class User
      */
     private  $onlineTime;
 
+	/**
+	 * @var string
+	 *
+	 * @ORM\Column(name="description", type="text")
+	 */
+	private $description;
+
     /**
      * @ORM\ManyToMany(targetEntity="Clan")
      * @ORM\JoinTable(name="users_clans",
@@ -130,6 +137,16 @@ class User
      * @ORM\OneToMany(targetEntity="UserStats",mappedBy="stat")
      */
     protected $userstats;
+
+	/**
+	 * @ORM\OneToMany(targetEntity="UserAvis",mappedBy="auteur")
+	 */
+	protected $mesAvis;
+
+	/**
+	 * @ORM\OneToMany(targetEntity="UserAvis",mappedBy="user")
+	 */
+	protected $avisSurMoi;
 
     public function __construct() {
 	    $this->salt = base_convert(sha1(uniqid(mt_rand(), true)), 16, 36);
@@ -808,5 +825,94 @@ class User
 
     public function isPartenaire(){
         return preg_match('/'.self::ROLE_PARTENAIRE.'/',$this->getRole());
+    }
+
+    /**
+     * Set description
+     *
+     * @param string $description
+     * @return User
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * Get description
+     *
+     * @return string 
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * Add mesAvis
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserAvis $mesAvis
+     * @return User
+     */
+    public function addMesAvi(\Acme\EsBattleBundle\Entity\UserAvis $mesAvis)
+    {
+        $this->mesAvis[] = $mesAvis;
+
+        return $this;
+    }
+
+    /**
+     * Remove mesAvis
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserAvis $mesAvis
+     */
+    public function removeMesAvi(\Acme\EsBattleBundle\Entity\UserAvis $mesAvis)
+    {
+        $this->mesAvis->removeElement($mesAvis);
+    }
+
+    /**
+     * Get mesAvis
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getMesAvis()
+    {
+        return $this->mesAvis;
+    }
+
+    /**
+     * Add avisSurMoi
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserAvis $avisSurMoi
+     * @return User
+     */
+    public function addAvisSurMoi(\Acme\EsBattleBundle\Entity\UserAvis $avisSurMoi)
+    {
+        $this->avisSurMoi[] = $avisSurMoi;
+
+        return $this;
+    }
+
+    /**
+     * Remove avisSurMoi
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserAvis $avisSurMoi
+     */
+    public function removeAvisSurMoi(\Acme\EsBattleBundle\Entity\UserAvis $avisSurMoi)
+    {
+        $this->avisSurMoi->removeElement($avisSurMoi);
+    }
+
+    /**
+     * Get avisSurMoi
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getAvisSurMoi()
+    {
+        return $this->avisSurMoi;
     }
 }

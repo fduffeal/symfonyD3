@@ -80,6 +80,13 @@ class Matchmaking
 	 **/
 	protected $plateforms;
 
+
+	/**
+	 * @ORM\ManyToOne(targetEntity="Document")
+	 * @ORM\JoinColumn(name="vignette_id", referencedColumnName="id",nullable=true)
+	 */
+	protected $vignette;
+
 	/**
 	 * Constructor
 	 */
@@ -304,6 +311,7 @@ class Matchmaking
 		}
 
 
+		$vignette = $this->getVignette();
 		return array(
 			'id' => $this->getId(),
 			'description' => $this->getDescription(),
@@ -312,7 +320,31 @@ class Matchmaking
 			'icone' => $this->getIcone(),
 			'nbParticipant' => $this->getNbParticipant(),
 			'tags'=> $aTag,
-			'plateforms' => $aPlateform
+			'plateforms' => $aPlateform,
+			'vignette' => ($vignette)?$vignette->_toArray():null
 		);
 	}
+
+    /**
+     * Set vignette
+     *
+     * @param \Acme\EsBattleBundle\Entity\Document $vignette
+     * @return Matchmaking
+     */
+    public function setVignette(\Acme\EsBattleBundle\Entity\Document $vignette = null)
+    {
+        $this->vignette = $vignette;
+
+        return $this;
+    }
+
+    /**
+     * Get vignette
+     *
+     * @return \Acme\EsBattleBundle\Entity\Document 
+     */
+    public function getVignette()
+    {
+        return $this->vignette;
+    }
 }

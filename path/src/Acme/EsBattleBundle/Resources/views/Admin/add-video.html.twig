@@ -3,27 +3,7 @@
 {% block content %}
 <h2>Vidéo</h2>
 <form name="test" action="" method="post">
-	<div class="group-control">
-		<label for="">URL</label>
-		<input type="text" name="url" class="form-control" placeholder="Url" value="{{ video.url }}"><br>
-	</div>
-	<div class="group-control">
-		<label for="">Description</label>
-		<textarea name="description" class="form-control" placeholder="description">{{ video.description }}</textarea><br>
-	</div>
-	
-
-
-	<select name="partenaire" class="selectpicker">
-		{% for partenaire in partenaires %}
-		{% if video.partenaire and partenaire.id == video.partenaire.id %}
-		<option value="{{ partenaire.id }}" selected>{{ partenaire.nom }}</option>
-		{% else %}
-		<option value="{{ partenaire.id }}">{{  partenaire.nom }}</option>
-		{% endif %}
-		{% endfor %}
-	</select>
-<br />
+    {{ form_widget(form) }}
 	<input type="submit" value="Valider" class="btn btn-primary">
 </form>
 {% endblock %}

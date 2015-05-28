@@ -29,14 +29,17 @@
 <nav class="navbar navbar-inverse navbar-fixed-top">
 	<div class="container">
 		<div class="navbar-header">
-			<a href="" class="navbar-brand">ESBATTLE ADMIN</a>
+			<span  class="navbar-brand">ESBATTLE ADMIN</span>
 		</div>
 		<ul class="nav navbar-nav">
-			<li><a href="{{ path('acme_es_battle_admin_upload') }}">Upload image</a></li>
-			<li><a href="{{ path('acme_es_battle_admin_biblio') }}">Images</a></li>
             <li><a href="{{ path('acme_es_battle_admin_redaction') }}">Rédaction News</a></li>
+            <li><a href="{{ path('acme_es_battle_planification_admin') }}">Planification</a></li>
+			<li><a href="{{ path('acme_es_battle_admin_biblio') }}">Images</a></li>
+            <li><a href="{{ path('acme_es_battle_admin_upload') }}">Upload image</a></li>
 			<li><a href="{{ path('acme_es_battle_admin_partenaire') }}">Partenaires</a></li>
 			<li><a href="{{ path('acme_es_battle_admin_video') }}">Vidéos</a></li>
+            <li><a href="{{ path('acme_es_battle_admin_logout') }}">Logout</a></li>
+
 		</ul>
 	</div>
 </nav>

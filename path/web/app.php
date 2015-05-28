@@ -14,11 +14,13 @@ $loader->register(true);
 */
 
 if($_SERVER['SERVER_ADDR'] === '195.154.119.183' || $_SERVER['SERVER_ADDR'] === '62.210.252.220'){
-	header('Access-Control-Allow-Origin: '.$_SERVER['HTTP_ORIGIN']);
+//	header('Access-Control-Allow-Origin: '.$_SERVER['HTTP_ORIGIN']);
 //	header('Access-Control-Allow-Origin: http://www.esbattle.com');
 } else {
-	header('Access-Control-Allow-Origin: http://localhost:8000');
+//	header('Access-Control-Allow-Origin: http://localhost:8000');
 }
+
+//header('Access-Control-Allow-Methods',"POST, GET, PUT, DELETE, OPTIONS");
 
 //if($_SERVER['SERVER_NAME'] === 'lfg.esbattle.com'){
 //	header('Access-Control-Allow-Origin: http://localhost:8000');
