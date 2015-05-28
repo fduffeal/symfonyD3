@@ -30,9 +30,15 @@ class JeuxVideo
 
     public $methode = null;
 
+	public function replaceTag($tag){
+		$search = array('26','30','32','34','35','prison','pdv');
+		$replace = array('level26','level30','level32','level34','level35','prison arene','prison arene');
+		return str_replace($search,$replace,$tag);
+	}
+
     public function __construct()
     {
-        $this->tag = ['caveau','cropta','atheon','raid','assaut','30','26','nuit','noire','épique','epique','semaine'];
+        $this->tag = ['caveau','cropta','atheon','raid','assaut','30','26','nuit','noire','épique','epique','semaine','prison','pdv','32','34','35'];
     }
 
     private function _curl($url){
@@ -180,9 +186,11 @@ class JeuxVideo
         for($key = self::INDEX_MESSAGE_START; $key < $aCommentSize; $key++){
             $tagLower = strtolower($aComment[$key]);
             if(in_array($tagLower,$this->tag) && !in_array($tagLower,$aTag)){
-                $aTag[] = $tagLower;
+                $aTag[] = $this->replaceTag($tagLower);
             }
         }
+
+	    $aTag = array_unique($aTag);
 
         return implode(' ',$aTag);
     }
