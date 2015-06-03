@@ -1,0 +1,11 @@
+{% extends 'AcmeEsBattleBundle::layout.html.twig' %}
+{% block content %}
+    <h2>Liste des Partenaires</h2>
+    <div class="list-group">
+        {% for partenaire in partenaires %}
+            <a href="{{ path('acme_es_battle_admin_partenaire_update', { 'id': partenaire.id }) }}" class="list-group-item">{{ partenaire.nom }}</a>
+        {% endfor %}
+    </div>
+
+    <a href="{{ path('acme_es_battle_admin_partenaire_create') }}" class="btn btn-primary">Ajouter un partenaire</a>
+{% endblock %}
