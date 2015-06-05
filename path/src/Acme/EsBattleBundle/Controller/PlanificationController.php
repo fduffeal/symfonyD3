@@ -101,9 +101,14 @@ class PlanificationController extends Controller
 			$response = $this->forward('AcmeEsBattleBundle:Planification:list');
 		} else {
 
+			$collectionDocument = $this->getDoctrine()
+				->getRepository('AcmeEsBattleBundle:Document')
+				->findAll();
+
 			$response = $this->render('AcmeEsBattleBundle:Planification:form.html.twig', array(
 				'planification'  => $planification,
-				'form' => $form->createView()
+				'form' => $form->createView(),
+				'documents' => $collectionDocument
 			));
 		}
 
@@ -127,7 +132,7 @@ class PlanificationController extends Controller
 				'empty_value' => 'Choisissez une image',
 				'required' => false,
 				'class' => 'AcmeEsBattleBundle:Document',
-				'property' => 'path',
+				'property' => 'name',
 				'attr' => array('class'=>'form-control')
 			))
 			->getForm();
@@ -159,9 +164,14 @@ class PlanificationController extends Controller
 			}
 		}
 
+		$collectionDocument = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Document')
+			->findAll();
+
 		$response = $this->render('AcmeEsBattleBundle:Planification:form.html.twig', array(
 			'planification'  => $planification,
-			'form' => $form->createView()
+			'form' => $form->createView(),
+			'documents' => $collectionDocument
 		));
 
 		return $response;

@@ -7,18 +7,18 @@
     {% if current %}
     <ul style="padding:0">
         <li class="list-group-item">
-            {{ current.start|date("d/m/Y") }} - {{ current.end|date("d/m/Y") }}
+            {{ current.start|date("d/m/Y H:i") }} - {{ current.end|date("d/m/Y H:i") }}
             </br>
             {{ current.titre }}
             </br>
             {{ current.description }}
             </br>
             {% if current.video %}
-            Vidéo : {{ current.video.url }}
+            <a href="{{ current.video.url }}">{{ current.video.url }}</a>
             {%  endif %}
             </br>
             {% if current.image %}
-            Image : {{ current.image.url }}
+                <img src="{{ (current.image)?current.image.src }}">
             {%  endif %}
         </li>
     </ul>
@@ -27,7 +27,8 @@
     <ul style="padding:0">
         {% for planification in planifications %}
             <li class="list-group-item">
-                {{ planification.start|date("d/m/Y") }} - {{ planification.end|date("d/m/Y") }} > {{ planification.titre }}
+                {{ planification.start|date("d/m/Y H:i") }} - {{ planification.end|date("d/m/Y H:i") }} > {{ planification.titre }}
+                <br/>{% if planification.video %} <a href="{{ planification.video.url }}">{{ planification.video.url }}</a>{% endif %}
                 <br/>
                 <div class="btn-group-xs">
                     <a href="{{ path('acme_es_battle_planification_update', { 'id': planification.id }) }}" class="btn btn-default">Modifier</a>
