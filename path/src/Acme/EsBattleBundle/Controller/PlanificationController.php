@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 
 class PlanificationController extends Controller
@@ -119,8 +120,18 @@ class PlanificationController extends Controller
 		return $this->createFormBuilder($planification)
 			->add('titre','text',array('attr' => array('class'=>'form-control')))
 			->add('description','textarea',array('attr' => array('class'=>'form-control')))
-			->add('start')
-			->add('end')
+			->add('start','datetime', array(
+				'required' => true,
+				'date_widget' => 'single_text',
+				'time_widget' => 'single_text',
+				'attr' => array('class'=>'datepicker')
+			))
+			->add('end','datetime', array(
+				'required' => true,
+				'date_widget' => 'single_text',
+				'time_widget' => 'single_text',
+				'attr' => array('class'=>'datepicker')
+			))
 			->add('video', 'entity', array(
 				'empty_value' => 'Choisissez une vidéo',
 				'required' => false,
