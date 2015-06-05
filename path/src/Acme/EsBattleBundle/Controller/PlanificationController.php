@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Validator\Constraints\DateTime;
 
+use Symfony\Component\HttpFoundation\Response;
+
 
 class PlanificationController extends Controller
 {
