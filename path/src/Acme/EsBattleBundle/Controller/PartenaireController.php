@@ -89,41 +89,61 @@ class PartenaireController extends Controller
 		$partenaire = new Partenaire();
 
 		$form = $this->createFormBuilder($partenaire)
-			->add('nom')
-			->add('description')
-			->add('youtube')
-			->add('twitch')
-			->add('facebook')
-			->add('twitter')
+			->add('nom','text',array(
+				'required' => true,
+				'attr' => array('class'=>'form-control')
+			))
+			->add('description','textarea',array(
+				'required' => true,
+				'attr' => array('class'=>'form-control')
+			))
+			->add('youtube','text',array(
+				'required' => false,
+				'attr' => array('class'=>'form-control')
+			))
+			->add('twitch','text',array(
+				'required' => false,
+				'attr' => array('class'=>'form-control')
+			))
+			->add('facebook','text',array(
+				'required' => false,
+				'attr' => array('class'=>'form-control')
+			))
+			->add('twitter','text',array(
+				'required' => false,
+				'attr' => array('class'=>'form-control')
+			))
 			->add('logo','entity', array(
 				'empty_value' => 'Choisissez une image',
 				'required' => false,
 				'class' => 'AcmeEsBattleBundle:Document',
 				'property' => 'name',
+				'attr' => array('class'=>'form-control')
 			))
 			->add('tuile','entity', array(
 				'empty_value' => 'Choisissez une image',
 				'required' => false,
 				'class' => 'AcmeEsBattleBundle:Document',
 				'property' => 'name',
+				'attr' => array('class'=>'form-control')
 			))
 			->add('header','entity', array(
 				'empty_value' => 'Choisissez une image',
 				'required' => false,
 				'class' => 'AcmeEsBattleBundle:Document',
 				'property' => 'name',
+				'attr' => array('class'=>'form-control')
 			))
 			->add('blocHomeImg','entity', array(
 				'empty_value' => 'Choisissez une image',
 				'required' => false,
 				'class' => 'AcmeEsBattleBundle:Document',
 				'property' => 'name',
+				'attr' => array('class'=>'form-control')
 			))
-			->add('blocHomeLink','entity', array(
-				'empty_value' => 'Choisissez une image',
+			->add('blocHomeLink','text',array(
 				'required' => false,
-				'class' => 'AcmeEsBattleBundle:Document',
-				'property' => 'name',
+				'attr' => array('class'=>'form-control')
 			))
 			->getForm();
 
@@ -137,8 +157,14 @@ class PartenaireController extends Controller
 			$response = $this->forward('AcmeEsBattleBundle:Partenaire:admin');
 		} else {
 
+			$collectionDocument = $this->getDoctrine()
+				->getRepository('AcmeEsBattleBundle:Document')
+				->findAll();
+
 			$response = $this->render('AcmeEsBattleBundle:Partenaire:form.html.twig', array(
-				'form' => $form->createView()
+				'partenaire'  => $partenaire,
+				'form' => $form->createView(),
+				'documents' => $collectionDocument
 			));
 		}
 
@@ -156,20 +182,67 @@ class PartenaireController extends Controller
 		/**
 		 * @var \Acme\EsBattleBundle\Entity\Partenaire $partenaire
 		 */
-		$partenaire = new Partenaire();
+		$partenaire = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Partenaire')
+			->find($id);
 
 		$form = $this->createFormBuilder($partenaire)
-			->add('nom')
-			->add('description')
-			->add('youtube')
-			->add('twitch')
-			->add('facebook')
-			->add('twitter')
-			->add('logo')
-			->add('tuile')
-			->add('header')
-			->add('blocHomeImg')
-			->add('blocHomeLink')
+			->add('nom','text',array(
+				'required' => true,
+				'attr' => array('class'=>'form-control')
+			))
+			->add('description','textarea',array(
+				'required' => true,
+				'attr' => array('class'=>'form-control')
+			))
+			->add('youtube','text',array(
+				'required' => false,
+				'attr' => array('class'=>'form-control')
+			))
+			->add('twitch','text',array(
+				'required' => false,
+				'attr' => array('class'=>'form-control')
+			))
+			->add('facebook','text',array(
+				'required' => false,
+				'attr' => array('class'=>'form-control')
+			))
+			->add('twitter','text',array(
+				'required' => false,
+				'attr' => array('class'=>'form-control')
+			))
+			->add('logo','entity', array(
+				'empty_value' => 'Choisissez une image',
+				'required' => false,
+				'class' => 'AcmeEsBattleBundle:Document',
+				'property' => 'name',
+				'attr' => array('class'=>'form-control')
+			))
+			->add('tuile','entity', array(
+				'empty_value' => 'Choisissez une image',
+				'required' => false,
+				'class' => 'AcmeEsBattleBundle:Document',
+				'property' => 'name',
+				'attr' => array('class'=>'form-control')
+			))
+			->add('header','entity', array(
+				'empty_value' => 'Choisissez une image',
+				'required' => false,
+				'class' => 'AcmeEsBattleBundle:Document',
+				'property' => 'name',
+				'attr' => array('class'=>'form-control')
+			))
+			->add('blocHomeImg','entity', array(
+				'empty_value' => 'Choisissez une image',
+				'required' => false,
+				'class' => 'AcmeEsBattleBundle:Document',
+				'property' => 'name',
+				'attr' => array('class'=>'form-control')
+			))
+			->add('blocHomeLink','text',array(
+				'required' => false,
+				'attr' => array('class'=>'form-control')
+			))
 			->getForm();
 
 		if($partenaire !== null){
@@ -181,9 +254,14 @@ class PartenaireController extends Controller
 			}
 		}
 
+		$collectionDocument = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Document')
+			->findAll();
+
 		$response = $this->render('AcmeEsBattleBundle:Partenaire:form.html.twig', array(
 			'partenaire'  => $partenaire,
-			'form' => $form->createView()
+			'form' => $form->createView(),
+			'documents' => $collectionDocument
 		));
 
 		return $response;
@@ -199,15 +277,15 @@ class PartenaireController extends Controller
 		}
 
 		/**
-		 * @var \Acme\EsBattleBundle\Entity\Planification $planification
+		 * @var \Acme\EsBattleBundle\Entity\Partenaire $partenaire
 		 */
-		$planification = $this->getDoctrine()
-			->getRepository('AcmeEsBattleBundle:Planification')
+		$partenaire = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Partenaire')
 			->find($id);
 
-		if($planification !== null){
+		if($partenaire !== null){
 			$em = $this->getDoctrine()->getManager();
-			$em->remove($planification);
+			$em->remove($partenaire);
 
 			$em->flush();
 		}

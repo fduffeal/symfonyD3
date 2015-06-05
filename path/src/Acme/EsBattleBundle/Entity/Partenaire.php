@@ -33,28 +33,28 @@ class Partenaire {
 	/**
 	 * @var string
 	 *
-	 * @ORM\Column(name="description", type="string", length=255)
+	 * @ORM\Column(name="description", type="string", length=255,nullable=true)
 	 */
 	private $description;
 
 	/**
 	 * @var string
 	 *
-	 * @ORM\Column(name="youtube", type="string", length=255)
+	 * @ORM\Column(name="youtube", type="string", length=255,nullable=true)
 	 */
 	private $youtube;
 
 	/**
 	 * @var string
 	 *
-	 * @ORM\Column(name="twitch", type="string", length=255)
+	 * @ORM\Column(name="twitch", type="string", length=255,nullable=true)
 	 */
 	private $twitch;
 
 	/**
 	 * @var string
 	 *
-	 * @ORM\Column(name="facebook", type="string", length=255)
+	 * @ORM\Column(name="facebook", type="string", length=255,nullable=true)
 	 */
 	private $facebook;
 
@@ -62,7 +62,7 @@ class Partenaire {
 	/**
 	 * @var string
 	 *
-	 * @ORM\Column(name="twitter", type="string", length=255)
+	 * @ORM\Column(name="twitter", type="string", length=255,nullable=true)
 	 */
 	private $twitter;
 
