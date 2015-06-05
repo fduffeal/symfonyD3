@@ -89,24 +89,7 @@ class PlanificationController extends Controller
 		 */
 		$planification = new Planification();
 
-		$form = $this->createFormBuilder($planification)
-			->add('titre')
-			->add('description')
-			->add('start')
-			->add('end')
-			->add('video', 'entity', array(
-				'empty_value' => 'Choisissez une vidéo',
-				'required' => false,
-				'class' => 'AcmeEsBattleBundle:Video',
-				'property' => 'description',
-			))
-			->add('image', 'entity', array(
-				'empty_value' => 'Choisissez une image',
-				'required' => false,
-				'class' => 'AcmeEsBattleBundle:Document',
-				'property' => 'path',
-			))
-			->getForm();
+		$form = self::getForm($planification);
 
 		$form->handleRequest($request);
 
@@ -127,6 +110,29 @@ class PlanificationController extends Controller
 		return $response;
 	}
 
+	public function getForm($planification){
+		return $this->createFormBuilder($planification)
+			->add('titre','text',array('attr' => array('class'=>'form-control')))
+			->add('description','textarea',array('attr' => array('class'=>'form-control')))
+			->add('start')
+			->add('end')
+			->add('video', 'entity', array(
+				'empty_value' => 'Choisissez une vidéo',
+				'required' => false,
+				'class' => 'AcmeEsBattleBundle:Video',
+				'property' => 'description',
+				'attr' => array('class'=>'form-control')
+			))
+			->add('image', 'entity', array(
+				'empty_value' => 'Choisissez une image',
+				'required' => false,
+				'class' => 'AcmeEsBattleBundle:Document',
+				'property' => 'path',
+				'attr' => array('class'=>'form-control')
+			))
+			->getForm();
+	}
+
 	public function updateAction($id,Request $request){
 
 		if(!$request->getSession()->get('modo')){
@@ -142,24 +148,7 @@ class PlanificationController extends Controller
 			->getRepository('AcmeEsBattleBundle:Planification')
 			->find($id);
 
-		$form = $this->createFormBuilder($planification)
-			->add('titre')
-			->add('description')
-			->add('start')
-			->add('end')
-			->add('video', 'entity', array(
-				'empty_value' => 'Choisissez une vidéo',
-				'required' => false,
-				'class' => 'AcmeEsBattleBundle:Video',
-				'property' => 'description',
-			))
-			->add('image', 'entity', array(
-				'empty_value' => 'Choisissez une image',
-				'required' => false,
-				'class' => 'AcmeEsBattleBundle:Document',
-				'property' => 'path',
-			))
-			->getForm();
+		$form = self::getForm($planification);
 
 		if($planification !== null){
 			$form->handleRequest($request);

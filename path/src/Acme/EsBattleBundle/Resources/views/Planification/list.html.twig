@@ -7,7 +7,9 @@
     {% if current %}
     <ul style="padding:0">
         <li class="list-group-item">
-            {{ current.id }} -  {{ current.titre }}
+            {{ current.start|date("d/m/Y") }} - {{ current.end|date("d/m/Y") }}
+            </br>
+            {{ current.titre }}
             </br>
             {{ current.description }}
             </br>
@@ -25,7 +27,7 @@
     <ul style="padding:0">
         {% for planification in planifications %}
             <li class="list-group-item">
-                {{ planification.id }} -  {{ planification.titre }}
+                {{ planification.start|date("d/m/Y") }} - {{ planification.end|date("d/m/Y") }} > {{ planification.titre }}
                 <br/>
                 <div class="btn-group-xs">
                     <a href="{{ path('acme_es_battle_planification_update', { 'id': planification.id }) }}" class="btn btn-default">Modifier</a>

@@ -219,6 +219,8 @@ class Planification
 			'id'=> $this->getId(),
 			'titre'=>$this->getTitre(),
 			'description'=>$this->getDescription(),
+			'start'=>($this->getStart())?$this->getStart()->getTimestamp():null,
+			'end'=>($this->getEnd())?$this->getEnd()->getTimestamp():null,
 			'image'=>($image)?$image->_toArray():null,
 			'video'=>($video)?$video->_toArray():null,
 		);
