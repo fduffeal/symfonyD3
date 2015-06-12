@@ -61,7 +61,7 @@ class PlanificationController extends Controller
 		$content = $response->getContent();
 		$displayed = json_decode($content);
 
-		if(!property_exists($displayed,'id')){
+		if($displayed && !property_exists($displayed,'id')){
 			$displayed = null;
 		}
 

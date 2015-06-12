@@ -53,6 +53,13 @@ class Planification
 	private $end;
 
 	/**
+	 * @var \DateTime
+	 *
+	 * @ORM\Column(name="updated", type="datetime")
+	 */
+	protected $updated;
+
+	/**
 	 * @ORM\ManyToOne(targetEntity="Video")
 	 * @ORM\JoinColumn(name="video_id", referencedColumnName="id")
 	 **/
@@ -224,5 +231,37 @@ class Planification
 			'image'=>($image)?$image->_toArray():null,
 			'video'=>($video)?$video->_toArray():null,
 		);
+	}
+
+    /**
+     * Set updated
+     *
+     * @param \DateTime $updated
+     * @return Planification
+     */
+    public function setUpdated($updated)
+    {
+        $this->updated = $updated;
+
+        return $this;
+    }
+
+    /**
+     * Get updated
+     *
+     * @return \DateTime 
+     */
+    public function getUpdated()
+    {
+        return $this->updated;
+    }
+
+	/**
+	 * @ORM\PrePersist
+	 * @ORM\PreUpdate
+	 */
+	public function setUpdatedValue()
+	{
+		$this->updated = new \DateTime();
 	}
 }

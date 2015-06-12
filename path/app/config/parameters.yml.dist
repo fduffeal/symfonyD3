@@ -15,3 +15,4 @@ parameters:
     secret:            ThisTokenIsNotSoSecretChangeIt
     bungie: 557e7d06a6f84ae194bd1b2f2d976206
     destinyGameId: 1
+    twitchapiversion: 3

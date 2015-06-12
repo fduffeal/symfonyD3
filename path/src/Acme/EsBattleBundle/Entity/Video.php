@@ -42,6 +42,13 @@ class Video
      */
     private $description;
 
+	/**
+	 * @var string
+	 *
+	 * @ORM\Column(name="logo", type="string", length=255)
+	 */
+	private $logo;
+
     /**
      * @ORM\ManyToMany(targetEntity="Tag")
      * @ORM\JoinTable(name="video_tag",
@@ -215,6 +222,7 @@ class Video
 			'id' => $this->getId(),
 			'url' => $this->getUrl(),
 			'description' => $this->getDescription(),
+			'logo' => $this->getLogo(),
 			'tags' => $aTags,
 			'created' => ($created)?$created->getTimestamp():null
 		);
@@ -252,5 +260,28 @@ class Video
     public function getPartenaire()
     {
         return $this->partenaire;
+    }
+
+    /**
+     * Set logo
+     *
+     * @param string $logo
+     * @return Video
+     */
+    public function setLogo($logo)
+    {
+        $this->logo = $logo;
+
+        return $this;
+    }
+
+    /**
+     * Get logo
+     *
+     * @return string 
+     */
+    public function getLogo()
+    {
+        return $this->logo;
     }
 }

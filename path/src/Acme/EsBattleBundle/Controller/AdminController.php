@@ -719,6 +719,21 @@ class AdminController extends Controller
 		$form->handleRequest($request);
 
 		if ($form->isValid()) {
+
+			$url = $video->getUrl();
+			$isTwitch = preg_match('/twitch.tv/i',$url, $matches, PREG_OFFSET_CAPTURE);
+
+			if($isTwitch === 1){
+				$twitch = $this->get('acme_es_battle.twitch');
+
+				$aUrl = explode('/',$url);
+				$test = $twitch->getUser($aUrl[3]);
+				if($test->channels && $test->channels[0]){
+					$video->setLogo($test->channels[0]->logo);
+				}
+			}
+
+
 			$em = $this->getDoctrine()->getManager();
 			$em->persist($video);
 			$em->flush();
