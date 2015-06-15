@@ -314,6 +314,11 @@ acme_es_battle_planification_get:
     defaults: { _controller: AcmeEsBattleBundle:Planification:index,_format:json }
     methods:  [GET]
 
+acme_es_battle_planification_next_get:
+    path:     /planification/next.{_format}
+    defaults: { _controller: AcmeEsBattleBundle:Planification:next,_format:json }
+    methods:  [GET]
+
 acme_es_battle_planification_admin:
     path:     /admin/planification
     defaults: { _controller: AcmeEsBattleBundle:Planification:list }

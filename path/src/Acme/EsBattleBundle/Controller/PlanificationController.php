@@ -20,9 +20,7 @@ class PlanificationController extends Controller
 		$query = $em->createQuery(
 			'SELECT planification
             FROM AcmeEsBattleBundle:Planification planification
-            WHERE planification.start < CURRENT_TIMESTAMP()
-            AND planification.end > CURRENT_TIMESTAMP()
-            ORDER BY planification.start DESC'
+            ORDER BY planification.updated DESC'
 		)->setMaxResults(1);
 
 		$collection = $query->getResult();
@@ -37,7 +35,7 @@ class PlanificationController extends Controller
 			return $response;
 		}
 
-		$response->setLastModified($collection[0]->getStart());
+		$response->setLastModified($collection[0]->getUpdated());
 
 		// Vérifie que l'objet Response n'est pas modifié
 		// pour un objet Request donné
@@ -46,10 +44,77 @@ class PlanificationController extends Controller
 			return $response;
 		}
 
+		$query = $em->createQuery(
+			'SELECT planification
+            FROM AcmeEsBattleBundle:Planification planification
+            WHERE planification.start < CURRENT_TIMESTAMP()
+            AND planification.end > CURRENT_TIMESTAMP()
+            ORDER BY planification.start DESC'
+		)->setMaxResults(1);
+
+		$collection = $query->getResult();
+
 		/**
 		 * @var \Acme\EsBattleBundle\Entity\Planification $collection[0]
 		 */
-		$response->setData($collection[0]->_toArray());
+		if($collection){
+			$response->setData($collection[0]->_toArray());
+		}
+
+		return $response;
+	}
+
+	public function nextAction(){
+		$em = $this->getDoctrine()->getManager();
+		$query = $em->createQuery(
+			'SELECT planification
+            FROM AcmeEsBattleBundle:Planification planification
+            ORDER BY planification.updated DESC'
+		)->setMaxResults(1);
+
+		$collection = $query->getResult();
+
+		$response = new JsonResponse();
+
+		$response->setPublic();
+		$response->setMaxAge(300);
+		$response->setSharedMaxAge(300);
+
+		if(!$collection){
+			return $response;
+		}
+
+		$response->setLastModified($collection[0]->getUpdated());
+
+		// Vérifie que l'objet Response n'est pas modifié
+		// pour un objet Request donné
+		if ($response->isNotModified($this->getRequest())) {
+			// Retourne immédiatement un objet 304 Response
+			return $response;
+		}
+
+		$query = $em->createQuery(
+			'SELECT planification
+            FROM AcmeEsBattleBundle:Planification planification
+            WHERE planification.end > CURRENT_TIMESTAMP()
+            AND planification.start > CURRENT_TIMESTAMP()
+            ORDER BY planification.start ASC'
+		)->setMaxResults(5);
+
+		$collection = $query->getResult();
+
+		$aResult = [];
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\Planification $planification
+		 */
+		foreach($collection as $planification){
+			$aResult[] = $planification->_toArray();
+		}
+
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\Planification $collection[0]
+		 */
+		$response->setData($aResult);
 
 		return $response;
 	}
