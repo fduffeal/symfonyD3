@@ -27,7 +27,7 @@ class ForumController extends Controller
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
 
-	    $arrayStatus = array(Topic::STATUS_HIGH,Topic::STATUS_NORMAL,Topic::STATUS_POSTIT);
+	    $arrayStatus = array(Topic::STATUS_HIGH,Topic::STATUS_NORMAL,Topic::STATUS_POSTIT,Topic::STATUS_NEWS,Topic::STATUS_VIDEO,Topic::STATUS_TUTO);
         $em = $this->getDoctrine()->getManager();
 
         $query = $em->createQuery(
