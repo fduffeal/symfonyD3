@@ -13,10 +13,14 @@ use Symfony\Component\HttpFoundation\Response;
 class LoginController extends Controller
 {
 
+	/**
+	 * @var \Acme\EsBattleBundle\Entity\User $user
+	 */
     private function _updateDestinyCharacter($user){
         $bungie = $this->get('acme_es_battle.bungie');
         $userGameCollection = $user->getUsergames();
         $aGamerTag = [];
+	    $aExternalId = [];
         /**
          * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
          */
@@ -47,10 +51,26 @@ class LoginController extends Controller
 
             if($characters !== null){
                 foreach($characters as $key => $character){
+	                /**
+	                 * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
+	                 */
                     $userGame = $bungie->saveGameUserInfo($character,$user,$plateform,$game);
+	                $aExternalId[] = $userGame->getExtId();
                 }
             }
         }
+
+	    $em = $this->getDoctrine()->getManager();
+	    /**
+	     * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
+	     */
+	    foreach($userGameCollection as $userGame){
+		    if(!in_array($userGame->getExtId(),$aExternalId)){
+			    $em->remove($userGame);
+		    }
+	    }
+	    $em->flush();
+
         return $user;
     }
 
