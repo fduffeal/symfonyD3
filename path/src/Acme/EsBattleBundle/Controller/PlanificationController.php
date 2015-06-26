@@ -3,11 +3,15 @@
 namespace Acme\EsBattleBundle\Controller;
 
 use Acme\EsBattleBundle\Entity\Planification;
+use Doctrine\ORM\Query\AST\Join;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Validator\Constraints\DateTime;
+use Doctrine\ORM\EntityRepository;
+
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 use Symfony\Component\HttpFoundation\Response;
 
@@ -28,8 +32,8 @@ class PlanificationController extends Controller
 		$response = new JsonResponse();
 
 		$response->setPublic();
-		$response->setMaxAge(300);
-		$response->setSharedMaxAge(300);
+//		$response->setMaxAge(300);
+//		$response->setSharedMaxAge(300);
 
 		if(!$collection){
 			return $response;
@@ -119,7 +123,9 @@ class PlanificationController extends Controller
 		return $response;
 	}
 
-	public function listAction(){
+	public function listAction(Request $request,$offset,$limit){
+
+		$nbContentByPage = $limit;
 		$em = $this->getDoctrine()->getManager();
 		$response = $this->forward('AcmeEsBattleBundle:Planification:index');
 
@@ -130,18 +136,82 @@ class PlanificationController extends Controller
 			$displayed = null;
 		}
 
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\User $user
+		 */
+		$user = unserialize($request->getSession()->get('user'));
+
+		$query = $em->createQuery(
+			'SELECT userPartenaire.id
+            FROM AcmeEsBattleBundle:UserPartenaire userPartenaire
+            INNER JOIN  AcmeEsBattleBundle:User user
+            WHERE user.id = :id'
+		)->setParameter('id',$user->getId());
+
+		$userPartenaires = $query->getResult();
+
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\UserPartenaire $userPartenaire
+		 */
+		foreach($userPartenaires as $userPartenaire){
+			$arrayIdCurrentPartenaire[] = $userPartenaire['id'];
+		}
+
 		$query = $em->createQuery(
 			'SELECT planification
             FROM AcmeEsBattleBundle:Planification planification
             ORDER BY planification.start DESC'
-		);
+		)->setFirstResult($offset)
+		->setMaxResults($nbContentByPage);
 
-		$all = $query->getResult();
+		$paginator = new Paginator($query, false);
+
+		$c = count($paginator);
 
 		return $this->render('AcmeEsBattleBundle:Planification:list.html.twig', array(
+			'nbContentByPage'=> $nbContentByPage,
+			'offset'=> $offset,
 			'current' => $displayed,
-			'planifications' => $all
+			'planifications' => $paginator,
+			'nbPage' => ceil($c/$nbContentByPage),
+			'arrayIdCurrentPartenaire' => $arrayIdCurrentPartenaire
 		));
+	}
+
+	/**
+	 * @var \Acme\EsBattleBundle\Entity\Planification $planification
+	 */
+	private function _getPanifInSameTime($planification){
+		$em = $this->getDoctrine()->getManager();
+
+		if($planification->getId() !== null){
+			$query = $em->createQuery(
+				'SELECT planification
+            FROM AcmeEsBattleBundle:Planification planification
+            where ((planification.start >=  :start and planification.start <= :end)
+            OR (planification.end <=  :end and planification.end >= :start)
+            OR (planification.start <=  :start and planification.end >= :end))
+            and planification.id != :currentId
+            ORDER BY planification.start'
+			)->setParameter('start', $planification->getStart())
+				->setParameter('end', $planification->getEnd())
+				->setParameter('currentId', $planification->getId());
+		} else {
+			$query = $em->createQuery(
+				'SELECT planification
+            FROM AcmeEsBattleBundle:Planification planification
+            where ((planification.start >=  :start and planification.start <= :end)
+            OR (planification.end <=  :end and planification.end >= :start)
+            OR (planification.start <=  :start and planification.end >= :end))
+			ORDER BY planification.start'
+			)->setParameter('start', $planification->getStart())
+				->setParameter('end', $planification->getEnd());
+		}
+
+
+		$collection = $query->getResult();
+
+		return $collection;
 	}
 
 	public function createAction(Request $request){
@@ -151,39 +221,61 @@ class PlanificationController extends Controller
 			$response->setStatusCode(401);
 			return $response;
 		}
+		/**
+		 * @var \Acme\EsBattleBundle\Entity\User $user
+		 */
+		$user = unserialize($request->getSession()->get('user'));
 
 		/**
 		 * @var \Acme\EsBattleBundle\Entity\Planification $planification
 		 */
 		$planification = new Planification();
 
-		$form = self::getForm($planification);
+		$form = self::getForm($planification,$user);
 
 		$form->handleRequest($request);
+		$otherPlanification = null;
 
 		if ($form->isValid()) {
-			$em = $this->getDoctrine()->getManager();
-			$em->persist($planification);
-			$em->flush();
 
-			$response = $this->forward('AcmeEsBattleBundle:Planification:list');
-		} else {
-
-			$collectionDocument = $this->getDoctrine()
-				->getRepository('AcmeEsBattleBundle:Document')
-				->findAll();
-
-			$response = $this->render('AcmeEsBattleBundle:Planification:form.html.twig', array(
-				'planification'  => $planification,
-				'form' => $form->createView(),
-				'documents' => $collectionDocument
-			));
+			$otherPlanification = $this->_getPanifInSameTime($planification);
+			if(empty ($otherPlanification)){
+				$em = $this->getDoctrine()->getManager();
+				$em->persist($planification);
+				$em->flush();
+				return $this->redirect($this->generateUrl('acme_es_battle_planification_admin'), 301);
+			}
 		}
+
+		$collectionDocument = $this->getDoctrine()
+			->getRepository('AcmeEsBattleBundle:Document')
+			->findAll();
+
+
+		$response = $this->render('AcmeEsBattleBundle:Planification:form.html.twig', array(
+			'planification'  => $planification,
+			'form' => $form->createView(),
+			'documents' => $collectionDocument,
+			'otherPlanifications'=>$otherPlanification
+		));
 
 		return $response;
 	}
 
-	public function getForm($planification){
+	/**
+	 * @var \Acme\EsBattleBundle\Entity\Planification $planification
+	 * @var \Acme\EsBattleBundle\Entity\User $user
+	 */
+	public function getForm($planification,$user){
+
+		$queryVideos =  $this->getDoctrine()->getRepository('AcmeEsBattleBundle:Video')->createQueryBuilder('v')
+			->innerJoin('v.partenaire', 'p', Join::JOIN_TYPE_INNER)
+			->innerJoin('p.userpartenaires', 'up', Join::JOIN_TYPE_INNER)
+			->innerJoin('up.user', 'u', Join::JOIN_TYPE_INNER)
+			->where('u.id = :currentUserId')
+			->setParameter('currentUserId',$user->getId())
+			->orderBy('v.description', 'ASC');
+
 		return $this->createFormBuilder($planification)
 			->add('titre','text',array('attr' => array('class'=>'form-control')))
 			->add('description','textarea',array('attr' => array('class'=>'form-control')))
@@ -203,14 +295,7 @@ class PlanificationController extends Controller
 				'empty_value' => 'Choisissez une vidéo',
 				'required' => false,
 				'class' => 'AcmeEsBattleBundle:Video',
-				'property' => 'description',
-				'attr' => array('class'=>'form-control')
-			))
-			->add('image', 'entity', array(
-				'empty_value' => 'Choisissez une image',
-				'required' => false,
-				'class' => 'AcmeEsBattleBundle:Document',
-				'property' => 'name',
+				'query_builder' => $queryVideos,
 				'attr' => array('class'=>'form-control')
 			))
 			->getForm();
@@ -225,20 +310,43 @@ class PlanificationController extends Controller
 		}
 
 		/**
+		 * @var \Acme\EsBattleBundle\Entity\User $user
+		 */
+		$user = unserialize($request->getSession()->get('user'));
+
+		/**
 		 * @var \Acme\EsBattleBundle\Entity\Planification $planification
 		 */
 		$planification = $this->getDoctrine()
-			->getRepository('AcmeEsBattleBundle:Planification')
-			->find($id);
+			->getRepository('AcmeEsBattleBundle:Planification')->createQueryBuilder('planif')
+			->innerJoin('planif.video', 'v', Join::JOIN_TYPE_INNER)
+			->innerJoin('v.partenaire','part', Join::JOIN_TYPE_INNER)
+			->innerJoin('part.userpartenaires','up', Join::JOIN_TYPE_INNER)
+			->innerJoin('up.user','u', Join::JOIN_TYPE_INNER)
+			->where('u.id = :currentUserId')
+			->andWhere('planif.id = :id')
+			->setParameter('currentUserId',$user->getId())
+			->setParameter('id',$id)->getQuery()->getResult();
 
-		$form = self::getForm($planification);
+		if(empty($planification)) {
+			return $this->redirect($this->generateUrl('acme_es_battle_planification_admin'), 301);
+		}
 
-		if($planification !== null){
-			$form->handleRequest($request);
+		$planification = $planification[0];
 
-			if ($form->isValid()) {
+		$form = self::getForm($planification,$user);
+
+		$otherPlanification = null;
+
+		$form->handleRequest($request);
+
+		if ($form->isValid()) {
+			$otherPlanification = $this->_getPanifInSameTime($planification);
+			if(empty($otherPlanification)){
 				$em = $this->getDoctrine()->getManager();
 				$em->flush();
+
+				return $this->redirect($this->generateUrl('acme_es_battle_planification_admin'), 301);
 			}
 		}
 
@@ -249,14 +357,15 @@ class PlanificationController extends Controller
 		$response = $this->render('AcmeEsBattleBundle:Planification:form.html.twig', array(
 			'planification'  => $planification,
 			'form' => $form->createView(),
-			'documents' => $collectionDocument
+			'documents' => $collectionDocument,
+			'otherPlanifications'=>$otherPlanification
 		));
 
 		return $response;
 	}
 
-	public function deleteAction($id){
-		$session = new Session();
+	public function deleteAction($id,Request $request){
+		$session = $request->getSession();
 
 		if(!$session->get('modo')){
 			$response = new Response();
@@ -265,11 +374,29 @@ class PlanificationController extends Controller
 		}
 
 		/**
+		 * @var \Acme\EsBattleBundle\Entity\User $user
+		 */
+		$user = unserialize($request->getSession()->get('user'));
+
+		/**
 		 * @var \Acme\EsBattleBundle\Entity\Planification $planification
 		 */
 		$planification = $this->getDoctrine()
-			->getRepository('AcmeEsBattleBundle:Planification')
-			->find($id);
+			->getRepository('AcmeEsBattleBundle:Planification')->createQueryBuilder('planif')
+			->innerJoin('planif.video', 'v', Join::JOIN_TYPE_INNER)
+			->innerJoin('v.partenaire','part', Join::JOIN_TYPE_INNER)
+			->innerJoin('part.userpartenaires','up', Join::JOIN_TYPE_INNER)
+			->innerJoin('up.user','u', Join::JOIN_TYPE_INNER)
+			->where('u.id = :currentUserId')
+			->andWhere('planif.id = :id')
+			->setParameter('currentUserId',$user->getId())
+			->setParameter('id',$id)->getQuery()->getResult();
+
+		if(empty($planification)) {
+			return $this->redirect($this->generateUrl('acme_es_battle_planification_admin'), 301);
+		}
+
+		$planification = $planification[0];
 
 		if($planification !== null){
 			$em = $this->getDoctrine()->getManager();
@@ -278,8 +405,6 @@ class PlanificationController extends Controller
 			$em->flush();
 		}
 
-		$response = $this->forward('AcmeEsBattleBundle:Planification:list');
-
-		return $response;
+		return $this->redirect($this->generateUrl('acme_es_battle_planification_admin'), 301);
 	}
 }

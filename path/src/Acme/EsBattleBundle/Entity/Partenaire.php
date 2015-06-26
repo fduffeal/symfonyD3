@@ -103,6 +103,11 @@ class Partenaire {
 	 */
 	protected $videos;
 
+	/**
+	 * @ORM\OneToMany(targetEntity="UserPartenaire",mappedBy="partenaire")
+	 */
+	protected $userpartenaires;
+
 
 	public function __construct() {
 		$this->videos = new ArrayCollection();
@@ -440,4 +445,37 @@ class Partenaire {
 
 		return $array;
 	}
+
+    /**
+     * Add userpartenaires
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserPartenaire $userpartenaires
+     * @return Partenaire
+     */
+    public function addUserpartenaire(\Acme\EsBattleBundle\Entity\UserPartenaire $userpartenaires)
+    {
+        $this->userpartenaires[] = $userpartenaires;
+
+        return $this;
+    }
+
+    /**
+     * Remove userpartenaires
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserPartenaire $userpartenaires
+     */
+    public function removeUserpartenaire(\Acme\EsBattleBundle\Entity\UserPartenaire $userpartenaires)
+    {
+        $this->userpartenaires->removeElement($userpartenaires);
+    }
+
+    /**
+     * Get userpartenaires
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getUserpartenaires()
+    {
+        return $this->userpartenaires;
+    }
 }

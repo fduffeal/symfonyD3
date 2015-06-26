@@ -284,4 +284,8 @@ class Video
     {
         return $this->logo;
     }
+
+	public function __toString(){
+		return $this->getPartenaire()->getNom().' | '.$this->getDescription();
+	}
 }

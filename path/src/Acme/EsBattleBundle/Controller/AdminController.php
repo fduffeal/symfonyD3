@@ -538,7 +538,7 @@ class AdminController extends Controller
 
 			if($user !== null && $user->isPasswordOk($password) && $user->getRole() !== null){
 				$session = new Session();
-				$session->set('user',$user->_toArrayShort());
+				$session->set('user',serialize($user));
 
                 if($user->isModo()){
                     $session->set('modo',true);
