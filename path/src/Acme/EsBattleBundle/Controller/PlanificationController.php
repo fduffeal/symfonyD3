@@ -4,6 +4,7 @@ namespace Acme\EsBattleBundle\Controller;
 
 use Acme\EsBattleBundle\Entity\Planification;
 use Doctrine\ORM\Query\AST\Join;
+use MyProject\Proxies\__CG__\stdClass;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -276,7 +277,7 @@ class PlanificationController extends Controller
 			->setParameter('currentUserId',$user->getId())
 			->orderBy('v.description', 'ASC');
 
-		return $this->createFormBuilder($planification)
+		$formBuilder = $this->createFormBuilder($planification)
 			->add('titre','text',array('attr' => array('class'=>'form-control')))
 			->add('description','textarea',array('attr' => array('class'=>'form-control')))
 			->add('start','datetime', array(
@@ -297,8 +298,13 @@ class PlanificationController extends Controller
 				'class' => 'AcmeEsBattleBundle:Video',
 				'query_builder' => $queryVideos,
 				'attr' => array('class'=>'form-control')
-			))
-			->getForm();
+			));
+
+		if($user->isModo() == true ){
+			$formBuilder->add('isDefault','checkbox');
+		}
+
+		return $formBuilder->getForm();
 	}
 
 	public function updateAction($id,Request $request){

@@ -72,6 +72,20 @@ class Planification
 	private $image;
 
     /**
+     * @var \Boolean
+     * @ORM\Column(name="isDefault", type="boolean")
+     */
+    private $isDefault;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->isDefault = false;
+    }
+
+    /**
      * Get id
      *
      * @return integer 
@@ -264,4 +278,27 @@ class Planification
 	{
 		$this->updated = new \DateTime();
 	}
+
+    /**
+     * Set isDefault
+     *
+     * @param boolean $isDefault
+     * @return Planification
+     */
+    public function setIsDefault($isDefault)
+    {
+        $this->isDefault = $isDefault;
+
+        return $this;
+    }
+
+    /**
+     * Get isDefault
+     *
+     * @return boolean 
+     */
+    public function getIsDefault()
+    {
+        return $this->isDefault;
+    }
 }
