@@ -102,6 +102,12 @@ class UserGame {
      */
     private  $ext_id;
 
+    /**
+     * @var blob
+     *
+     * @ORM\Column(name="data", type="string",nullable=true)
+     */
+    private  $data;
 
 
 
@@ -404,5 +410,28 @@ class UserGame {
     public function getData5()
     {
         return $this->data_5;
+    }
+
+    /**
+     * Set data
+     *
+     * @param string $data
+     * @return UserGame
+     */
+    public function setData($data)
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    /**
+     * Get data
+     *
+     * @return string 
+     */
+    public function getData()
+    {
+        return $this->data;
     }
 }

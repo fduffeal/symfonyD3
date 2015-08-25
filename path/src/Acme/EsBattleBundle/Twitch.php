@@ -8,7 +8,10 @@ namespace Acme\EsBattleBundle;
 class Twitch
 {
 	const TWITCH_URL = "https://api.twitch.tv";
-
+	const ClIENT_ID = 84813000;
+	const REDIRECT_URL = "http://apidev.esbattle.com/app_dev.php/oauth/twitch";
+	const SCOPE = "user_read";
+	const TOKEN = "dzqdlnqzidé13123RAD3254VT3R3ZR3Zqdzdzlposlkv2432qjdblfkejvzlk453DSF2";
 	/**
 	 * {@inheritDoc}
 	 */
@@ -52,6 +55,28 @@ class Twitch
 	public function getUser($username)
 	{
 		$url = '/kraken/search/channels?q='.$username;
+		return $this->_curl($url);
+	}
+
+	/**
+	 * Follows , Get a user's list of followed channels
+	 * @param $username
+	 * @return mixed
+	 *
+	 */
+	public function getChannelListUser($username)
+	{
+		$url = '/kraken/users/'.$username.'/follows/channels';
+		return $this->_curl($url);
+	}
+
+	public function searchStream($hote){
+		$url = '/kraken/search/streams?q='+$hote;
+		return $this->_curl($url);
+	}
+
+	public function getStream($hote){
+		$url = '/kraken/streams/mllesundyrose';
 		return $this->_curl($url);
 	}
 }

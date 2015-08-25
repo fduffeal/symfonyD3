@@ -320,7 +320,7 @@ acme_es_battle_planification_next_get:
     methods:  [GET]
 
 acme_es_battle_planification_admin:
-    path:     /admin/planification/{offset}/{limit}/
+    path:     /admin/planification/list/{offset}/{limit}/
     defaults: { _controller: AcmeEsBattleBundle:Planification:list, offset: 0, limit: 10 }
 
 acme_es_battle_planification_create:
@@ -328,14 +328,22 @@ acme_es_battle_planification_create:
     defaults: { _controller: AcmeEsBattleBundle:Planification:create }
 
 acme_es_battle_planification_update:
-    path:     /admin/planification/update/{id}
+    path:     /admin/planification/update/{id}/
     defaults: { _controller: AcmeEsBattleBundle:Planification:update }
 
 acme_es_battle_planification_delete:
-    path:     /admin/planification/delete/{id}
+    path:     /admin/planification/delete/{id}/
     defaults: { _controller: AcmeEsBattleBundle:Planification:delete }
+
+acme_es_battle_planification_automatique:
+    path:     /admin/planification/auto
+    defaults: { _controller: AcmeEsBattleBundle:Planification:auto }
 
 acme_es_battle_admin_logout:
     path:     /admin/logout
     defaults: { _controller: AcmeEsBattleBundle:Admin:logout }
+
+acme_es_battle_home:
+    path:     /home
+    defaults: { _controller: AcmeEsBattleBundle:Home:index }
 

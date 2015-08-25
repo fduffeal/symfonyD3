@@ -110,7 +110,8 @@ class Bungie
 				'clan' => $clanName,
 				'backgroundPath' => self::BUNGIE_URL . $value->backgroundPath,
 				'emblemPath' => self::BUNGIE_URL . $value->emblemPath,
-				'characterId' => $value->characterBase->characterId
+				'characterId' => $value->characterBase->characterId,
+				'data'=>serialize($value)
 			);
 		}
 
@@ -148,6 +149,7 @@ class Bungie
 		$userGame->setData3($character['clan']);
 		$userGame->setData4($character['backgroundPath']);
 		$userGame->setData5($character['emblemPath']);
+		$userGame->setData(serialize($character['data']));
 		$userGame->setExtId($character['characterId']);
 		$userGame->setUser($user);
 		$userGame->setPlateform($plaform);
