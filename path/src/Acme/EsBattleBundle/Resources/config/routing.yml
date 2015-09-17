@@ -347,3 +347,7 @@ acme_es_battle_home:
     path:     /home
     defaults: { _controller: AcmeEsBattleBundle:Home:index }
 
+acme_es_battle_news:
+    path: /news/{id}
+    defaults: { _controller: AcmeEsBattleBundle:Home:news }
+

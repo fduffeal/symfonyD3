@@ -1,0 +1,23 @@
+{% block head %}
+<link rel="icon" sizes="16x16" href="{{ asset('favicon.ico') }}" />
+<link rel="stylesheet" href="{{ asset('bundles/esbattle/css/all.css') }}" />
+<link rel="icon" sizes="16x16" href="{{ asset('favicon.ico') }}" />
+<link rel="stylesheet" href="{{ asset('bundles/esbattle/css/all.css') }}" />
+{% endblock %}
+
+<script lang="javascript" src="{{ asset('bundles/esbattle/js/jquery-2.1.4.min.js') }}"></script>
+<script lang="javascript" src="{{ asset('bundles/esbattle/js/masonry.pkgd.min.js') }}"></script>
+
+{% block title 'Esbattle' %}
+
+{% block body %}
+
+{% block content_header %}
+
+{% endblock %}
+
+<div class="container">
+	{% block content %}{% endblock %}
+</div>
+
+{% endblock %}
