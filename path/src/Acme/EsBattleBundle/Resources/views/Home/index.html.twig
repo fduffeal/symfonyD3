@@ -1,0 +1,38 @@
+{% extends 'AcmeEsBattleBundle::front.html.twig' %}
+
+{% block content %}
+
+    <div class="grid">
+        <!-- do not use banner in Masonry layout -->
+        {% for topic in aTopic %}
+            <div class="grid-item">
+                <a href="{{ path('acme_es_battle_news', { 'id': topic.id }) }}">
+
+                    <div class="article-content {{topic.status}}">
+                        <div class="category {{topic.status}}">{{topic.status}}</div>
+                        <div class="title2">{{topic.titre}}</div>
+                        <div class="block-cover">
+                            {% if (topic.vignette) %}
+                            <img class="cover" src="/{{ topic.vignette.webpath }}">
+                            {% endif %}
+                        </div>
+                        <span class="date">{{ topic.created|date("d/m/Y") }}</span>
+
+                        <div class="text">
+                            <span>{{ topic.messages[0].texte |slice(0, 100) |raw}}</span>
+                        </div>
+                        <div class="by">par <span>{{topic.user.username}}</span> | {{topic.nbMessages}} commentaire(s)</div>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        // jQuery
+        $('.grid').masonry({
+            columnWidth: 200,
+            itemSelector: '.grid-item'
+        });
+    </script>
+{% endblock %}
