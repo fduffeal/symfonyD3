@@ -351,3 +351,15 @@ acme_es_battle_news:
     path: /news/{id}
     defaults: { _controller: AcmeEsBattleBundle:Home:news }
 
+acme_es_battle_admin_matchmaking_create:
+    path:     /admin/matchmaking/add
+    defaults: { _controller: AcmeEsBattleBundle:Matchmaking:add }
+
+acme_es_battle_admin_matchmaking_update:
+    path:     /admin/matchmaking/update/{id}
+    defaults: { _controller: AcmeEsBattleBundle:Matchmaking:update }
+
+acme_es_battle_admin_matchmaking:
+    path:     /admin/matchmaking/
+    defaults: { _controller: AcmeEsBattleBundle:Matchmaking:retrieve }
+

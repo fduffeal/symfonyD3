@@ -1,0 +1,84 @@
+{% extends 'AcmeEsBattleBundle::layout.html.twig' %}
+{% block content %}
+
+    <form action="#" method="post">
+        {{ form_widget(form) }}
+        <input type="submit" value="Valider"  class="btn btn-primary">
+    </form>
+
+    <div id="bibliotheque" style="padding-top: 70px" class="close">
+        <h2>Selectionnez une image</h2>
+        <ul>
+            {% for document in documents %}
+                <li>
+                    <img width="150" id="document_{{ document.id }}"  src="/{{ document.webpath }}" alt="{{ document.name }}" onclick="setVignette({{ document.id }},'{{ document.webpath }}',this)"/>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <div class="action">
+            <span type="button" onclick="closeBiblio()"  class="btn btn-primary">Valider</span>
+        </div>
+    </div>
+
+    <script>
+
+        $('#form_vignette').on( "click", function(event ) {
+            openBiblio($( this ));
+        });
+
+        var currentInput = null;
+        var currentImgPrevisu = null;
+
+        var biblioNode = document.getElementById('bibliotheque');
+
+        var setCurrent = function(elm){
+            currentInput = elm;
+            var name = currentInput[0].id+'_previsu';
+            console.log(name)
+            currentImgPrevisu = document.getElementById(name);
+        };
+
+        var setVignette = function(id,webpath,elm){
+            var ul = elm.parentNode.parentNode;
+            var aSelected = ul.getElementsByClassName('selected');
+            for(var key in aSelected){
+                if(typeof aSelected[key] == "object" ){
+                    aSelected[key].setAttribute('class','');
+                }
+            }
+            elm.setAttribute('class','selected');
+            currentInput[0].value = id;
+            currentInput.show();
+            if(currentImgPrevisu !== null){
+                currentImgPrevisu.setAttribute('src','/'+webpath);
+            }
+        };
+
+        var closeBiblio = function(){
+            biblioNode.setAttribute('class','close');
+        };
+
+        var openBiblioFor = function(name){
+            var elm = document.getElementById(name);
+            if(elm !== null){
+                elm.click();
+            }
+        };
+
+        var openBiblio = function(elm){
+            setCurrent(elm);
+            biblioNode.setAttribute('class','open');
+
+            ;
+
+            var currenValue = elm.find(":selected")[0].value;
+            var currentDocument = document.getElementById('document_'+currenValue);
+            if(currentDocument != null){
+                currentDocument.click();
+            }
+
+            elm.hide()
+        };
+    </script>
+{% endblock %}
