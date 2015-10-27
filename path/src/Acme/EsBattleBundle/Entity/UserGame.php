@@ -103,9 +103,9 @@ class UserGame {
     private  $ext_id;
 
     /**
-     * @var blob
+     * @var text
      *
-     * @ORM\Column(name="data", type="string",nullable=true)
+     * @ORM\Column(name="data", type="text",nullable=true)
      */
     private  $data;
 
@@ -328,6 +328,7 @@ class UserGame {
             'data3' => $this->getData3(),
             'data4' => $this->getData4(),
             'data5' => $this->getData5(),
+            'data'  => $this->getData(),
             'extId' => $this->getExtId()
         );
     }
@@ -432,6 +433,8 @@ class UserGame {
      */
     public function getData()
     {
-        return $this->data;
+
+        return  unserialize($this->data);
+
     }
 }

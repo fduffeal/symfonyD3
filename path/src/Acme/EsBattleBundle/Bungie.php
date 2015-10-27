@@ -111,7 +111,7 @@ class Bungie
 				'backgroundPath' => self::BUNGIE_URL . $value->backgroundPath,
 				'emblemPath' => self::BUNGIE_URL . $value->emblemPath,
 				'characterId' => $value->characterBase->characterId,
-				'data'=>serialize($value)
+				'data'=>$value
 			);
 		}
 
