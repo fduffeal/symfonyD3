@@ -94,6 +94,77 @@ class RdvController extends Controller
         return $response;
     }
 
+    public function getByPlateformAction($plateformId)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $query = $em->createQuery(
+            'SELECT rdv
+            FROM AcmeEsBattleBundle:Appointment rdv
+            JOIN rdv.plateform plateform
+            where plateform.id = :plateformId
+            ORDER BY rdv.updated DESC'
+        )->setParameter('plateformId', $plateformId)
+            ->setMaxResults(1);
+
+        $collection = $query->getResult();
+
+        $response = new Response();
+        $response->setPublic();
+        // définit l'âge max des caches privés ou des caches partagés
+        $response->setMaxAge(30);
+        $response->setSharedMaxAge(30);
+        $response->headers->set('Content-Type', 'application/json');
+
+        if(!$collection[0]){
+            return $response;
+        }
+
+        $response->setLastModified($collection[0]->getUpdated());
+
+        // Vérifie que l'objet Response n'est pas modifié
+        // pour un objet Request donné
+        if ($response->isNotModified($this->getRequest())) {
+            // Retourne immédiatement un objet 304 Response
+            return $response;
+        }
+
+        $now = date('Y-m-d H:i:s',strtotime('-2 day', time()));
+
+        $query = $em->createQuery(
+            'SELECT rdv,usersGame, tags, plateform, game, user, leader
+            FROM AcmeEsBattleBundle:Appointment rdv
+            JOIN rdv.usersGame usersGame
+            JOIN usersGame.user user
+            JOIN rdv.plateform plateform
+            JOIN rdv.game game
+            JOIN rdv.tags tags
+            JOIN rdv.leader leader
+            where rdv.end > :now
+            and plateform.id = :plateformId'
+        )->setParameter('plateformId', $plateformId)
+            ->setParameter('now', $now);
+
+        $collection = $query->getResult();
+
+
+        $aResult = [];
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Appointment $appointment
+         */
+        foreach($collection as $appointment){
+            $aResult[] = $appointment->_toArrayShort();
+        }
+
+        $json = json_encode($aResult);
+
+//        throw new Exception();
+
+        $response->setContent($json);
+
+
+        return $response;
+    }
+
 	public function createAction($plateform,$game,$tags,$description,$start,$duree,$nbParticipant,$userGameId,$vignetteId,$username,$token)
 	{
 
