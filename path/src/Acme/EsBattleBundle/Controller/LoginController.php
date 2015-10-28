@@ -13,10 +13,14 @@ use Symfony\Component\HttpFoundation\Response;
 class LoginController extends Controller
 {
 
+	/**
+	 * @var \Acme\EsBattleBundle\Entity\User $user
+	 */
     private function _updateDestinyCharacter($user){
         $bungie = $this->get('acme_es_battle.bungie');
         $userGameCollection = $user->getUsergames();
         $aGamerTag = [];
+	    $aExternalId = [];
         /**
          * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
          */
@@ -47,10 +51,26 @@ class LoginController extends Controller
 
             if($characters !== null){
                 foreach($characters as $key => $character){
+	                /**
+	                 * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
+	                 */
                     $userGame = $bungie->saveGameUserInfo($character,$user,$plateform,$game);
+	                $aExternalId[] = $userGame->getExtId();
                 }
             }
         }
+
+	    $em = $this->getDoctrine()->getManager();
+	    /**
+	     * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
+	     */
+	    foreach($userGameCollection as $userGame){
+		    if(!in_array($userGame->getExtId(),$aExternalId)){
+			    $em->remove($userGame);
+		    }
+	    }
+	    $em->flush();
+
         return $user;
     }
 
@@ -393,121 +413,4 @@ class LoginController extends Controller
 
         return $response;
 	}
-
-    public function updateUserGameAction($plateformId,$gameId,$profilId,$profilName,$gameUsername,$data1,$data2,$data3,$data4,$username,$apikey){
-
-        $user = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:User')
-            ->findOneBy(
-                array('username' => $username,'apikey'=>$apikey)
-            );
-
-        if($user === null){
-	        $response = new Response();
-	        $response->setStatusCode(401);
-	        return $response;
-        }
-
-        $plateform = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:Plateform')
-            ->findOneBy(
-                array('id' => $plateformId)
-            );
-
-        $game = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:Game')
-            ->findOneBy(
-                array('id' => $gameId)
-            );
-
-
-        $userGame = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:UserGame')
-            ->findOneBy(
-                array('id' => $profilId,'user' => $user)
-            );
-
-        if($userGame === null){
-
-            $response = new Response();
-            $response->setStatusCode(401);
-            return $response;
-
-
-        }
-
-        $userGame->setUser($user);
-        $userGame->setPlateform($plateform);
-        $userGame->setGame($game);
-        $userGame->setGameProfilName($profilName);
-        $userGame->setGameUsername($gameUsername);
-        $userGame->setData1($data1);
-        $userGame->setData2($data2);
-        $userGame->setData3($data3);
-        $userGame->setData4($data4);
-
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($userGame);
-        $em->flush();
-
-        $json = $user->_toJsonPrivate();
-
-	    $response = new Response();
-        $response->headers->set('Content-Type', 'application/json');
-	    $response->setContent($json);
-	    return $response;
-
-    }
-
-    public function createUserGameAction($plateformId,$gameId,$profilName,$gameUsername,$data1,$data2,$data3,$data4,$username,$apikey){
-
-        $response = new Response();
-        $response->headers->set('Content-Type', 'application/json');
-        $user = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:User')
-            ->findOneBy(
-                array('username' => $username,'apikey'=>$apikey)
-            );
-
-        if($user === null){
-            $response->setStatusCode(401);
-            return $response;
-        }
-
-        $plateform = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:Plateform')
-            ->findOneBy(
-                array('id' => $plateformId)
-            );
-
-        $game = $this->getDoctrine()
-            ->getRepository('AcmeEsBattleBundle:Game')
-            ->findOneBy(
-                array('id' => $gameId)
-            );
-
-        /**
-         * @var \Acme\EsBattleBundle\Entity\UserGame $userGame
-         */
-        $userGame = new UserGame();
-        $userGame->setUser($user);
-        $userGame->setPlateform($plateform);
-        $userGame->setGame($game);
-        $userGame->setGameProfilName($profilName);
-        $userGame->setGameUsername($gameUsername);
-        $userGame->setData1($data1);
-        $userGame->setData2($data2);
-        $userGame->setData3($data3);
-        $userGame->setData4($data4);
-
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($userGame);
-        $em->flush();
-
-        $json = $user->_toJsonPrivate();
-
-        $response->setContent($json);
-        return $response;
-
-    }
 }

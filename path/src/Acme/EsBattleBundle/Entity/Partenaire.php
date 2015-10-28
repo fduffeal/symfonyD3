@@ -33,28 +33,28 @@ class Partenaire {
 	/**
 	 * @var string
 	 *
-	 * @ORM\Column(name="description", type="string", length=255)
+	 * @ORM\Column(name="description", type="string", length=255,nullable=true)
 	 */
 	private $description;
 
 	/**
 	 * @var string
 	 *
-	 * @ORM\Column(name="youtube", type="string", length=255)
+	 * @ORM\Column(name="youtube", type="string", length=255,nullable=true)
 	 */
 	private $youtube;
 
 	/**
 	 * @var string
 	 *
-	 * @ORM\Column(name="twitch", type="string", length=255)
+	 * @ORM\Column(name="twitch", type="string", length=255,nullable=true)
 	 */
 	private $twitch;
 
 	/**
 	 * @var string
 	 *
-	 * @ORM\Column(name="facebook", type="string", length=255)
+	 * @ORM\Column(name="facebook", type="string", length=255,nullable=true)
 	 */
 	private $facebook;
 
@@ -62,7 +62,7 @@ class Partenaire {
 	/**
 	 * @var string
 	 *
-	 * @ORM\Column(name="twitter", type="string", length=255)
+	 * @ORM\Column(name="twitter", type="string", length=255,nullable=true)
 	 */
 	private $twitter;
 
@@ -102,6 +102,11 @@ class Partenaire {
 	 * @ORM\OneToMany(targetEntity="Video",mappedBy="partenaire")
 	 */
 	protected $videos;
+
+	/**
+	 * @ORM\OneToMany(targetEntity="UserPartenaire",mappedBy="partenaire")
+	 */
+	protected $userpartenaires;
 
 
 	public function __construct() {
@@ -440,4 +445,37 @@ class Partenaire {
 
 		return $array;
 	}
+
+    /**
+     * Add userpartenaires
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserPartenaire $userpartenaires
+     * @return Partenaire
+     */
+    public function addUserpartenaire(\Acme\EsBattleBundle\Entity\UserPartenaire $userpartenaires)
+    {
+        $this->userpartenaires[] = $userpartenaires;
+
+        return $this;
+    }
+
+    /**
+     * Remove userpartenaires
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserPartenaire $userpartenaires
+     */
+    public function removeUserpartenaire(\Acme\EsBattleBundle\Entity\UserPartenaire $userpartenaires)
+    {
+        $this->userpartenaires->removeElement($userpartenaires);
+    }
+
+    /**
+     * Get userpartenaires
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getUserpartenaires()
+    {
+        return $this->userpartenaires;
+    }
 }

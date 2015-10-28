@@ -53,6 +53,13 @@ class Planification
 	private $end;
 
 	/**
+	 * @var \DateTime
+	 *
+	 * @ORM\Column(name="updated", type="datetime")
+	 */
+	protected $updated;
+
+	/**
 	 * @ORM\ManyToOne(targetEntity="Video")
 	 * @ORM\JoinColumn(name="video_id", referencedColumnName="id")
 	 **/
@@ -63,6 +70,20 @@ class Planification
 	 * @ORM\JoinColumn(name="image_id", referencedColumnName="id")
 	 **/
 	private $image;
+
+    /**
+     * @var \Boolean
+     * @ORM\Column(name="isDefault", type="boolean")
+     */
+    private $isDefault;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->isDefault = false;
+    }
 
     /**
      * Get id
@@ -219,8 +240,65 @@ class Planification
 			'id'=> $this->getId(),
 			'titre'=>$this->getTitre(),
 			'description'=>$this->getDescription(),
+			'start'=>($this->getStart())?$this->getStart()->getTimestamp():null,
+			'end'=>($this->getEnd())?$this->getEnd()->getTimestamp():null,
 			'image'=>($image)?$image->_toArray():null,
 			'video'=>($video)?$video->_toArray():null,
 		);
 	}
+
+    /**
+     * Set updated
+     *
+     * @param \DateTime $updated
+     * @return Planification
+     */
+    public function setUpdated($updated)
+    {
+        $this->updated = $updated;
+
+        return $this;
+    }
+
+    /**
+     * Get updated
+     *
+     * @return \DateTime 
+     */
+    public function getUpdated()
+    {
+        return $this->updated;
+    }
+
+	/**
+	 * @ORM\PrePersist
+	 * @ORM\PreUpdate
+	 */
+	public function setUpdatedValue()
+	{
+		$this->updated = new \DateTime();
+	}
+
+    /**
+     * Set isDefault
+     *
+     * @param boolean $isDefault
+     * @return Planification
+     */
+    public function setIsDefault($isDefault)
+    {
+        $this->isDefault = $isDefault;
+
+        return $this;
+    }
+
+    /**
+     * Get isDefault
+     *
+     * @return boolean 
+     */
+    public function getIsDefault()
+    {
+        return $this->isDefault;
+    }
 }

@@ -148,6 +148,11 @@ class User
 	 */
 	protected $avisSurMoi;
 
+	/**
+	 * @ORM\OneToMany(targetEntity="UserPartenaire",mappedBy="user")
+	 */
+	protected $userpartenaires;
+
     public function __construct() {
 	    $this->salt = base_convert(sha1(uniqid(mt_rand(), true)), 16, 36);
         $this->clans = new ArrayCollection();
@@ -914,5 +919,38 @@ class User
     public function getAvisSurMoi()
     {
         return $this->avisSurMoi;
+    }
+
+    /**
+     * Add userpartenaires
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserPartenaire $userpartenaires
+     * @return User
+     */
+    public function addUserpartenaire(\Acme\EsBattleBundle\Entity\UserPartenaire $userpartenaires)
+    {
+        $this->userpartenaires[] = $userpartenaires;
+
+        return $this;
+    }
+
+    /**
+     * Remove userpartenaires
+     *
+     * @param \Acme\EsBattleBundle\Entity\UserPartenaire $userpartenaires
+     */
+    public function removeUserpartenaire(\Acme\EsBattleBundle\Entity\UserPartenaire $userpartenaires)
+    {
+        $this->userpartenaires->removeElement($userpartenaires);
+    }
+
+    /**
+     * Get userpartenaires
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getUserpartenaires()
+    {
+        return $this->userpartenaires;
     }
 }

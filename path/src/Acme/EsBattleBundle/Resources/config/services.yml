@@ -1,6 +1,7 @@
 parameters:
     acme_es_battle.example.class: Acme\EsBattleBundle\Bungie
     acme_es_battle.jeuxvideo.class: Acme\EsBattleBundle\JeuxVideo
+    acme_es_battle.twitch.class: Acme\EsBattleBundle\Twitch
 
 services:
     acme_es_battle.bungie:
@@ -9,6 +10,9 @@ services:
     acme_es_battle.jeuxvideo:
             arguments: []
             class: "%acme_es_battle.jeuxvideo.class%"
+    acme_es_battle.twitch:
+            arguments: ["%twitchapiversion%",@doctrine]
+            class: "%acme_es_battle.twitch.class%"
 #    acme_es_battle.example:
 #        class: %acme_es_battle.example.class%
 #        arguments: [@service_id, "plain_value", %parameter%]

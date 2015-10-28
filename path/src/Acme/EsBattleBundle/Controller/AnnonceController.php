@@ -154,4 +154,67 @@ class AnnonceController extends Controller
 
         return $response;
     }
+
+    public function getByPlateformAction($plateformId){
+
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setPublic();
+
+        $response->setMaxAge(30);
+        $response->setSharedMaxAge(30);
+
+        $em = $this->getDoctrine()->getManager();
+
+        $query = $em->createQuery(
+            'SELECT annonce
+            FROM AcmeEsBattleBundle:Annonce annonce
+            JOIN annonce.plateform plateform
+            where plateform.id = :plateformId
+            ORDER BY annonce.id DESC
+            '
+        )->setParameter('plateformId', $plateformId)->setMaxResults(1);
+
+        $result = $query->getResult();
+
+        if(!$result[0]){
+            return $response;
+        }
+
+        $response->setLastModified($result[0]->getCreated());
+
+        // Vérifie que l'objet Response n'est pas modifié
+        // pour un objet Request donné
+        if ($response->isNotModified($this->getRequest())) {
+            // Retourne immédiatement un objet 304 Response
+            return $response;
+        }
+
+        $query = $em->createQuery(
+            'SELECT annonce
+            FROM AcmeEsBattleBundle:Annonce annonce
+            JOIN annonce.author author
+            JOIN annonce.plateform plateform
+            JOIN annonce.game game
+            JOIN annonce.tags tags
+            where plateform.id = :plateformId
+            ORDER BY annonce.id DESC'
+        )->setParameter('plateformId', $plateformId)->setMaxResults(100);
+
+        $result = $query->getResult();
+        $aResult = [];
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Annonce $annonce
+         */
+        foreach($result as $annonce){
+            $aResult[] = $annonce->_toArrayShort();
+        }
+
+        $json = json_encode($aResult);
+
+
+        $response->setContent($json);
+
+        return $response;
+    }
 }

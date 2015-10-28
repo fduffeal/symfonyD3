@@ -75,8 +75,8 @@ class Appointment
     /**
      * @ORM\ManyToMany(targetEntity="UserGame")
      * @ORM\JoinTable(name="appointment_user_game",
-     *      joinColumns={@ORM\JoinColumn(name="appointment_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="user_game_id", referencedColumnName="id")}
+     *      joinColumns={@ORM\JoinColumn(name="appointment_id", referencedColumnName="id",onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="user_game_id", referencedColumnName="id",onDelete="CASCADE")}
      *      )
      **/
     private $usersGame;
@@ -84,8 +84,8 @@ class Appointment
 	/**
 	 * @ORM\ManyToMany(targetEntity="UserGame")
 	 * @ORM\JoinTable(name="appointment_user_game_in_queue",
-	 *      joinColumns={@ORM\JoinColumn(name="appointment_id", referencedColumnName="id")},
-	 *      inverseJoinColumns={@ORM\JoinColumn(name="user_game_id", referencedColumnName="id")}
+	 *      joinColumns={@ORM\JoinColumn(name="appointment_id", referencedColumnName="id", onDelete="CASCADE")},
+	 *      inverseJoinColumns={@ORM\JoinColumn(name="user_game_id", referencedColumnName="id", onDelete="CASCADE")}
 	 *      )
 	 **/
 	private $usersGameInQueue;
@@ -93,8 +93,8 @@ class Appointment
     /**
      * @ORM\ManyToMany(targetEntity="UserGame")
      * @ORM\JoinTable(name="appointment_user_game_invite",
-     *      joinColumns={@ORM\JoinColumn(name="appointment_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="user_game_id", referencedColumnName="id")}
+     *      joinColumns={@ORM\JoinColumn(name="appointment_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="user_game_id", referencedColumnName="id", onDelete="CASCADE")}
      *      )
      **/
     private $usersGameInvite;

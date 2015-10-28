@@ -1,40 +1,18 @@
 {% extends 'AcmeEsBattleBundle::layout.html.twig' %}
 {% block content %}
 
-    {% if otherPlanifications %}
-    <h2>Changez l'horaire ,celui ci est déjà pris par les émissions suivantes :</h2>
-    <ul style="padding:0">
-        {% for planification in otherPlanifications %}
-            <li class="list-group-item">
-                {{ planification.start|date("d/m/Y H:i") }} - {{ planification.end|date("d/m/Y H:i") }} > {{ planification.titre }}
-                <br/>{% if planification.video %} <a href="{{ planification.video.url }}">{{ planification.video.url }}</a>{% endif %}
-                <br/>
-                <div class="btn-group-xs">
-                    <a href="{{ path('acme_es_battle_planification_update', { 'id': planification.id }) }}" class="btn btn-default">Modifier</a>
-                    <a href="{{ path('acme_es_battle_planification_delete', { 'id': planification.id }) }}" class="btn btn-default">Supprimer</a>
-                </div>
-            </li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-
     <form action="#" method="post">
-        <div class="form-group">
-            <input type="hidden" name="planificationId" value="{{ planification.id }}">
-        </div>
         {{ form_widget(form) }}
         <input type="submit" value="Valider"  class="btn btn-primary">
     </form>
-
 
     <div id="bibliotheque" style="padding-top: 70px" class="close">
         <h2>Selectionnez une image</h2>
         <ul>
             {% for document in documents %}
-            <li>
-                <img width="150" id="document_{{ document.id }}" src="/{{ document.webpath }}" alt="{{ document.name }}"
-                     onclick="setVignette({{ document.id }},'{{ document.webpath }}',this)"/>
-            </li>
+                <li>
+                    <img width="150" id="document_{{ document.id }}"  src="/{{ document.webpath }}" alt="{{ document.name }}" onclick="setVignette({{ document.id }},'{{ document.webpath }}',this)"/>
+                </li>
             {% endfor %}
         </ul>
 
@@ -45,12 +23,7 @@
 
     <script>
 
-
-//      $(function() {
-//        $( "#form_end_date" ).datepicker();
-//      });
-
-        $('#form_image').on( "click", function(event ) {
+        $('#form_vignette').on( "click", function(event ) {
             openBiblio($( this ));
         });
 

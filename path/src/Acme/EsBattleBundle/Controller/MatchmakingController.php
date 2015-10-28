@@ -9,6 +9,8 @@
 namespace Acme\EsBattleBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
+use Doctrine\ORM\EntityRepository;
 
 use Acme\EsBattleBundle\Entity\User;
 use Acme\EsBattleBundle\Entity\Appointment;
@@ -226,4 +228,166 @@ class MatchmakingController extends Controller
         return $response;
 
 	}
+
+	public function addAction(Request $request){
+        $matchmaking = new Matchmaking();
+
+        $form = $this->createFormBuilder($matchmaking)
+            ->add('description','textarea',array(
+                'required' => true,
+                'attr' => array('class'=>'form-control')
+            ))
+            ->add('icone','text',array(
+                'required' => true,
+                'attr' => array('class'=>'form-control')
+            ))
+            ->add('plateforms','entity', array(
+                'empty_value' => 'Choisissez les plateforms',
+                'required' => true,
+                'class' => 'AcmeEsBattleBundle:Plateform',
+                'property' => 'nom',
+                'multiple' => true,
+                'attr' => array('class'=>'form-control')
+            ))
+            ->add('tags','entity', array(
+                'empty_value' => 'Choisissez les tags',
+                'required' => true,
+                'class' => 'AcmeEsBattleBundle:Tag',
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('u')
+                        ->where('u.poids > 0');
+                },
+                'property' => 'nom',
+                'multiple' => true,
+                'attr' => array('class'=>'form-control')
+            ))
+            ->add('game','entity', array(
+                'empty_value' => 'Choisissez le jeu',
+                'required' => true,
+                'class' => 'AcmeEsBattleBundle:Game',
+                'property' => 'name',
+                'attr' => array('class'=>'form-control')
+            ))
+            ->add('vignette','entity', array(
+                'empty_value' => 'Choisissez une image',
+                'required' => false,
+                'class' => 'AcmeEsBattleBundle:Document',
+                'property' => 'name',
+                'attr' => array('class'=>'form-control')
+            ))
+            ->getForm();
+
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($matchmaking);
+            $em->flush();
+
+            $response = $this->forward('AcmeEsBattleBundle:Matchmaking:admin');
+        } else {
+
+            $collectionDocument = $this->getDoctrine()
+                ->getRepository('AcmeEsBattleBundle:Document')
+                ->findAll();
+
+            $response = $this->render('AcmeEsBattleBundle:Matchmaking:form.html.twig', array(
+                'matchmaking'  => $matchmaking,
+                'form' => $form->createView(),
+                'documents' => $collectionDocument
+            ));
+        }
+
+        return $response;
+    }
+
+    public function updateAction($id,Request $request){
+        /**
+         * @var \Acme\EsBattleBundle\Entity\Matchmaking $matchmaking
+         */
+        $matchmaking = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Matchmaking')
+            ->find($id);
+
+        $form = $this->createFormBuilder($matchmaking)
+            ->add('description','textarea',array(
+                'required' => true,
+                'attr' => array('class'=>'form-control')
+            ))
+            ->add('icone','text',array(
+                'required' => true,
+                'attr' => array('class'=>'form-control')
+            ))
+            ->add('plateforms','entity', array(
+                'empty_value' => 'Choisissez les plateforms',
+                'required' => true,
+                'class' => 'AcmeEsBattleBundle:Plateform',
+                'property' => 'nom',
+                'multiple' => true,
+                'attr' => array('class'=>'form-control')
+            ))
+            ->add('tags','entity', array(
+                'empty_value' => 'Choisissez les tags',
+                'required' => true,
+                'class' => 'AcmeEsBattleBundle:Tag',
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('u')
+                        ->where('u.poids > 0');
+                },
+                'property' => 'nom',
+                'multiple' => true,
+                'attr' => array('class'=>'form-control')
+            ))
+            ->add('game','entity', array(
+                'empty_value' => 'Choisissez le jeu',
+                'required' => true,
+                'class' => 'AcmeEsBattleBundle:Game',
+                'property' => 'name',
+                'attr' => array('class'=>'form-control')
+            ))
+            ->add('vignette','entity', array(
+                'empty_value' => 'Choisissez une image',
+                'required' => false,
+                'class' => 'AcmeEsBattleBundle:Document',
+                'property' => 'name',
+                'attr' => array('class'=>'form-control')
+            ))
+            ->getForm();
+
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($matchmaking);
+            $em->flush();
+
+            $response = $this->forward('AcmeEsBattleBundle:Matchmaking:admin');
+        } else {
+
+            $collectionDocument = $this->getDoctrine()
+                ->getRepository('AcmeEsBattleBundle:Document')
+                ->findAll();
+
+            $response = $this->render('AcmeEsBattleBundle:Matchmaking:form.html.twig', array(
+                'matchmaking'  => $matchmaking,
+                'form' => $form->createView(),
+                'documents' => $collectionDocument
+            ));
+        }
+
+        return $response;
+    }
+
+    public function retrieveAction(){
+        /**
+         * @var \Doctrine\Common\Collections\ArrayCollection $matchmakingCollection
+         */
+        $matchmakingCollection = $this->getDoctrine()
+            ->getRepository('AcmeEsBattleBundle:Matchmaking')
+            ->findAll();
+
+        return $this->render('AcmeEsBattleBundle:Matchmaking:list.html.twig', array(
+            'matchmakings' => $matchmakingCollection
+        ));
+    }
 }

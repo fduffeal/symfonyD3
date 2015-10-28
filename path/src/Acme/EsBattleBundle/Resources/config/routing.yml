@@ -36,6 +36,10 @@ acme_es_battle_rdv:
     path:     /rdv/.{_format}
     defaults: { _controller: AcmeEsBattleBundle:Rdv:index,_format: json }
 
+acme_es_battle_rdv_by_plateform:
+    path:     /rdv/byPlateform/{plateformId}.{_format}
+    defaults: { _controller: AcmeEsBattleBundle:Rdv:getByPlateform,_format: json }
+
 acme_es_battle_rdv_create:
     path:     /rdv/add/{plateform}/{game}/{tags}/{description}/{start}/{duree}/{nbParticipant}/{userGameId}/{vignetteId}/{username}/{token}
     defaults: { _controller: AcmeEsBattleBundle:Rdv:create }
@@ -91,14 +95,6 @@ acme_es_battle_forget_password:
 acme_es_battle_update_password:
     path:     /update_password/{password}/{username}/{apikey}
     defaults: { _controller: AcmeEsBattleBundle:Login:updatePassword }
-
-acme_es_battle_game_data_create:
-    path:     /game_data/create/{plateformId}/{gameId}/{profilName}/{gameUsername}/{data1}/{data2}/{data3}/{data4}/{username}/{apikey}
-    defaults: { _controller: AcmeEsBattleBundle:Login:createUserGame }
-
-acme_es_battle_game_data_update:
-    path:     /game_data/update/{plateformId}/{gameId}/{profilId}/{profilName}/{gameUsername}/{data1}/{data2}/{data3}/{data4}/{username}/{apikey}
-    defaults: { _controller: AcmeEsBattleBundle:Login:updateUserGame }
 
 acme_es_battle_matchmaking_conf:
     path:     /matchmaking/
@@ -169,6 +165,10 @@ acme_es_battle_annonce:
     path:     /annonce.{_format}
     defaults: { _controller: AcmeEsBattleBundle:Annonce:index,_format:json }
 
+acme_es_battle_annonce_by_plateform:
+    path:     /annonce/byPlateform/{plateformId}.{_format}
+    defaults: { _controller: AcmeEsBattleBundle:Annonce:getByPlateform,_format:json }
+
 #acme_es_battle_admin_check_usergame:
 #    path:     /francis/usergame
 #    defaults: { _controller: AcmeEsBattleBundle:Admin:checkUserGame }
@@ -199,11 +199,19 @@ acme_es_battle_admin_topic:
 
 acme_es_battle_admin_partenaire:
     path:     /admin/partenaire
-    defaults: { _controller: AcmeEsBattleBundle:Admin:partenaire }
+    defaults: { _controller: AcmeEsBattleBundle:Partenaire:admin }
 
-acme_es_battle_admin_partenaire_add:
-    path:     /admin/partenaire/add/{id}
-    defaults: { _controller: AcmeEsBattleBundle:Admin:addPartenaire }
+acme_es_battle_admin_partenaire_create:
+    path:     /admin/partenaire/create
+    defaults: { _controller: AcmeEsBattleBundle:Partenaire:create }
+
+acme_es_battle_admin_partenaire_update:
+    path:     /admin/partenaire/update/{id}
+    defaults: { _controller: AcmeEsBattleBundle:Partenaire:update }
+
+acme_es_battle_admin_partenaire_delete:
+    path:     /admin/partenaire/delete/{id}
+    defaults: { _controller: AcmeEsBattleBundle:Partenaire:delete }
 
 acme_es_battle_admin_video:
     path:     /admin/video
@@ -306,23 +314,52 @@ acme_es_battle_planification_get:
     defaults: { _controller: AcmeEsBattleBundle:Planification:index,_format:json }
     methods:  [GET]
 
+acme_es_battle_planification_next_get:
+    path:     /planification/next.{_format}
+    defaults: { _controller: AcmeEsBattleBundle:Planification:next,_format:json }
+    methods:  [GET]
+
 acme_es_battle_planification_admin:
-    path:     /admin/planification
-    defaults: { _controller: AcmeEsBattleBundle:Planification:list }
+    path:     /admin/planification/list/{offset}/{limit}/
+    defaults: { _controller: AcmeEsBattleBundle:Planification:list, offset: 0, limit: 10 }
 
 acme_es_battle_planification_create:
     path:     /admin/planification/create
     defaults: { _controller: AcmeEsBattleBundle:Planification:create }
 
 acme_es_battle_planification_update:
-    path:     /admin/planification/update/{id}
+    path:     /admin/planification/update/{id}/
     defaults: { _controller: AcmeEsBattleBundle:Planification:update }
 
 acme_es_battle_planification_delete:
-    path:     /admin/planification/delete/{id}
+    path:     /admin/planification/delete/{id}/
     defaults: { _controller: AcmeEsBattleBundle:Planification:delete }
+
+acme_es_battle_planification_automatique:
+    path:     /admin/planification/auto
+    defaults: { _controller: AcmeEsBattleBundle:Planification:auto }
 
 acme_es_battle_admin_logout:
     path:     /admin/logout
     defaults: { _controller: AcmeEsBattleBundle:Admin:logout }
+
+acme_es_battle_home:
+    path:     /home
+    defaults: { _controller: AcmeEsBattleBundle:Home:index }
+
+acme_es_battle_news:
+    path: /news/{id}
+    defaults: { _controller: AcmeEsBattleBundle:Home:news }
+
+acme_es_battle_admin_matchmaking_create:
+    path:     /admin/matchmaking/add
+    defaults: { _controller: AcmeEsBattleBundle:Matchmaking:add }
+
+acme_es_battle_admin_matchmaking_update:
+    path:     /admin/matchmaking/update/{id}
+    defaults: { _controller: AcmeEsBattleBundle:Matchmaking:update }
+
+acme_es_battle_admin_matchmaking:
+    path:     /admin/matchmaking/
+    defaults: { _controller: AcmeEsBattleBundle:Matchmaking:retrieve }
 

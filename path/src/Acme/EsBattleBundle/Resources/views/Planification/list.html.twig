@@ -7,16 +7,18 @@
     {% if current %}
     <ul style="padding:0">
         <li class="list-group-item">
-            {{ current.id }} -  {{ current.titre }}
+            {{ current.start|date("d/m/Y H:i") }} - {{ current.end|date("d/m/Y H:i") }}
+            </br>
+            {{ current.titre }}
             </br>
             {{ current.description }}
             </br>
             {% if current.video %}
-            Vidéo : {{ current.video.url }}
+            <a href="{{ current.video.url }}">{{ current.video.url }}</a>
             {%  endif %}
             </br>
             {% if current.image %}
-            Image : {{ current.image.url }}
+                <img src="{{ (current.image)?current.image.src }}">
             {%  endif %}
         </li>
     </ul>
@@ -24,14 +26,41 @@
     <h2>Toutes les planifications</h2>
     <ul style="padding:0">
         {% for planification in planifications %}
-            <li class="list-group-item">
-                {{ planification.id }} -  {{ planification.titre }}
+            <li class="list-group-item
+                {%  if planification.video.partenaire and planification.video.partenaire.id in arrayIdCurrentPartenaire %}
+                    list-group-item-success
+                {% endif %}">
+                {{ planification.start|date("d/m/Y H:i") }} - {{ planification.end|date("d/m/Y H:i") }}
+                {%  if planification.video.partenaire %}
+                    <br>{{ planification.video.partenaire.nom }}
+                {% endif %}
+                <br>{{ planification.titre }}
+                <br/>{% if planification.video %} <a href="{{ planification.video.url }}">{{ planification.video.url }}</a>{% endif %}
                 <br/>
-                <div class="btn-group-xs">
-                    <a href="{{ path('acme_es_battle_planification_update', { 'id': planification.id }) }}" class="btn btn-default">Modifier</a>
-                    <a href="{{ path('acme_es_battle_planification_delete', { 'id': planification.id }) }}" class="btn btn-default">Supprimer</a>
-                </div>
+
+                {%  if planification.video.partenaire and planification.video.partenaire.id in arrayIdCurrentPartenaire %}
+                    <div class="btn-group-xs">
+                        <a href="{{ path('acme_es_battle_planification_update', { 'id': planification.id }) }}" class="btn btn-default">Modifier</a>
+                        <a href="{{ path('acme_es_battle_planification_delete', { 'id': planification.id }) }}" class="btn btn-default">Supprimer</a>
+                    </div>
+                {% endif %}
             </li>
+        {% endfor %}
+    </ul>
+
+    <ul>
+        {% for i in 0..nbPage-1 %}
+            {% if (offset/nbContentByPage - i)|abs < 3 or i < 1 or i > nbPage-2  %}
+            <li>
+                <a href="{{ path('acme_es_battle_planification_admin', { 'offset': i*nbContentByPage,'limit': nbContentByPage}) }}" class="btn btn-default">
+                    {% if offset/nbContentByPage == i %}
+                        <b>{{ i+1 }}</b>
+                    {% else %}
+                        {{ i+1 }}
+                    {% endif %}
+                </a>
+            </li>
+            {% endif %}
         {% endfor %}
     </ul>
 {% endblock %}
