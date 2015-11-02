@@ -176,7 +176,7 @@ class UserController extends Controller
 
 
 
-	        $url = 'http://www.esbattle.com/fr/users/connected?user='.$gameUsername;
+	        $url = 'http://lfg.esbattle.com/fr/users/connected?user='.$gameUsername;
 
 	        $message = \Swift_Message::newInstance()
 		        ->setContentType('text/html')
