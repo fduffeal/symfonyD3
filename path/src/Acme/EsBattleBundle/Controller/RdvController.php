@@ -1028,7 +1028,7 @@ class RdvController extends Controller
         $em->persist($notification);
         $em->flush();
 
-        $url = 'http://lfg.esbattle.com/fr/party/waiting/'.$appointment->getId();
+        $url = 'http://www.esbattle.com/fr/party/waiting/'.$appointment->getId();
 
 
         $message = \Swift_Message::newInstance()
