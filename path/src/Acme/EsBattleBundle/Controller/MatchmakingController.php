@@ -241,6 +241,14 @@ class MatchmakingController extends Controller
                 'required' => true,
                 'attr' => array('class'=>'form-control')
             ))
+            ->add('duree','number',array(
+                'required' => true,
+                'attr' => array('class'=>'form-control')
+            ))
+            ->add('nbParticipant','number',array(
+                'required' => true,
+                'attr' => array('class'=>'form-control')
+            ))
             ->add('plateforms','entity', array(
                 'empty_value' => 'Choisissez les plateforms',
                 'required' => true,
@@ -284,7 +292,7 @@ class MatchmakingController extends Controller
             $em->persist($matchmaking);
             $em->flush();
 
-            $response = $this->forward('AcmeEsBattleBundle:Matchmaking:admin');
+            $response = $this->forward('AcmeEsBattleBundle:Matchmaking:retrieve');
         } else {
 
             $collectionDocument = $this->getDoctrine()
@@ -318,6 +326,14 @@ class MatchmakingController extends Controller
                 'required' => true,
                 'attr' => array('class'=>'form-control')
             ))
+            ->add('duree','number',array(
+                'required' => true,
+                'attr' => array('class'=>'form-control')
+            ))
+            ->add('nbParticipant','number',array(
+                'required' => true,
+                'attr' => array('class'=>'form-control')
+            ))
             ->add('plateforms','entity', array(
                 'empty_value' => 'Choisissez les plateforms',
                 'required' => true,
@@ -361,7 +377,7 @@ class MatchmakingController extends Controller
             $em->persist($matchmaking);
             $em->flush();
 
-            $response = $this->forward('AcmeEsBattleBundle:Matchmaking:admin');
+            $response = $this->forward('AcmeEsBattleBundle:Matchmaking:retrieve');
         } else {
 
             $collectionDocument = $this->getDoctrine()
